@@ -1,6 +1,47 @@
-___.                             .___       __             __                .__     
-\_ |__ _____    ____  __ __    __| _/____ _/  |______    _/  |_  ____   ____ |  |__  
- | __ \\__  \  /    \|  |  \  / __ |\__  \\   __\__  \   \   __\/ __ \_/ ___\|  |  \ 
- | \_\ \/ __ \|   |  \  |  / / /_/ | / __ \|  |  / __ \_  |  | \  ___/\  \___|   Y  \
- |___  (____  /___|  /____/  \____ |(____  /__| (____  /  |__|  \___  >\___  >___|  /
-     \/     \/     \/             \/     \/          \/             \/     \/     \/ 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut</title>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+
+        ::-moz-selection {
+            background: #505050;
+        }
+
+        html,
+        body,
+        .container {
+            overflow: hidden;
+            background-color: black;
+            height: 100%;
+        }
+
+        .container {
+            color: white;
+            display: -webkit-flexbox;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-align: center;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <pre class="center" id="d"></pre>
+    </div>
+    <script src="donut.js"></script>
+</body>
+
+</html>
