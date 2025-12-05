@@ -56,8 +56,8 @@ document.addEventListener("wheel", function(event) {
 }, { passive: false });
 
 // Screen dimensions (characters)
-const SCREEN_WIDTH = 80;
-const SCREEN_HEIGHT = 22;
+const SCREEN_WIDTH = 120;
+const SCREEN_HEIGHT = 35;
 
 // Torus parameters
 const R1 = 1;       // Radius of the tube (cross-section)
@@ -125,8 +125,8 @@ function renderFrame() {
             // Perspective projection with zoom-aware scaling
             // The 30 and 15 are base scale factors for X and Y
 
-            const screenX = Math.floor(40 + 30 * oneOverZ * (cosPhi * circleX * cosZ - t * sinZ));
-            const screenY = Math.floor(12 + 15 * oneOverZ * (cosPhi * circleX * sinZ + t * cosZ));
+            const screenX = Math.floor(60 + 45 * oneOverZ * (cosPhi * circleX * cosZ - t * sinZ));
+            const screenY = Math.floor(17 + 22 * oneOverZ * (cosPhi * circleX * sinZ + t * cosZ));
 
             // ═══════════════════════════════════════════════════════════
             // STEP 4: Calculate surface luminance (lighting)
