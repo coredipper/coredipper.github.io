@@ -13,6 +13,33 @@
                 {left: '$', right: '$', display: false}
             ]
         });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
     <style>
         ::selection {
             background: #505050;
@@ -191,14 +218,15 @@
             margin: 24px 0;
             text-align: center;
         }
-        .diagram-content {
-            display: inline-block;
-            text-align: left;
-            font-family: 'SF Mono', monospace;
-            font-size: 13px;
-            color: #b0b0b0;
-            white-space: pre;
-            overflow-x: auto;
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
         }
         .definition, .theorem {
             background: #0f0f0f;
@@ -433,18 +461,14 @@
             </p>
 
             <figure class="diagram">
-                <div class="diagram-content">                    ┌─────────────────────┐
-                    │   Output  o ∈ O     │
-                    └──────────┬──────────┘
-                               │
-           ┌───────────────────┼───────────────────┐
-           │                   │                   │
-      ┌────┴────┐         ┌────┴────┐         ┌────┴────┐
-      │ i₁∈I_o  │         │ i₂∈I_o  │         │   ...   │
-      └─────────┘         └─────────┘         └─────────┘
-
-              The Interface P(y) ("Mushroom" or "Corolla")</div>
-                <figcaption>A visual representation of a Polynomial Functor. The system offers an Output (the cap) and exposes specific Input ports (the stalks) dependent on that output.</figcaption>
+                <pre class="mermaid">
+flowchart TB
+    O["Output o ∈ O"]
+    O --> I1["i₁ ∈ Iₒ"]
+    O --> I2["i₂ ∈ Iₒ"]
+    O --> I3["···"]
+                </pre>
+                <figcaption>The Interface P(y) — A Polynomial Functor visualized as a "Mushroom" or "Corolla". The system offers an Output (the cap) and exposes specific Input ports (the stalks) dependent on that output.</figcaption>
             </figure>
 
             <h3>3.2 The Isomorphism: Genes and Agents</h3>
@@ -770,17 +794,20 @@
             </div>
 
             <figure class="diagram">
-                <div class="diagram-content">    ┌─────────────────┐         ┌─────────────────┐
-    │  User Request   │────────▶│    Executor     │
-    │       (X)       │         │       (Z)       │
-    └────────┬────────┘         └────────┬────────┘
-             │                           │
-             │                           │
-             ▼                           ▼
-    ┌─────────────────┐         ┌─────────────────┐
-    │  Risk Assessor  │────────▶│    AND Gate     │────▶ Action
-    │       (Y)       │         │      (∧)        │
-    └─────────────────┘         └─────────────────┘</div>
+                <pre class="mermaid">
+flowchart LR
+    X["User Request<br/>(X)"]
+    Z["Executor<br/>(Z)"]
+    Y["Risk Assessor<br/>(Y)"]
+    AND{"AND Gate<br/>(∧)"}
+    A(["Action"])
+
+    X --> Z
+    X --> Y
+    Z --> AND
+    Y --> AND
+    AND --> A
+                </pre>
                 <figcaption>The CFFL implemented in W<sub>Agent</sub>. The Executor cannot act without the token from the Risk Assessor, topologically preventing unilateral execution.</figcaption>
             </figure>
 
