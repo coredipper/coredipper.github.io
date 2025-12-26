@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Bogdan Banu</title>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            background-color: #000;
+            color: #e0e0e0;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        nav {
+            margin-bottom: 48px;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+        .articles {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .article-card {
+            display: block;
+            padding: 24px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .article-card:hover {
+            background: #111;
+            border-color: #333;
+            transform: translateY(-2px);
+        }
+        .article-card h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .article-card .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .article-card .meta {
+            font-size: 12px;
+            color: #666;
+        }
+        .article-card .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #888;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/">&larr; Home</a>
+        </nav>
+
+        <h1>Blog</h1>
+
+        <div class="articles">
+            <a href="/blog/biological-motifs-agentic-control/" class="article-card">
+                <h2>Biological Motifs for Agentic Control</h2>
+                <p class="subtitle">A Categorical Isomorphism between Gene Regulatory Networks and Autonomous Software Architectures</p>
+                <p class="meta">
+                    <span class="tag">Category Theory</span>
+                    <span class="tag">Systems Biology</span>
+                    <span class="tag">AI Agents</span>
+                    Preprint
+                </p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
