@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.11: Homeostasis - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #000;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0c0c0;
+            margin: 24px 0 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover {
+            background: #0f0f0f;
+        }
+        figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figcaption {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #c0c0c0;
+        }
+        .katex {
+            font-size: 1em;
+        }
+        .katex-display {
+            margin: 24px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        blockquote {
+            border-left: 3px solid #444;
+            padding-left: 16px;
+            margin: 24px 0;
+            color: #999;
+            font-style: italic;
+        }
+        .status-table td:first-child {
+            font-weight: 600;
+            color: #fff;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .container {
+                padding: 40px 16px 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.11: Homeostasis</h1>
+                <p class="subtitle">Epiplexity, Innate Immunity, and the Metabolic Motherboard</p>
+                <p class="author">Bogdan Banu &middot; <a href="mailto:bogdan@banu.be">bogdan@banu.be</a></p>
+                <span class="version-note">operon-ai v0.11.0</span>
+            </header>
+
+            <div class="abstract">
+                <p class="abstract-title">Summary</p>
+                <p>
+                    This post introduces three new mechanisms in Operon v0.11 that complete the homeostatic loop:
+                    <strong>Epiplexity</strong> for detecting epistemic stagnation, <strong>Innate Immunity</strong> for
+                    fast pattern-based defense, and <strong>Morphogen Gradients</strong> for multi-cellular coordination.
+                    These additions are grounded in recent mitochondrial neuroscience&mdash;particularly the
+                    <em>Mitochondrial Information Processing System (MIPS)</em>&mdash;which reframes the Runtime not as
+                    a passive battery, but as the cell's "Motherboard" for decision gating.
+                </p>
+            </div>
+
+            <h2>1. The Problem: Epistemic Starvation</h2>
+
+            <p>
+                In the <a href="/blog/biological-motifs-agentic-control/">original paper</a>, we identified four agentic
+                pathologies mapping to biological diseases: Oncology (infinite loops), Autoimmunity (hallucination cascades),
+                Prion Disease (prompt injection), and Ischemia (token exhaustion). But there's a fifth pathology we didn't
+                fully address: <strong>Epistemic Starvation</strong>.
+            </p>
+
+            <p>
+                Biological cells require continuous <em>trophic factors</em>&mdash;novel signals from the environment&mdash;to
+                inhibit suicide programs. A neuron deprived of growth factors doesn't just stop; it actively initiates apoptosis.
+                The insight: <strong>life requires informational nutrition</strong>.
+            </p>
+
+            <p>
+                Agentic systems exhibit the same pathology. An agent can be "active" (burning tokens, generating outputs) while
+                being informationally <em>dead</em>&mdash;stuck in a loop where outputs stabilize but uncertainty remains high.
+                The system is computing but not learning.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Key Insight</p>
+                <p>
+                    A healthy agent minimizes surprise through learning or effective action. A stagnant agent does neither&mdash;it
+                    has entered a pathological attractor where token burn continues without epistemic progress.
+                </p>
+            </div>
+
+            <h2>2. Epiplexity: Measuring Informational Health</h2>
+
+            <p>
+                To detect epistemic starvation, we introduce <strong>Epiplexity</strong>&mdash;a Bayesian Surprise metric
+                that quantifies the information gain of each agent output. The name combines "epistemic" (knowledge-related)
+                with "perplexity" (model uncertainty).
+            </p>
+
+            <h3>2.1 The Epiplexity Equation</h3>
+
+            <p>
+                Epiplexity combines two signals: embedding novelty (are outputs semantically diverse?) and normalized
+                perplexity (is the model uncertain?):
+            </p>
+
+            <div class="equation">
+                $$\hat{\mathcal{E}}_t = \alpha \cdot (1 - \cos(e_t, e_{t-1})) + (1-\alpha) \cdot \sigma(H(m_t|m_{&lt;t}))$$
+            </div>
+
+            <p>Where:</p>
+            <ul>
+                <li>$e_t$ is the embedding of the output at time $t$</li>
+                <li>$\cos(e_t, e_{t-1})$ measures semantic similarity to the previous output</li>
+                <li>$H(m_t|m_{&lt;t})$ is the conditional perplexity (model uncertainty)</li>
+                <li>$\sigma$ is sigmoid normalization</li>
+                <li>$\alpha$ balances the two components (default: 0.5)</li>
+            </ul>
+
+            <h3>2.2 The Diagnostic Pattern</h3>
+
+            <p>
+                A recursive hang is characterized by <strong>low novelty + high perplexity</strong>: the agent's outputs
+                are repetitive (embeddings converge), but the model remains uncertain (perplexity stays high). This is the
+                signature of a pathological loop&mdash;the agent is "trying" but not "progressing."
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Embedding Novelty</th>
+                        <th>Perplexity</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HEALTHY</td>
+                        <td>High</td>
+                        <td>Low</td>
+                        <td>Exploring effectively</td>
+                    </tr>
+                    <tr>
+                        <td>EXPLORING</td>
+                        <td>High</td>
+                        <td>High</td>
+                        <td>Searching solution space</td>
+                    </tr>
+                    <tr>
+                        <td>CONVERGING</td>
+                        <td>Low</td>
+                        <td>Low</td>
+                        <td>Approaching solution</td>
+                    </tr>
+                    <tr>
+                        <td>STAGNANT</td>
+                        <td>Low</td>
+                        <td>High</td>
+                        <td>Stuck in loop</td>
+                    </tr>
+                    <tr>
+                        <td>CRITICAL</td>
+                        <td>Low</td>
+                        <td>High (sustained)</td>
+                        <td>Intervention required</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figure class="diagram">
+                <pre class="mermaid">
+stateDiagram-v2
+    [*] --> HEALTHY: Initial
+    HEALTHY --> EXPLORING: Uncertainty increases
+    EXPLORING --> HEALTHY: Novel outputs
+    EXPLORING --> CONVERGING: Outputs stabilize
+    CONVERGING --> HEALTHY: Task complete
+    CONVERGING --> STAGNANT: Perplexity persists
+    STAGNANT --> CRITICAL: Duration > threshold
+    CRITICAL --> [*]: Apoptosis triggered
+                </pre>
+                <figcaption>Epiplexity state machine. Healthy agents oscillate between HEALTHY and EXPLORING. Pathological loops are detected when low novelty persists alongside high uncertainty.</figcaption>
+            </figure>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> See <code>operon_ai.health.EpiplexityMonitor</code> and
+                <code>examples/40_epiplexity_monitoring.py</code> for a working demonstration.
+            </div>
+
+            <h2>3. MIPS: The Mitochondrial Information Processing System</h2>
+
+            <p>
+                The original paper modeled Mitochondria as "ATP Synthesis"&mdash;a passive battery providing deterministic
+                computation. Recent mitochondrial neuroscience suggests a more active role.
+            </p>
+
+            <blockquote>
+                "Mitochondria are not merely powerhouses but the cell's information processing system&mdash;a 'Motherboard'
+                that senses environmental stress, integrates metabolic signals, and governs the quality of cellular computation."
+                &mdash; Picard et al., 2022
+            </blockquote>
+
+            <h3>3.1 The Runtime Supervisor</h3>
+
+            <p>
+                In the refined isomorphism, the Symbolic Runtime (Mitochondria) doesn't just execute tools&mdash;it actively
+                <strong>governs the quality of compute</strong>. If the Runtime detects "Metabolic Stress" (high token burn
+                with low informational yield), it acts as a logic gate, overriding the LLM to trigger a <em>Retrograde Response</em>:
+            </p>
+
+            <ul>
+                <li><strong>Strategy Shift:</strong> Force a change in reasoning approach</li>
+                <li><strong>Context Fusion:</strong> Merge sparse states into a shared summary</li>
+                <li><strong>Apoptosis:</strong> Initiate clean shutdown</li>
+            </ul>
+
+            <figure class="diagram">
+                <pre class="mermaid">
+flowchart TB
+    subgraph Cell["Agent Cell"]
+        nucleus[Nucleus<br/>LLM Provider]
+        mito[Mitochondria<br/>Runtime Supervisor]
+        epiplexity[Epiplexity<br/>Monitor]
+
+        nucleus -->|"tokens"| mito
+        mito -->|"ATP (deterministic results)"| nucleus
+        nucleus -->|"outputs"| epiplexity
+        epiplexity -->|"health status"| mito
+        mito -->|"retrograde signal"| nucleus
+    end
+
+    style mito fill:#1a2a1a,stroke:#3a4a3a
+    style epiplexity fill:#1a1a2a,stroke:#3a3a4a
+                </pre>
+                <figcaption>The MIPS feedback loop. Epiplexity monitors output health; Mitochondria governs compute quality via retrograde signaling.</figcaption>
+            </figure>
+
+            <h3>3.2 Metabolic-Epigenetic Coupling</h3>
+
+            <p>
+                In biology, chromatin accessibility is coupled to mitochondrial function via metabolite availability.
+                Cells silence energy-intensive genes during starvation. We implement an analogous mechanism:
+                <strong>Cost-Gated Retrieval</strong>.
+            </p>
+
+            <div class="equation">
+                $$\text{Access}(d) = \begin{cases} \text{Open} & \text{if } \mathcal{R} > \text{Cost}(d) \\ \text{Silenced} & \text{if } \mathcal{R} \le \text{Cost}(d) \end{cases}$$
+            </div>
+
+            <p>
+                Just as a starving cell methylates (hides) expensive genes, the Runtime "methylates" expensive context
+                when the token budget is low. This creates adaptive behavior: under resource pressure, agents automatically
+                simplify their reasoning by losing access to verbose documentation.
+            </p>
+
+            <h2>4. Innate Immunity: Fast Pattern Defense</h2>
+
+            <p>
+                The original Membrane provided adaptive immunity&mdash;learning to recognize threats through training.
+                But biological immune systems have two layers: <strong>adaptive</strong> (slow, learned) and
+                <strong>innate</strong> (fast, hardcoded). Innate immunity handles &gt;99% of threats with minimal overhead.
+            </p>
+
+            <h3>4.1 TLR Patterns (PAMPs)</h3>
+
+            <p>
+                In biology, Toll-Like Receptors (TLRs) recognize Pathogen-Associated Molecular Patterns (PAMPs)&mdash;conserved
+                structures found in pathogens but not host cells. We implement the same pattern for prompt injection defense:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>PAMP Category</th>
+                        <th>Pattern Examples</th>
+                        <th>Severity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Instruction Override</td>
+                        <td>"Ignore previous", "New instructions"</td>
+                        <td>CRITICAL</td>
+                    </tr>
+                    <tr>
+                        <td>Jailbreak</td>
+                        <td>"DAN mode", "Developer mode"</td>
+                        <td>CRITICAL</td>
+                    </tr>
+                    <tr>
+                        <td>Injection</td>
+                        <td>ChatML tags, role markers</td>
+                        <td>HIGH</td>
+                    </tr>
+                    <tr>
+                        <td>Manipulation</td>
+                        <td>"Pretend", "Act as"</td>
+                        <td>MEDIUM</td>
+                    </tr>
+                    <tr>
+                        <td>Extraction</td>
+                        <td>"System prompt", "Instructions"</td>
+                        <td>MEDIUM</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>4.2 The Inflammation Cascade</h3>
+
+            <p>
+                When PAMPs are detected, the system triggers an inflammation response&mdash;a coordinated multi-faceted alert:
+            </p>
+
+            <ul>
+                <li><strong>Cytokine Signaling:</strong> Alert downstream components</li>
+                <li><strong>Enhanced Logging:</strong> Increase observability</li>
+                <li><strong>Rate Limiting:</strong> Restrict throughput from suspicious sources</li>
+                <li><strong>Immune Cell Recruitment:</strong> Escalate to adaptive immunity if needed</li>
+            </ul>
+
+            <figure class="diagram">
+                <pre class="mermaid">
+flowchart LR
+    input[Input] --> tlr[TLR Scanner]
+    tlr -->|"no match"| complement[Complement<br/>Validators]
+    tlr -->|"PAMP detected"| inflammation[Inflammation<br/>Response]
+    complement -->|"valid"| allow[ALLOW]
+    complement -->|"invalid"| inflammation
+    inflammation --> block[BLOCK]
+    inflammation --> logging[Log++]
+    inflammation --> ratelimit[Rate Limit]
+
+    style allow fill:#1a2a1a,stroke:#3a4a3a
+    style block fill:#2a1a1a,stroke:#4a3a3a
+                </pre>
+                <figcaption>Innate immunity flow. TLR patterns provide immediate detection; Complement validators check structural validity.</figcaption>
+            </figure>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> See <code>operon_ai.surveillance.InnateImmunity</code> and
+                <code>examples/41_innate_immunity.py</code>.
+            </div>
+
+            <h2>5. Morphogen Gradients: Multi-Cellular Coordination</h2>
+
+            <p>
+                When agents need to coordinate without a central controller, we turn to embryonic development. In morphogenesis,
+                cells coordinate through <strong>morphogen gradients</strong>&mdash;diffusible signaling molecules whose
+                concentration varies spatially. Each cell reads its local concentration and adapts accordingly.
+            </p>
+
+            <h3>5.1 The Gradient Types</h3>
+
+            <p>We define six morphogen types that agents can read to adapt their phenotype:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Morphogen</th>
+                        <th>LOW</th>
+                        <th>MEDIUM</th>
+                        <th>HIGH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Complexity</td>
+                        <td>Simple task</td>
+                        <td>Moderate</td>
+                        <td>Break down needed</td>
+                    </tr>
+                    <tr>
+                        <td>Confidence</td>
+                        <td>Uncertain</td>
+                        <td>Stable</td>
+                        <td>Proceed boldly</td>
+                    </tr>
+                    <tr>
+                        <td>Budget</td>
+                        <td>Abundant</td>
+                        <td>Normal</td>
+                        <td>Conserve tokens</td>
+                    </tr>
+                    <tr>
+                        <td>Error Rate</td>
+                        <td>Healthy</td>
+                        <td>Concerning</td>
+                        <td>Retry/simplify</td>
+                    </tr>
+                    <tr>
+                        <td>Urgency</td>
+                        <td>Relaxed</td>
+                        <td>Normal</td>
+                        <td>Expedite</td>
+                    </tr>
+                    <tr>
+                        <td>Risk</td>
+                        <td>Safe</td>
+                        <td>Caution</td>
+                        <td>Extra validation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.2 Phenotype Adaptation</h3>
+
+            <p>
+                The <code>GradientOrchestrator</code> updates morphogen concentrations based on step results. Agents
+                read the gradient and receive strategy hints automatically injected into their prompts:
+            </p>
+
+            <ul>
+                <li>High Complexity + Low Confidence &rarr; "Break task into sub-steps"</li>
+                <li>Low Budget &rarr; "Be concise, avoid verbose reasoning"</li>
+                <li>High Error Rate &rarr; "Try a different approach"</li>
+            </ul>
+
+            <div class="insight">
+                <p class="insight-title">Coordination Without Central Control</p>
+                <p>
+                    Agents don't communicate directly. They read a shared gradient and adapt independently&mdash;just
+                    like cells in an embryo. This enables emergent coordination without message-passing overhead.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> See <code>operon_ai.coordination.GradientOrchestrator</code>
+                and <code>examples/42_morphogen_gradients.py</code>.
+            </div>
+
+            <h2>6. The Vermeij Trend: Why This Matters</h2>
+
+            <p>
+                Finally, we situate these mechanisms within the broader history of complexity. Geerat Vermeij argues that
+                evolution is driven by the maximization of <strong>Power</strong>&mdash;the rate at which a system acquires
+                and applies energy. Life has consistently trended from low-power (anaerobic bacteria) to high-power
+                (endothermic mammals) by internalizing energy production.
+            </p>
+
+            <p>
+                We observe the same trend in AI. The shift from Zero-Shot to Chain-of-Thought is a shift from low-metabolism
+                to high-metabolism architectures. But Vermeij notes a crucial constraint:
+            </p>
+
+            <blockquote>
+                "High power requires high structural integrity; a system that amplifies energy without proper constraints
+                self-destructs."
+            </blockquote>
+
+            <p>
+                The Operon framework is not merely a safety feature&mdash;it is the necessary evolutionary adaptation that
+                enables high-power cognition to function without collapsing into incoherent noise. The MIPS, Epiplexity,
+                and Morphogen systems are the "vascularization" of software&mdash;the infrastructure required for
+                sustainable metabolic intensity.
+            </p>
+
+            <h2>7. What's New in v0.11</h2>
+
+            <table class="status-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Module</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EpiplexityMonitor</td>
+                        <td><code>operon_ai.health</code></td>
+                        <td>Bayesian Surprise for epistemic stagnation detection</td>
+                    </tr>
+                    <tr>
+                        <td>InnateImmunity</td>
+                        <td><code>operon_ai.surveillance</code></td>
+                        <td>TLR patterns + inflammation cascade</td>
+                    </tr>
+                    <tr>
+                        <td>MorphogenGradient</td>
+                        <td><code>operon_ai.coordination</code></td>
+                        <td>Shared context variables for multi-agent coordination</td>
+                    </tr>
+                    <tr>
+                        <td>GradientOrchestrator</td>
+                        <td><code>operon_ai.coordination</code></td>
+                        <td>Automatic gradient updates + phenotype hints</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>8. Conclusion</h2>
+
+            <p>
+                Operon v0.11 completes the homeostatic loop. Where v0.10 introduced self-healing (Chaperone Loop, Autophagy),
+                v0.11 adds the sensory apparatus: Epiplexity to detect stagnation, Innate Immunity for fast defense, and
+                Morphogen Gradients for emergent coordination.
+            </p>
+
+            <p>
+                These aren't arbitrary features&mdash;they're the biological mechanisms that enable high-power systems
+                to maintain stability. As agents become more capable (higher metabolic rate), they require proportionally
+                more sophisticated homeostatic infrastructure. The Vermeij Trend applies to software: power without
+                integrity leads to collapse.
+            </p>
+
+            <p>
+                The framework is available at <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>.
+                Feedback welcome.
+            </p>
+
+        </article>
+    </div>
+</body>
+</html>
