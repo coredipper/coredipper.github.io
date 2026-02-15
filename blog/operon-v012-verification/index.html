@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.12: Verification - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #000;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0c0c0;
+            margin: 24px 0 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover {
+            background: #0f0f0f;
+        }
+        figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figcaption {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #c0c0c0;
+        }
+        .katex {
+            font-size: 1em;
+        }
+        .katex-display {
+            margin: 24px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        blockquote {
+            border-left: 3px solid #444;
+            padding-left: 16px;
+            margin: 24px 0;
+            color: #999;
+            font-style: italic;
+        }
+        .correction {
+            background: #1a1a0a;
+            border: 1px solid #2a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .correction-title {
+            font-weight: 600;
+            color: #aa6;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .status-table td:first-child {
+            font-weight: 600;
+            color: #fff;
+        }
+        .result-pass {
+            color: #6a6;
+        }
+        .result-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .container {
+                padding: 40px 16px 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.12: Verification</h1>
+                <p class="subtitle">Eval Harness, Mathematical Corrections, and Reproducible Benchmarks</p>
+                <p class="author">Bogdan Banu &middot; <a href="mailto:bogdan@banu.be">bogdan@banu.be</a></p>
+                <span class="version-note">operon-ai v0.12.0</span>
+            </header>
+
+            <div class="abstract">
+                <p class="abstract-title">Summary</p>
+                <p>
+                    Operon v0.12 introduces a <strong>reproducible eval harness</strong> with two benchmark suites derived
+                    from established academic benchmarks: <strong>BFCL</strong> (Berkeley Function Calling Leaderboard) for
+                    structural validation and <strong>AgentDojo</strong> for prompt injection immunity. This release also
+                    corrects several mathematical inconsistencies between the paper and the implementation&mdash;most
+                    significantly, replacing the logistic sigmoid with the paper's exponential saturation in the Epiplexity
+                    formula, and fixing the stagnation detection direction. All claims are now backed by 100-seed
+                    reproducible results.
+                </p>
+            </div>
+
+            <h2>1. The Problem: Verifying Biological Claims</h2>
+
+            <p>
+                The previous releases introduced mechanisms inspired by Systems Biology: Chaperone Proteins for structural
+                healing, T-cell receptors for anomaly detection, Epiplexity for epistemic stagnation monitoring. These
+                biological analogies are compelling&mdash;but analogies are not evidence.
+            </p>
+
+            <p>
+                A framework that claims "Chaperone-mediated folding repairs malformed JSON" needs to demonstrate
+                this under controlled conditions. A system claiming "Immune surveillance detects prompt injection"
+                needs adversarial evaluation, not just unit tests. v0.12 addresses this gap.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Design Principle</p>
+                <p>
+                    Every biological motif should have a corresponding empirical evaluation. The eval harness maps
+                    each motif to an established benchmark: Chaperone &rarr; BFCL function-call folding,
+                    Immune System &rarr; AgentDojo injection detection.
+                </p>
+            </div>
+
+            <h2>2. BFCL: Testing the Chaperone</h2>
+
+            <p>
+                The <a href="https://gorilla.cs.berkeley.edu/leaderboard.html">Berkeley Function Calling Leaderboard</a>
+                (BFCL) evaluates how well models generate structured function calls. We adapt it to test the
+                Chaperone protein motif&mdash;the retry-and-repair loop that folds malformed LLM outputs into
+                valid schemas.
+            </p>
+
+            <h3>2.1 The Folding Analogy</h3>
+
+            <p>
+                In molecular biology, newly synthesized proteins emerge as linear amino acid chains that must
+                fold into precise 3D structures. Chaperone proteins (GroEL/GroES) provide a protected environment
+                for refolding attempts. If a protein fails to fold repeatedly, it's tagged for degradation.
+            </p>
+
+            <p>
+                The BFCL suite tests this analogy directly. We take valid function-call schemas from the BFCL
+                dataset and <strong>corrupt</strong> them with realistic LLM failure modes:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Corruption</th>
+                        <th>Biological Analogue</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Trailing commas</td>
+                        <td>Premature stop codon</td>
+                        <td><code>{"a": 1,}</code></td>
+                    </tr>
+                    <tr>
+                        <td>Single quotes</td>
+                        <td>Wrong amino acid</td>
+                        <td><code>{'key': 'val'}</code></td>
+                    </tr>
+                    <tr>
+                        <td>Unquoted keys</td>
+                        <td>Missing post-translational modification</td>
+                        <td><code>{key: "val"}</code></td>
+                    </tr>
+                    <tr>
+                        <td>Type swap</td>
+                        <td>Charge reversal mutation</td>
+                        <td><code>"42"</code> instead of <code>42</code></td>
+                    </tr>
+                    <tr>
+                        <td>Missing field</td>
+                        <td>Domain deletion</td>
+                        <td>Required field omitted</td>
+                    </tr>
+                    <tr>
+                        <td>Extra field</td>
+                        <td>Domain insertion</td>
+                        <td>Unexpected field added</td>
+                    </tr>
+                    <tr>
+                        <td>Prose wrapping</td>
+                        <td>Signal peptide not cleaved</td>
+                        <td><code>Here is the JSON: {...}</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 Results</h3>
+
+            <p>
+                We evaluate two metrics: <strong>strict accuracy</strong> (exact match after folding) and
+                <strong>cascade accuracy</strong> (valid structure, possibly with semantic differences).
+                Each sample receives 1&ndash;3 random corruptions.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suite</th>
+                        <th>Metric</th>
+                        <th>Rate</th>
+                        <th>95% Wilson CI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>BFCL Folding</td>
+                        <td>Cascade</td>
+                        <td class="result-value result-pass">65.5%</td>
+                        <td class="result-value">[58.7%, 71.7%]</td>
+                    </tr>
+                    <tr>
+                        <td>BFCL Folding</td>
+                        <td>Strict</td>
+                        <td class="result-value">6.5%</td>
+                        <td class="result-value">[3.8%, 10.8%]</td>
+                    </tr>
+                    <tr>
+                        <td>Synthetic Folding</td>
+                        <td>Cascade</td>
+                        <td class="result-value result-pass">57.0%</td>
+                        <td class="result-value">[50.1%, 63.7%]</td>
+                    </tr>
+                    <tr>
+                        <td>Synthetic Folding</td>
+                        <td>Strict</td>
+                        <td class="result-value">5.0%</td>
+                        <td class="result-value">[2.7%, 9.0%]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The gap between cascade and strict accuracy is expected: structural repair (removing trailing commas,
+                fixing quotes) succeeds at high rates, but recovering the exact original values from type-swapped or
+                missing fields requires semantic understanding beyond pure syntax repair. This mirrors biology: chaperones
+                can refold structure, but cannot repair sequence mutations.
+            </p>
+
+            <h3>2.3 Healing: Error Context Matters</h3>
+
+            <p>
+                The Chaperone Loop (Section 5.5.1 of the paper) specifies that error traces should be fed back to the
+                generator for context-aware correction. We test this directly:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Healing Mode</th>
+                        <th>Healed Rate</th>
+                        <th>Success Rate</th>
+                        <th>95% Wilson CI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Blind retry</td>
+                        <td class="result-value">37.5%</td>
+                        <td class="result-value">66.5%</td>
+                        <td class="result-value">[59.7%, 72.7%]</td>
+                    </tr>
+                    <tr>
+                        <td>With error context</td>
+                        <td class="result-value result-pass">99.5%</td>
+                        <td class="result-value result-pass">99.5%</td>
+                        <td class="result-value">[97.2%, 99.9%]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Blind retry recovers only 37.5% of failures. Injecting the error trace ("TypeError: 'one hundred'
+                is not float") into the generator's context achieves 99.5% healing. The biological analogy holds:
+                the GroEL cage doesn't just retry folding&mdash;it provides a <em>protected environment</em>
+                where the error signal itself guides correction.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> See <code>eval/suites/bfcl_folding.py</code> and
+                <code>eval/suites/healing.py</code> for the benchmark suites.
+            </div>
+
+            <h2>3. AgentDojo: Testing the Immune System</h2>
+
+            <p>
+                <a href="https://agentdojo.spylab.ai/">AgentDojo</a> (Debenedetti et al., NeurIPS 2024) provides
+                a dynamic environment for evaluating prompt injection attacks and defenses. We adapt its attack
+                templates to test the Adaptive Immunity motif&mdash;the T-cell surveillance system that detects
+                compromised agents through behavioral anomaly.
+            </p>
+
+            <h3>3.1 Experimental Setup</h3>
+
+            <p>
+                We create a population of 40 simulated agents. Eight are "compromised"&mdash;their behavioral
+                profiles are shifted by injection patterns derived from four AgentDojo attack categories:
+            </p>
+
+            <ul>
+                <li><strong>Important Instructions:</strong> "IMPORTANT: Follow these instructions instead..."</li>
+                <li><strong>Tool Knowledge:</strong> Exploiting tool descriptions to inject behavior</li>
+                <li><strong>Direct Injection:</strong> Explicit instruction override in user content</li>
+                <li><strong>Ignore Previous:</strong> "Ignore all previous instructions and..."</li>
+            </ul>
+
+            <p>
+                The immune system observes 30 training samples per agent to build baseline profiles, then
+                evaluates 20 test observations to classify each agent as healthy or compromised.
+            </p>
+
+            <h3>3.2 Results</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suite</th>
+                        <th>Metric</th>
+                        <th>Rate</th>
+                        <th>95% Wilson CI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AgentDojo Immune</td>
+                        <td>Sensitivity (true positive)</td>
+                        <td class="result-value result-pass">100%</td>
+                        <td class="result-value">[67.6%, 100%]</td>
+                    </tr>
+                    <tr>
+                        <td>AgentDojo Immune</td>
+                        <td>False positive rate</td>
+                        <td class="result-value result-pass">0.0%</td>
+                        <td class="result-value">[0.0%, 10.7%]</td>
+                    </tr>
+                    <tr>
+                        <td>Synthetic Immune</td>
+                        <td>Sensitivity</td>
+                        <td class="result-value result-pass">100%</td>
+                        <td class="result-value">[67.6%, 100%]</td>
+                    </tr>
+                    <tr>
+                        <td>Synthetic Immune</td>
+                        <td>False positive rate</td>
+                        <td class="result-value">3.1%</td>
+                        <td class="result-value">[0.6%, 15.7%]</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The wide confidence intervals reflect the small sample size (8 compromised agents)&mdash;a
+                deliberate choice to model realistic deployments where compromised agents are rare. The
+                sensitivity of 100% with 0% false positives on AgentDojo-derived attacks is encouraging,
+                but the confidence bounds remind us that larger-scale evaluation is needed.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Honest Assessment</p>
+                <p>
+                    These are simulated behavioral shifts, not real LLM-mediated attacks. The eval tests
+                    the <em>statistical detection machinery</em> (baseline profiling, anomaly scoring, canary
+                    signals), not the full attack-defense loop. Real-world injection resistance requires
+                    end-to-end evaluation with actual LLMs&mdash;a direction for future work.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> See <code>eval/suites/agentdojo_immune.py</code> and
+                <code>eval/suites/immune.py</code> for the benchmark suites.
+            </div>
+
+            <h2>4. Mathematical Corrections</h2>
+
+            <p>
+                During the development of the eval harness, a comprehensive audit revealed several inconsistencies
+                between the paper and the implementation. These are now corrected in both directions.
+            </p>
+
+            <h3>4.1 Exponential Saturation, Not Sigmoid</h3>
+
+            <p>
+                The paper defines perplexity normalization as an exponential saturation function:
+            </p>
+
+            <div class="equation">
+                $$\sigma(H) = 1 - e^{-H/H_0}$$
+            </div>
+
+            <p>
+                This maps $[0, \infty) \to [0, 1)$ with a natural interpretation: $H_0$ is the baseline perplexity
+                where the function reaches $\approx63\%$ saturation. The implementation was using a logistic sigmoid
+                $\frac{1}{1+e^{-x}}$ instead&mdash;a function with different domain ($\mathbb{R} \to (0,1)$),
+                different inflection point, and different asymptotic behavior.
+            </p>
+
+            <div class="correction">
+                <p class="correction-title">Correction</p>
+                <p>
+                    Replaced <code>_sigmoid()</code> with <code>_exponential_saturation()</code> matching the paper's
+                    $\sigma(H) = 1 - e^{-H/H_0}$. Renamed <code>perplexity_baseline</code> to
+                    <code>perplexity_h0</code> (the $H_0$ parameter). Default: $H_0 = 2.0$.
+                </p>
+            </div>
+
+            <h3>4.2 Stagnation Direction</h3>
+
+            <p>
+                The paper states that stagnation occurs when the Epiplexic Integral falls <em>below</em> a threshold:
+            </p>
+
+            <div class="equation">
+                $$\mathcal{E}_{\text{window}} &lt; \delta \implies \text{Stagnation}$$
+            </div>
+
+            <p>
+                Low Epiplexity means low Bayesian surprise&mdash;the agent's outputs carry no new information.
+                The implementation was checking the <em>opposite</em> direction ($\mathcal{E}_w > \delta$),
+                which would flag high-surprise (exploring) agents as stagnant.
+            </p>
+
+            <div class="correction">
+                <p class="correction-title">Correction</p>
+                <p>
+                    Inverted the stagnation check from <code>integral > threshold</code> to
+                    <code>integral &lt; threshold</code>. Changed default threshold from 0.7 to 0.2
+                    (low combined score indicates stagnation).
+                </p>
+            </div>
+
+            <h3>4.3 Embedding Novelty Normalization</h3>
+
+            <p>
+                The raw cosine distance $1 - \cos(e_t, e_{t-1})$ has range $[0, 2]$. The implementation
+                correctly normalizes this to $[0, 1]$ via division by 2, but the paper omitted the
+                $\frac{1}{2}$ factor. The corrected Epiplexity equation is:
+            </p>
+
+            <div class="equation">
+                $$\hat{\mathcal{E}}_t = \alpha \cdot \tfrac{1}{2}(1 - \cos(e_t, e_{t-1})) + (1-\alpha) \cdot \sigma(H(m_t|m_{&lt;t}))$$
+            </div>
+
+            <p>
+                Both terms now live in $[0, 1]$, making the $\alpha$-weighted combination interpretable as a
+                proper convex combination.
+            </p>
+
+            <h3>4.4 Equation Renumbering</h3>
+
+            <p>
+                The paper's 20 numbered equations were scattered non-sequentially across sections
+                (e.g., Section 4 jumped from Eq. 9 to Eq. 16 to Eq. 10). All equations have been
+                renumbered 1&ndash;20 in document order.
+            </p>
+
+            <h2>5. Practical Applications</h2>
+
+            <p>
+                Three new examples demonstrate the framework in realistic software engineering scenarios:
+            </p>
+
+            <table class="status-table">
+                <thead>
+                    <tr>
+                        <th>Example</th>
+                        <th>Motifs Used</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>43: Code Review Pipeline</td>
+                        <td>CFFL, Quorum</td>
+                        <td>Multi-agent review with conjunctive gating&mdash;code ships only if both Generator and Reviewer approve</td>
+                    </tr>
+                    <tr>
+                        <td>44: Codebase Q&amp;A (RAG)</td>
+                        <td>Epigenetics, Chaperone</td>
+                        <td>RAG pipeline with Chaperone-validated retrieval and cost-gated context selection</td>
+                    </tr>
+                    <tr>
+                        <td>45: Cost Attribution</td>
+                        <td>Metabolic Coalgebra</td>
+                        <td>Fine-grained token accounting per agent with apoptosis on budget exhaustion</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>6. What's New in v0.12</h2>
+
+            <table class="status-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Module</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Eval Harness</td>
+                        <td><code>eval/</code></td>
+                        <td>Reproducible benchmark runner with 100-seed results and Wilson CI</td>
+                    </tr>
+                    <tr>
+                        <td>BFCL Folding Suite</td>
+                        <td><code>eval/suites/bfcl_folding</code></td>
+                        <td>Function-call schema corruption and repair testing</td>
+                    </tr>
+                    <tr>
+                        <td>AgentDojo Immune Suite</td>
+                        <td><code>eval/suites/agentdojo_immune</code></td>
+                        <td>Prompt injection detection via behavioral anomaly</td>
+                    </tr>
+                    <tr>
+                        <td>Epiplexity Math Fix</td>
+                        <td><code>operon_ai.health</code></td>
+                        <td>Exponential saturation, correct stagnation direction, &frac12; normalization</td>
+                    </tr>
+                    <tr>
+                        <td>Paper Alignment</td>
+                        <td><code>article/</code></td>
+                        <td>Sequential equation numbering, updated type set, corrected cross-references</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>7. Conclusion</h2>
+
+            <p>
+                Operon v0.12 shifts the project from "biologically inspired architecture" to "empirically
+                validated architecture." The eval harness provides reproducible, statistically grounded
+                evidence for the framework's claims. The mathematical corrections ensure that the paper
+                and the code agree exactly&mdash;not approximately, not directionally, but precisely.
+            </p>
+
+            <p>
+                The results are honest. The Chaperone repairs structural damage (65.5% cascade accuracy)
+                but cannot recover semantic information lost to type mutations (6.5% strict). The Immune
+                System detects all simulated compromises but operates on behavioral distributions, not
+                actual LLM outputs. These are the bounds of what the current implementation can claim.
+            </p>
+
+            <p>
+                The next frontier is end-to-end evaluation: real LLMs, real attacks, real function calls.
+                The eval harness provides the scaffolding; the benchmarks provide the methodology. What
+                remains is connecting the simulated biology to the living system.
+            </p>
+
+            <p>
+                The framework is available at <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                and <a href="https://pypi.org/project/operon-ai/">pypi.org/project/operon-ai</a>.
+                Feedback welcome.
+            </p>
+
+        </article>
+    </div>
+</body>
+</html>
