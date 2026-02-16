@@ -785,7 +785,105 @@
                 </tbody>
             </table>
 
-            <h2>7. Conclusion</h2>
+            <h2>7. Interactive Demos</h2>
+
+            <p>
+                Every biological motif in the framework now has a corresponding interactive demo on
+                HuggingFace Spaces. These run entirely in-browser&mdash;no API keys, no setup. Each demo
+                includes curated presets that demonstrate the motif's core behavior: failure modes, recovery
+                dynamics, and parameter sensitivity.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Motif</th>
+                        <th>Space</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Chaperone Folding</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-chaperone">operon-chaperone</a></td>
+                        <td>Recover structured data from malformed LLM output</td>
+                    </tr>
+                    <tr>
+                        <td>Healing Loop + Autophagy</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-healing">operon-healing</a></td>
+                        <td>Chaperone healing loop with error feedback and autophagy context pruning</td>
+                    </tr>
+                    <tr>
+                        <td>Membrane + Innate Immunity</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-membrane">operon-membrane</a></td>
+                        <td>Two-layer defense against prompt injection attacks</td>
+                    </tr>
+                    <tr>
+                        <td>Regenerative Swarm</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-swarm">operon-swarm</a></td>
+                        <td>Worker apoptosis on entropy collapse and regeneration with memory transfer</td>
+                    </tr>
+                    <tr>
+                        <td>Epiplexity Monitor</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-epiplexity">operon-epiplexity</a></td>
+                        <td>Epistemic stagnation detection via Bayesian surprise</td>
+                    </tr>
+                    <tr>
+                        <td>Morphogen Gradients</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-morphogen">operon-morphogen</a></td>
+                        <td>Gradient-based agent coordination without central control</td>
+                    </tr>
+                    <tr>
+                        <td>Signal Cascade</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-cascade">operon-cascade</a></td>
+                        <td>Multi-stage signal amplification pipeline with checkpoints</td>
+                    </tr>
+                    <tr>
+                        <td>Quorum Sensing</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-quorum">operon-quorum</a></td>
+                        <td>Multi-agent voting with 7 consensus strategies</td>
+                    </tr>
+                    <tr>
+                        <td>Feedback Loops</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-feedback">operon-feedback</a></td>
+                        <td>Negative feedback loop homeostasis simulation</td>
+                    </tr>
+                    <tr>
+                        <td>Oscillators</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-oscillator">operon-oscillator</a></td>
+                        <td>Biological oscillator patterns and waveform visualization</td>
+                    </tr>
+                    <tr>
+                        <td>Telomere + Genome</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-lifecycle">operon-lifecycle</a></td>
+                        <td>Agent lifecycle management with telomere shortening and genome configuration</td>
+                    </tr>
+                    <tr>
+                        <td>Mitochondria (MIPS)</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-mitochondria">operon-mitochondria</a></td>
+                        <td>Safe calculator with AST-based parsing&mdash;no injection risk</td>
+                    </tr>
+                    <tr>
+                        <td>ATP Budget</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-budget">operon-budget</a></td>
+                        <td>Multi-currency metabolic energy management</td>
+                    </tr>
+                    <tr>
+                        <td>Complete Cell</td>
+                        <td><a href="https://huggingface.co/spaces/coredipper/operon-cell">operon-cell</a></td>
+                        <td>Full 5-organelle pipeline from input to validated output</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The demos are built with <a href="https://gradio.app">Gradio</a> and deployed from the
+                <code>space-*/</code> directories in the repository. Each includes tunable parameters so
+                that edge cases&mdash;entropy collapse, budget exhaustion, stagnation recovery&mdash;can
+                be explored directly.
+            </p>
+
+            <h2>8. Conclusion</h2>
 
             <p>
                 Operon v0.12 shifts the project from "biologically inspired architecture" to "empirically
@@ -808,8 +906,9 @@
             </p>
 
             <p>
-                The framework is available at <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
-                and <a href="https://pypi.org/project/operon-ai/">pypi.org/project/operon-ai</a>.
+                The framework is available at <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">pypi.org/project/operon-ai</a>, and
+                <a href="https://huggingface.co/coredipper">huggingface.co/coredipper</a> (14 interactive demos).
                 Feedback welcome.
             </p>
 
