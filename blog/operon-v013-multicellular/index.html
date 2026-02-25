@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.13: Multicellular - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #000;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0c0c0;
+            margin: 24px 0 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover {
+            background: #0f0f0f;
+        }
+        figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figcaption {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #c0c0c0;
+        }
+        pre {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+        .katex {
+            font-size: 1em;
+        }
+        .katex-display {
+            margin: 24px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        blockquote {
+            border-left: 3px solid #444;
+            padding-left: 16px;
+            margin: 24px 0;
+            color: #999;
+            font-style: italic;
+        }
+        .correction {
+            background: #1a1a0a;
+            border: 1px solid #2a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .correction-title {
+            font-weight: 600;
+            color: #aa6;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .status-table td:first-child {
+            font-weight: 600;
+            color: #fff;
+        }
+        .result-pass {
+            color: #6a6;
+        }
+        .result-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        a {
+            color: #6af;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .container {
+                padding: 40px 16px 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.13: Multicellular</h1>
+                <p class="subtitle">Plasmid Registry, Denaturation Layers, and Tissue Architecture</p>
+                <p class="author">Bogdan Banu &middot; <a href="mailto:bogdan@banu.be">bogdan@banu.be</a></p>
+                <span class="version-note">operon-ai v0.13.0</span>
+            </header>
+
+            <div class="abstract">
+                <p class="abstract-title">Summary</p>
+                <p>
+                    Operon v0.13 implements five paper concepts across three feature areas:
+                    <strong>Plasmid Registry</strong> for dynamic tool acquisition via horizontal gene transfer (Paper &sect;6.2),
+                    <strong>Denaturation Layers</strong> for wire-level anti-injection filtering (Paper &sect;5.3),
+                    and <strong>Multicellular Organization</strong>&mdash;metabolic-epigenetic coupling, cell type specialization,
+                    and tissue architecture (Paper &sect;6.5). The release adds 64 new tests (760 total, zero regressions),
+                    5 examples, and 2 interactive Gradio demos.
+                </p>
+            </div>
+
+            <h2>1. From Cells to Organisms</h2>
+
+            <p>
+                Previous releases built the individual cell: membrane, mitochondria, chaperone, ribosome, lysosome, nucleus.
+                Each organelle does one thing well. But a cell in isolation is a bacterium. The interesting biology starts
+                when cells specialize, group into tissues, and coordinate as organisms.
+            </p>
+
+            <p>
+                v0.13 crosses that threshold. An agent can now dynamically acquire tools from a shared pool (horizontal
+                gene transfer), protect its wiring from injection cascades (denaturation), and participate in hierarchical
+                multi-agent architectures where topology enforces security (tissues).
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart TB
+                        subgraph Organism["Organism (WiringDiagram)"]
+                            subgraph T1["ClassificationTissue"]
+                                C1[Classifier Cell]
+                            end
+                            subgraph T2["ResearchTissue"]
+                                R1[Researcher Cell]
+                                R2[Researcher Cell]
+                            end
+                            subgraph T3["ValidationTissue"]
+                                V1[Validator Cell]
+                            end
+                            T1 -->|"denatured wire"| T2
+                            T2 -->|"denatured wire"| T3
+                        end
+                        PR[(Plasmid Registry)] -.->|"acquire()"| R1
+                        PR -.->|"acquire()"| R2
+                </div>
+            </div>
+
+            <h2>2. Plasmid Registry: Horizontal Gene Transfer</h2>
+
+            <p>
+                In molecular biology, plasmids are small circular DNA molecules that bacteria exchange via
+                conjugation, transformation, or transduction. A bacterium that acquires a plasmid carrying
+                an antibiotic resistance gene gains that capability without vertical inheritance. This is
+                <em>horizontal gene transfer</em> (HGT)&mdash;the mechanism by which bacteria share tools.
+            </p>
+
+            <p>
+                The paper&rsquo;s Equation 12 formalizes this for agents:
+            </p>
+
+            <div class="equation">
+                $$\text{Agent}_\text{new} = \text{Agent}_\text{old} \otimes \text{ToolSchema}$$
+            </div>
+
+            <p>
+                The tensor product $\otimes$ extends the agent&rsquo;s polynomial interface with a new tool.
+                In implementation, the <code>PlasmidRegistry</code> acts as the environmental gene pool,
+                and <code>Mitochondria.acquire()</code> performs the uptake:
+            </p>
+
+<pre>
+registry = PlasmidRegistry()
+registry.register(Plasmid(
+    name="reverse",
+    description="Reverse a string",
+    func=lambda s: s[::-1],
+    tags=frozenset({"text"}),
+))
+registry.register(Plasmid(
+    name="fetch",
+    description="Fetch a URL",
+    func=lambda url: f"&lt;html&gt;{url}&lt;/html&gt;",
+    required_capabilities=frozenset({Capability.NET}),
+))
+
+mito = Mitochondria(allowed_capabilities={Capability.READ_FS})
+
+mito.acquire("reverse", registry)       # OK
+mito.acquire("fetch", registry)          # Blocked: needs NET
+
+mito.metabolize('reverse("hello")')      # "olleh"
+mito.release("reverse")                  # Plasmid curing
+</pre>
+
+            <h3>2.1 Capability Gating</h3>
+
+            <p>
+                The critical constraint is capability gating. A plasmid&rsquo;s
+                <code>required_capabilities</code> must be a subset of the agent&rsquo;s
+                <code>allowed_capabilities</code>. This prevents privilege escalation&mdash;an agent
+                restricted to filesystem reads cannot absorb a plasmid that requires network access,
+                regardless of what&rsquo;s available in the registry.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Biological Parallel</p>
+                <p>
+                    Bacteria have restriction enzymes that degrade foreign DNA lacking the correct
+                    methylation pattern. Capability gating is the computational equivalent: only
+                    plasmids compatible with the agent&rsquo;s security profile survive uptake.
+                </p>
+            </div>
+
+            <h3>2.2 API Surface</h3>
+
+            <table>
+                <tr><th>Method</th><th>Description</th></tr>
+                <tr><td><code>PlasmidRegistry.register()</code></td><td>Add a plasmid to the gene pool</td></tr>
+                <tr><td><code>PlasmidRegistry.search()</code></td><td>Case-insensitive search by name, description, and tags</td></tr>
+                <tr><td><code>PlasmidRegistry.list_available()</code></td><td>List all plasmids with metadata</td></tr>
+                <tr><td><code>Mitochondria.acquire()</code></td><td>Capability-gated tool uptake from registry</td></tr>
+                <tr><td><code>Mitochondria.release()</code></td><td>Remove tool (plasmid curing)</td></tr>
+            </table>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/organelles/plasmid.py</code>,
+                <code>Mitochondria.acquire()</code> and <code>.release()</code> in <code>operon_ai/organelles/mitochondria.py</code>
+            </div>
+
+            <h2>3. Denaturation Layers: Anti-Prion Defense</h2>
+
+            <p>
+                Prion diseases (Creutzfeldt-Jakob, BSE) cascade because a single misfolded protein
+                refolds its neighbors into the same pathological conformation. The analogy to multi-agent
+                systems is prompt injection cascading: a compromised agent&rsquo;s output, passed as input to
+                the next agent, carries the injection payload forward through the pipeline.
+            </p>
+
+            <p>
+                The paper (&sect;5.3) prescribes <em>denaturation</em>&mdash;wire-level transformation that
+                destroys the syntactic structure injections rely on, without destroying semantic content.
+                Like heat denaturing a protein unfolds its tertiary structure, these filters unfold the
+                markup structure that carries the attack.
+            </p>
+
+            <h3>3.1 Four Filter Strategies</h3>
+
+            <table>
+                <tr><th>Filter</th><th>Strategy</th><th>Targets</th></tr>
+                <tr>
+                    <td><code>StripMarkupFilter</code></td>
+                    <td>Pattern removal</td>
+                    <td>Code blocks, ChatML (<code>&lt;|im_start|&gt;</code>), <code>[INST]</code> tags, XML role tags, role delimiters</td>
+                </tr>
+                <tr>
+                    <td><code>NormalizeFilter</code></td>
+                    <td>Canonical form</td>
+                    <td>Lowercase, strip control chars, Unicode NFKC (collapses homoglyphs)</td>
+                </tr>
+                <tr>
+                    <td><code>SummarizeFilter</code></td>
+                    <td>Compression</td>
+                    <td>Truncation + prefix, whitespace collapsing</td>
+                </tr>
+                <tr>
+                    <td><code>ChainFilter</code></td>
+                    <td>Composition</td>
+                    <td>Apply multiple filters in sequence (left-to-right)</td>
+                </tr>
+            </table>
+
+            <h3>3.2 Wire-Level Integration</h3>
+
+            <p>
+                Filters attach to wires, not to modules. The <code>Wire</code> dataclass gains an optional
+                <code>denature</code> field, and <code>DiagramExecutor</code> applies the filter automatically
+                as data flows through the wire:
+            </p>
+
+<pre>
+diagram = WiringDiagram()
+diagram.add_module(ModuleSpec(
+    name="agent_a",
+    outputs={"resp": PortType(DataType.TEXT, IntegrityLabel.VALIDATED)},
+))
+diagram.add_module(ModuleSpec(
+    name="agent_b",
+    inputs={"data": PortType(DataType.TEXT, IntegrityLabel.VALIDATED)},
+))
+
+diagram.connect(
+    "agent_a", "resp", "agent_b", "data",
+    denature=ChainFilter(filters=(
+        StripMarkupFilter(),
+        NormalizeFilter(),
+    )),
+)
+</pre>
+
+            <div class="insight">
+                <p class="insight-title">Why Wire-Level?</p>
+                <p>
+                    Filtering at the wire level rather than the module level is the key design decision.
+                    Module-level filtering depends on each agent implementing it correctly&mdash;a behavioral
+                    property. Wire-level filtering is a topological property: it&rsquo;s enforced by the wiring
+                    diagram itself, regardless of what the modules do. Safety from structure, not from strings.
+                </p>
+            </div>
+
+            <h3>3.3 Backward Compatibility</h3>
+
+            <p>
+                The <code>denature</code> field defaults to <code>None</code>. Existing wires, diagrams, and
+                executor calls work unchanged. The filter is only applied when explicitly attached. This makes
+                denaturation opt-in and composable: you can denature inter-tissue wires while leaving intra-tissue
+                wires raw.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/core/denature.py</code> (filters),
+                <code>Wire.denature</code> in <code>operon_ai/core/wagent.py</code>,
+                denaturation block in <code>DiagramExecutor.execute()</code> in <code>operon_ai/core/wiring_runtime.py</code>
+            </div>
+
+            <h2>4. Multicellular Organization</h2>
+
+            <p>
+                The remaining three features complete the paper&rsquo;s &sect;6.5 hierarchy:
+                Cell &rarr; Tissue &rarr; Organ &rarr; Organism.
+            </p>
+
+            <h3>4.1 Metabolic-Epigenetic Coupling</h3>
+
+            <p>
+                Memory retrieval now costs energy. A <code>MetabolicAccessPolicy</code> defines which marker
+                strengths are accessible at each metabolic state:
+            </p>
+
+            <table>
+                <tr><th>Metabolic State</th><th>Accessible Markers</th><th>Analogy</th></tr>
+                <tr><td>FEASTING / NORMAL</td><td>All (WEAK+)</td><td>Fed cell: full chromatin access</td></tr>
+                <tr><td>CONSERVING</td><td>STRONG+ only</td><td>Stressed cell: silences weak enhancers</td></tr>
+                <tr><td>STARVING</td><td>PERMANENT only</td><td>Starving cell: only constitutive genes active</td></tr>
+                <tr><td>DORMANT</td><td>None</td><td>Dormant spore: full chromatin compaction</td></tr>
+            </table>
+
+            <p>
+                The coupling is optional. <code>HistoneStore</code> without an <code>energy_gate</code> behaves
+                exactly as before.
+            </p>
+
+            <h3>4.2 Cell Type Specialization</h3>
+
+            <p>
+                Every cell in your body shares the same DNA but expresses different gene programs. A neuron
+                silences muscle genes; a liver cell silences neuron genes. The same genome, different phenotypes.
+            </p>
+
+            <p>
+                <code>CellType</code> + <code>ExpressionProfile</code> implement this pattern. A
+                <code>CellType</code> defines which genes to overexpress, silence, or leave at baseline.
+                Calling <code>differentiate(genome)</code> produces a <code>DifferentiatedCell</code> with
+                the appropriate configuration:
+            </p>
+
+<pre>
+classifier = CellType(
+    name="Classifier",
+    expression_profile=ExpressionProfile(overrides={
+        "classification": ExpressionLevel.OVEREXPRESSED,
+        "verification": ExpressionLevel.SILENCED,
+    }),
+    required_capabilities={Capability.NET},
+)
+cell = classifier.differentiate(genome)
+</pre>
+
+            <h3>4.3 Tissue Architecture</h3>
+
+            <p>
+                Cells form tissues&mdash;groups sharing a morphogen gradient and a security boundary
+                (<code>TissueBoundary</code>). The boundary defines:
+            </p>
+
+            <ul>
+                <li><strong>Input/output ports</strong>&mdash;typed channels for inter-tissue communication</li>
+                <li><strong>Allowed capabilities</strong>&mdash;the maximum capability set for any cell in the tissue</li>
+            </ul>
+
+            <p>
+                A cell&rsquo;s <code>required_capabilities</code> must be a subset of its tissue&rsquo;s
+                <code>allowed_capabilities</code>. This is capability isolation at the organizational level:
+                a validation tissue with no capabilities cannot contain a researcher cell that requires network access.
+            </p>
+
+            <p>
+                Tissues export themselves as <code>ModuleSpec</code> objects, so they can be composed into
+                organism-level <code>WiringDiagram</code>s:
+            </p>
+
+<pre>
+organism = WiringDiagram()
+organism.add_module(classification_tissue.as_module())
+organism.add_module(research_tissue.as_module())
+organism.add_module(validation_tissue.as_module())
+
+organism.connect("ClassificationTissue", "label",
+                 "ResearchTissue", "query")
+organism.connect("ResearchTissue", "findings",
+                 "ValidationTissue", "draft")
+</pre>
+
+            <div class="insight">
+                <p class="insight-title">Compositionality</p>
+                <p>
+                    The same <code>WiringDiagram</code> that wires modules within a cell also wires
+                    tissues within an organism. This is the category-theoretic compositionality the paper
+                    prescribes: the same mathematical object at every level of the hierarchy.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/multicell/cell_type.py</code>,
+                <code>operon_ai/multicell/tissue.py</code>,
+                <code>operon_ai/state/metabolism.py</code> (<code>MetabolicAccessPolicy</code>)
+            </div>
+
+            <h2>5. Test Coverage</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Denaturation Layers</td>
+                    <td class="result-value">35</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Plasmid Registry / HGT</td>
+                    <td class="result-value">29</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Metabolic-Epigenetic Coupling</td>
+                    <td class="result-value">14</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Cell Type Specialization</td>
+                    <td class="result-value">18</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Tissue Architecture</td>
+                    <td class="result-value">14</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Existing (regression)</td>
+                    <td class="result-value">650</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr style="border-top: 2px solid #333;">
+                    <td><strong>Total</strong></td>
+                    <td class="result-value"><strong>760</strong></td>
+                    <td class="result-pass"><strong>All pass</strong></td>
+                </tr>
+            </table>
+
+            <h2>6. Examples and Demos</h2>
+
+            <h3>6.1 Examples</h3>
+
+            <table>
+                <tr><th>Example</th><th>Feature</th></tr>
+                <tr><td><code>56_metabolic_epigenetic_coupling.py</code></td><td>Cost-gated memory retrieval under metabolic pressure</td></tr>
+                <tr><td><code>57_cell_type_specialization.py</code></td><td>Differential gene expression &rarr; agent phenotypes</td></tr>
+                <tr><td><code>58_tissue_architecture.py</code></td><td>Hierarchical multi-agent organization with capability isolation</td></tr>
+                <tr><td><code>59_plasmid_registry.py</code></td><td>Dynamic tool acquisition with capability gating</td></tr>
+                <tr><td><code>60_denaturation_layers.py</code></td><td>Wire-level anti-injection filters</td></tr>
+            </table>
+
+            <h3>6.2 Interactive Gradio Demos</h3>
+
+            <p>
+                Two new Hugging Face Spaces provide interactive exploration:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>space-plasmid</strong>&mdash;Create agents with specific capabilities, browse the
+                    registry, acquire/release tools, and execute them. Includes a guided scenario walkthrough.
+                </li>
+                <li>
+                    <strong>space-denature</strong>&mdash;Paste injection payloads and see how each filter
+                    transforms them. Includes a wire comparison tab showing raw vs. denatured data flow
+                    through a live <code>DiagramExecutor</code>.
+                </li>
+            </ul>
+
+            <h2>7. What&rsquo;s Next</h2>
+
+            <p>
+                The gap analysis identifies several remaining paper concepts. The highest-priority items:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Coalgebraic State Machines</strong> (Paper &sect;4.2)&mdash;Formalize agent behavior
+                    as coalgebras with bisimulation equivalence, enabling provable behavioral guarantees.
+                </li>
+                <li>
+                    <strong>Morphogen Diffusion</strong> (Paper &sect;6.4)&mdash;Move from global shared gradients
+                    to locally diffused morphogen fields with spatial decay, enabling true position-dependent
+                    agent behavior.
+                </li>
+                <li>
+                    <strong>Optic-Based Wiring</strong> (Paper &sect;3.3)&mdash;Replace the current lens-based
+                    port model with full optics (prisms, traversals), enabling more expressive wiring patterns.
+                </li>
+            </ul>
+
+            <blockquote>
+                Code and examples: <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+            </blockquote>
+
+        </article>
+    </div>
+</body>
+</html>
