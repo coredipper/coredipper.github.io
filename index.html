@@ -34,6 +34,26 @@
             align-items: center;
             justify-content: center;
         }
+
+        .about-link {
+            position: fixed;
+            bottom: 24px;
+            right: 32px;
+            font-family: monospace;
+            font-size: 14px;
+            text-decoration: none;
+            color: white;
+            animation: fade-to-black 4s ease-in-out infinite alternate;
+        }
+
+        .about-link:hover {
+            color: white;
+        }
+
+        @keyframes fade-to-black {
+            0% { color: white; }
+            100% { color: black; }
+        }
     </style>
 </head>
 
@@ -41,6 +61,7 @@
     <div class="container">
         <pre class="center" id="d"></pre>
     </div>
+    <a href="/about/" class="about-link">about</a>
     <script src="donut.js"></script>
 </body>
 
