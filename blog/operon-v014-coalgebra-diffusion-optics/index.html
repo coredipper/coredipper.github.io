@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.14: Coalgebra, Diffusion, Optics - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #000;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0c0c0;
+            margin: 24px 0 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover {
+            background: #0f0f0f;
+        }
+        figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figcaption {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #c0c0c0;
+        }
+        pre {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+        .katex {
+            font-size: 1em;
+        }
+        .katex-display {
+            margin: 24px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        blockquote {
+            border-left: 3px solid #444;
+            padding-left: 16px;
+            margin: 24px 0;
+            color: #999;
+            font-style: italic;
+        }
+        .correction {
+            background: #1a1a0a;
+            border: 1px solid #2a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .correction-title {
+            font-weight: 600;
+            color: #aa6;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .status-table td:first-child {
+            font-weight: 600;
+            color: #fff;
+        }
+        .result-pass {
+            color: #6a6;
+        }
+        .result-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        a {
+            color: #6af;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .container {
+                padding: 40px 16px 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.14: Coalgebra, Diffusion, Optics</h1>
+                <p class="subtitle">Formal State Machines, Spatially Varying Gradients, and Conditional Wire Routing</p>
+                <p class="author">Bogdan Banu &middot; <a href="mailto:bogdan@banu.be">bogdan@banu.be</a></p>
+                <span class="version-note">operon-ai v0.14.0</span>
+            </header>
+
+            <div class="abstract">
+                <p class="abstract-title">Summary</p>
+                <p>
+                    Operon v0.14 implements three paper gaps:
+                    <strong>Coalgebraic State Machines</strong> (Paper &sect;4.2) for composable
+                    observation and evolution with bisimulation equivalence,
+                    <strong>Morphogen Diffusion</strong> (Paper &sect;6.4) for graph-based spatially varying
+                    concentrations that replace the global gradient model, and
+                    <strong>Optic-Based Wiring</strong> (Paper &sect;3.3) for conditional routing (prism)
+                    and collection processing (traversal) on wires.
+                    The release adds 67 new tests (827 total, zero regressions), 3 examples,
+                    and 17 new public exports.
+                </p>
+            </div>
+
+            <h2>1. The Algebra&ndash;Coalgebra Duality</h2>
+
+            <p>
+                v0.13 built the multicellular hierarchy: cells specialize, form tissues, exchange tools.
+                But the individual cell&rsquo;s behavior was still described informally. HistoneStore has
+                a <code>retrieve()</code> method and a <code>store()</code> method. ATP_Store has
+                <code>report()</code> and <code>consume()</code>. CellCycleController has
+                <code>get_phase()</code> and <code>advance()</code>. The pattern is the same each time:
+                <em>observe state</em> and <em>evolve state</em>. But without a shared interface, these
+                machines cannot be composed or compared.
+            </p>
+
+            <p>
+                The paper (&sect;4.2) identifies this as a <em>coalgebra</em>&mdash;the categorical dual
+                of an algebra. Where an algebra builds structure up through constructors, a coalgebra
+                <em>observes</em> structure through destructors. The fundamental signature is:
+            </p>
+
+            <div class="equation">
+                $$\text{readout}: S \to O \qquad \text{update}: S \times I \to S$$
+            </div>
+
+            <p>
+                This is a Mealy machine: a state space $S$, an input alphabet $I$, and an output
+                alphabet $O$. The coalgebraic framing gives us composition for free.
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart LR
+                        subgraph Parallel["Parallel (S1 &times; S2)"]
+                            direction TB
+                            I1[Input] --> C1["Coalgebra A"]
+                            I1 --> C2["Coalgebra B"]
+                            C1 --> O1["Output A"]
+                            C2 --> O2["Output B"]
+                        end
+                        subgraph Sequential["Sequential (S1 &times; S2)"]
+                            direction TB
+                            I2[Input] --> S1["Coalgebra A"]
+                            S1 -->|"readout"| S2["Coalgebra B"]
+                            S2 --> O3["Output B"]
+                        end
+                </div>
+            </div>
+
+            <h3>1.1 The Coalgebra Protocol</h3>
+
+            <p>
+                The <code>Coalgebra</code> protocol requires exactly two methods:
+            </p>
+
+<pre>
+@runtime_checkable
+class Coalgebra(Protocol[S, I, O]):
+    def readout(self, state: S) -> O: ...
+    def update(self, state: S, inp: I) -> S: ...
+</pre>
+
+            <p>
+                The simplest concrete implementation is <code>FunctionalCoalgebra</code>&mdash;two
+                plain functions wrapped into the protocol:
+            </p>
+
+<pre>
+counter = FunctionalCoalgebra(
+    readout_fn=lambda s: s,       # observe: current total
+    update_fn=lambda s, i: s + i, # evolve: add delta
+)
+
+counter.readout(0)    # 0
+counter.update(0, 5)  # 5
+counter.readout(5)    # 5
+</pre>
+
+            <h3>1.2 StateMachine: Mutable State with Trace</h3>
+
+            <p>
+                <code>StateMachine</code> wraps a coalgebra with a current state, providing an
+                imperative interface and recording every transition as a <code>TransitionRecord</code>:
+            </p>
+
+<pre>
+sm = StateMachine(state=0, coalgebra=counter)
+outputs = sm.run([1, 2, 3, 4, 5])
+# outputs = [0, 1, 3, 6, 10]  (readout before each update)
+# sm.state = 15
+# sm.trace = [TransitionRecord(...), ...]
+</pre>
+
+            <p>
+                The trace is a full audit log: for each step, it records state before, input,
+                output, and state after. Tracing can be disabled per-step with <code>record=False</code>
+                for performance-critical paths.
+            </p>
+
+            <h3>1.3 Composition</h3>
+
+            <p>
+                Two composition operators mirror the biological reality:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>ParallelCoalgebra</strong>&mdash;Two pathways activated by the same signal.
+                    State is $(S_1, S_2)$, output is $(O_1, O_2)$. Both receive the same input.
+                    Analogy: MAPK and PI3K both triggered by EGF binding.
+                </li>
+                <li>
+                    <strong>SequentialCoalgebra</strong>&mdash;Signal transduction cascade. Input goes
+                    to the first coalgebra; its readout becomes the input to the second. Analogy:
+                    receptor activation produces a second messenger that activates an effector.
+                </li>
+            </ul>
+
+            <h3>1.4 Bisimulation</h3>
+
+            <p>
+                Two state machines are <em>bisimilar</em> if no observer can distinguish them&mdash;for
+                every input sequence, they produce the same output sequence. <code>check_bisimulation</code>
+                tests this over a bounded input sequence:
+            </p>
+
+<pre>
+a = StateMachine(state=0, coalgebra=counter_coalgebra())
+b = StateMachine(state=0, coalgebra=counter_coalgebra())
+result = check_bisimulation(a, b, [1, 2, 3, 4, 5])
+# result.equivalent = True
+# result.states_explored = 5
+
+c = StateMachine(state=0, coalgebra=counter_coalgebra())
+d = StateMachine(state=100, coalgebra=counter_coalgebra())
+result = check_bisimulation(c, d, [1, 2, 3])
+# result.equivalent = False
+# result.witness = (1, 0, 100)  -- first diverging input and outputs
+</pre>
+
+            <div class="insight">
+                <p class="insight-title">Biological Parallel</p>
+                <p>
+                    Two cells are bisimilar if they respond identically to all stimuli&mdash;the
+                    definition of &ldquo;same cell type&rdquo; in functional terms. You never compare
+                    internal state directly; you compare observable behavior. This is precisely the
+                    coalgebraic perspective: identity through observation, not through structure.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/core/coalgebra.py</code>
+            </div>
+
+            <h2>2. Morphogen Diffusion</h2>
+
+            <p>
+                v0.13&rsquo;s <code>MorphogenGradient</code> is global: every agent reads the same
+                concentrations. This is like broadcasting a hormone through the bloodstream&mdash;useful,
+                but it misses the key mechanism that patterns embryonic development: <em>spatial diffusion</em>.
+            </p>
+
+            <p>
+                In real embryogenesis, morphogens like Bicoid in <em>Drosophila</em> are secreted from
+                localized sources and diffuse through tissue. Cells near the source see high concentration;
+                cells far away see low concentration. The resulting gradient drives spatially patterned
+                gene expression without any central controller.
+            </p>
+
+            <h3>2.1 Graph-Based Spatial Model</h3>
+
+            <p>
+                Operon agents don&rsquo;t have physical positions (Paper &sect;6.5, line 135). Instead, we
+                use <em>graph adjacency</em> from the wiring topology as the spatial model. Each node is
+                an agent or cell; each edge is a connection through which morphogens can diffuse.
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart LR
+                        S["Source (0.95)"] -->|diffuse| N1["Near (0.42)"]
+                        N1 -->|diffuse| N2["Mid (0.18)"]
+                        N2 -->|diffuse| F["Far (0.07)"]
+                </div>
+            </div>
+
+<pre>
+field = DiffusionField()
+for n in ["Source", "Near", "Mid", "Far"]:
+    field.add_node(n)
+field.add_edge("Source", "Near")
+field.add_edge("Near", "Mid")
+field.add_edge("Mid", "Far")
+
+field.add_source(MorphogenSource(
+    "Source", MorphogenType.COMPLEXITY, emission_rate=0.5
+))
+field.run(50)
+
+# Gradient forms: Source > Near > Mid > Far
+for n in ["Source", "Near", "Mid", "Far"]:
+    c = field.get_concentration(n, MorphogenType.COMPLEXITY)
+    print(f"{n}: {c:.3f}")
+</pre>
+
+            <h3>2.2 The Diffusion Algorithm</h3>
+
+            <p>
+                Each <code>step()</code> applies four phases:
+            </p>
+
+            <ol>
+                <li>
+                    <strong>Emit</strong>&mdash;Each <code>MorphogenSource</code> adds its
+                    <code>emission_rate</code> to its node, capped at <code>max_concentration</code>.
+                </li>
+                <li>
+                    <strong>Diffuse</strong>&mdash;For each node, a <code>diffusion_rate</code>
+                    fraction of concentration flows outward, split evenly among neighbors.
+                    This is a discrete approximation of Fick&rsquo;s law on the graph Laplacian.
+                </li>
+                <li>
+                    <strong>Decay</strong>&mdash;All concentrations are multiplied by
+                    $(1 - \text{decay\_rate})$, modeling morphogen degradation.
+                </li>
+                <li>
+                    <strong>Clamp</strong>&mdash;Values above 1.0 are capped; values below
+                    <code>min_concentration</code> snap to zero, preventing floating-point dust.
+                </li>
+            </ol>
+
+            <div class="definition">
+                <p class="definition-title">Definition: Discrete Graph Diffusion</p>
+                <p>
+                    For node $v$ with neighbors $N(v)$ and concentration $c_v$:
+                </p>
+                <div class="equation">
+                    $$c_v' = \left(c_v + \text{emit}(v) - c_v \cdot d + \sum_{u \in N(v)} \frac{c_u \cdot d}{|N(u)|}\right)(1 - \lambda)$$
+                </div>
+                <p>
+                    where $d$ is the diffusion rate and $\lambda$ is the decay rate.
+                </p>
+            </div>
+
+            <h3>2.3 Tissue Integration</h3>
+
+            <p>
+                <code>Tissue</code> gains an optional <code>diffusion_field</code> parameter. When
+                present, <code>add_cell()</code> registers nodes and <code>connect_cells()</code>
+                registers edges automatically. Two new methods bridge to the existing gradient API:
+            </p>
+
+            <ul>
+                <li>
+                    <code>tissue.diffuse(steps=1)</code>&mdash;Advance the diffusion field.
+                </li>
+                <li>
+                    <code>tissue.get_cell_gradient(name)</code>&mdash;Returns a
+                    <code>MorphogenGradient</code> reflecting local concentrations at that cell.
+                    Falls back to the shared tissue gradient when no diffusion field is configured.
+                </li>
+            </ul>
+
+            <p>
+                When <code>diffusion_field</code> is <code>None</code> (the default), all behavior
+                is identical to v0.13. The integration is fully backward compatible.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Why Graph Adjacency?</p>
+                <p>
+                    Physical coordinates would require inventing a spatial embedding for every
+                    agent topology. Graph adjacency is intrinsic&mdash;it comes directly from the
+                    wiring diagram that already exists. An agent&rsquo;s &ldquo;position&rdquo; is
+                    defined by its connectivity, not by arbitrary coordinates. Two agents that are
+                    three hops apart in the wiring graph are &ldquo;far&rdquo; in the diffusion model.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/coordination/diffusion.py</code>,
+                <code>Tissue.diffuse()</code> and <code>.get_cell_gradient()</code> in
+                <code>operon_ai/multicell/tissue.py</code>
+            </div>
+
+            <h2>3. Optic-Based Wiring</h2>
+
+            <p>
+                v0.13&rsquo;s wiring system uses <code>PortType</code> matching&mdash;a lens-like
+                pattern where data flows through if the types align. This handles the common case
+                but lacks two capabilities the paper describes:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Conditional routing</strong>&mdash;Send data to different destinations
+                    based on its DataType. Currently requires the application to build routing logic
+                    inside module handlers.
+                </li>
+                <li>
+                    <strong>Collection processing</strong>&mdash;Apply a transformation to each
+                    element of a list as it flows through a wire. Currently requires the receiving
+                    module to handle iteration.
+                </li>
+            </ul>
+
+            <p>
+                Optics (Paper &sect;3.3) solve both by adding three optic types to the wiring layer:
+            </p>
+
+            <table>
+                <tr><th>Optic</th><th>Behavior</th><th>Biological Analogy</th></tr>
+                <tr>
+                    <td><code>LensOptic</code></td>
+                    <td>Pass-through (always transmits)</td>
+                    <td>Constitutive expression&mdash;always active</td>
+                </tr>
+                <tr>
+                    <td><code>PrismOptic</code></td>
+                    <td>Conditional routing by DataType</td>
+                    <td>Receptor specificity&mdash;only responds to matching ligand</td>
+                </tr>
+                <tr>
+                    <td><code>TraversalOptic</code></td>
+                    <td>Map transform over list elements</td>
+                    <td>Polymerase processivity&mdash;walks a sequence</td>
+                </tr>
+                <tr>
+                    <td><code>ComposedOptic</code></td>
+                    <td>Sequential composition of optics</td>
+                    <td>Multi-step enzyme cascade</td>
+                </tr>
+            </table>
+
+            <h3>3.1 Prism Routing</h3>
+
+            <p>
+                The prism is the most interesting optic. It accepts a set of <code>DataType</code>
+                values and rejects everything else. When used with fan-out wiring&mdash;one output port
+                connected to multiple prism-filtered wires&mdash;data is routed to the correct
+                destination based on its runtime type:
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart LR
+                        A["Router"] -->|"prism(JSON)"| B["JSON Handler"]
+                        A -->|"prism(ERROR)"| C["Error Handler"]
+                </div>
+            </div>
+
+<pre>
+diagram = WiringDiagram()
+diagram.add_module(ModuleSpec(name="Router", ...))
+diagram.add_module(ModuleSpec(name="JSONHandler", ...))
+diagram.add_module(ModuleSpec(name="ErrorHandler", ...))
+
+diagram.connect("Router", "out", "JSONHandler", "in",
+    optic=PrismOptic(accept=frozenset({DataType.JSON})))
+diagram.connect("Router", "out", "ErrorHandler", "in",
+    optic=PrismOptic(accept=frozenset({DataType.ERROR})))
+
+# At runtime: if Router emits JSON, only JSONHandler receives it.
+# If Router emits ERROR, only ErrorHandler receives it.
+# The rejected module is skipped entirely.
+</pre>
+
+            <p>
+                Three changes to <code>DiagramExecutor</code> make this work:
+            </p>
+
+            <ol>
+                <li>
+                    <strong>Static type bypass</strong>&mdash;When a wire carries an optic,
+                    <code>require_flow_to</code> is skipped. The optic takes responsibility for
+                    type correctness at runtime.
+                </li>
+                <li>
+                    <strong>Output coercion relaxation</strong>&mdash;When all outgoing wires from
+                    a port carry optics, the executor accepts <code>TypedValue</code> as-is without
+                    enforcing DataType matching against the port spec.
+                </li>
+                <li>
+                    <strong>Prism-rejection skip</strong>&mdash;When a module&rsquo;s unfilled inputs
+                    all come from optic wires whose sources have already executed, the module is skipped
+                    with an empty <code>ModuleExecution</code> rather than causing a deadlock.
+                </li>
+            </ol>
+
+            <h3>3.2 Traversal Processing</h3>
+
+            <p>
+                <code>TraversalOptic</code> maps a transform over list elements on the wire:
+            </p>
+
+<pre>
+doubler = TraversalOptic(transform=lambda x: x * 2)
+doubler.transmit([1, 2, 3], DataType.JSON, IntegrityLabel.VALIDATED)
+# [2, 4, 6]
+
+# Single values are treated as one-element collections:
+doubler.transmit(5, DataType.JSON, IntegrityLabel.VALIDATED)
+# 10
+</pre>
+
+            <h3>3.3 Composition and Coexistence</h3>
+
+            <p>
+                <code>ComposedOptic</code> chains optics sequentially: all must accept, and transforms
+                are applied left-to-right. Optics also coexist with <code>DenatureFilter</code>s
+                on the same wire&mdash;denaturation applies first, then the optic:
+            </p>
+
+<pre>
+diagram.connect("A", "out", "B", "in",
+    denature=StripMarkupFilter(),
+    optic=TraversalOptic(transform=str.upper),
+)
+# Data flow: raw value -> strip markup -> uppercase each element -> deliver
+</pre>
+
+            <div class="insight">
+                <p class="insight-title">Why Skip, Not Fallback?</p>
+                <p>
+                    When a prism rejects data, the destination module is skipped entirely rather than
+                    receiving a default value. This mirrors biology: a receptor that doesn&rsquo;t bind
+                    its ligand doesn&rsquo;t activate the downstream pathway with a &ldquo;nothing bound&rdquo;
+                    signal. It simply doesn&rsquo;t activate. Skipping also avoids forcing every handler
+                    behind a prism to include <code>if input is None</code> boilerplate.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/core/optics.py</code>,
+                <code>Wire.optic</code> in <code>operon_ai/core/wagent.py</code>,
+                optic handling in <code>DiagramExecutor.execute()</code> in <code>operon_ai/core/wiring_runtime.py</code>
+            </div>
+
+            <h2>4. Test Coverage</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Coalgebraic State Machines</td>
+                    <td class="result-value">19</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Optic-Based Wiring</td>
+                    <td class="result-value">27</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Morphogen Diffusion</td>
+                    <td class="result-value">21</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Existing (regression)</td>
+                    <td class="result-value">760</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr style="border-top: 2px solid #333;">
+                    <td><strong>Total</strong></td>
+                    <td class="result-value"><strong>827</strong></td>
+                    <td class="result-pass"><strong>All pass</strong></td>
+                </tr>
+            </table>
+
+            <h2>5. Examples</h2>
+
+            <table>
+                <tr><th>Example</th><th>Feature</th></tr>
+                <tr><td><code>61_coalgebraic_state_machines.py</code></td><td>Counter coalgebra, StateMachine with trace, parallel &amp; sequential composition, bisimulation</td></tr>
+                <tr><td><code>62_morphogen_diffusion.py</code></td><td>Linear chain, star topology, competing sources, local gradients</td></tr>
+                <tr><td><code>63_optic_based_wiring.py</code></td><td>Lens, prism routing, traversal transforms, composition, denature coexistence</td></tr>
+            </table>
+
+            <h2>6. What&rsquo;s Next</h2>
+
+            <p>
+                With coalgebra, diffusion, and optics in place, the remaining paper gaps center on
+                higher-order composition and formal verification:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Bisimulation-Based Testing</strong>&mdash;Use coalgebraic equivalence as
+                    a regression test: if a refactored agent is bisimilar to the original over a
+                    representative input suite, the refactor preserves behavior.
+                </li>
+                <li>
+                    <strong>Diffusion-Guided Orchestration</strong>&mdash;Replace the global
+                    <code>GradientOrchestrator</code> with diffusion-field-aware orchestration
+                    where each agent reads its local gradient, not the shared one.
+                </li>
+                <li>
+                    <strong>Optic Composition in Tissue</strong>&mdash;Allow tissues to declare
+                    optic policies on their boundary ports, so inter-tissue wires automatically
+                    carry the tissue&rsquo;s routing and transform constraints.
+                </li>
+            </ul>
+
+            <blockquote>
+                Code and examples: <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+            </blockquote>
+
+        </article>
+    </div>
+</body>
+</html>
