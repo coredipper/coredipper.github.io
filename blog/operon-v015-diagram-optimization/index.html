@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.15: Diagram Optimization - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection {
+            background: #505050;
+        }
+        ::-moz-selection {
+            background: #505050;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            background-color: #000;
+        }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #c0c0c0;
+            margin: 24px 0 12px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .equation {
+            display: block;
+            text-align: center;
+            margin: 24px 0;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover {
+            background: #0f0f0f;
+        }
+        figure {
+            margin: 32px 0;
+            text-align: center;
+        }
+        figcaption {
+            font-size: 14px;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SF Mono', monospace;
+            font-size: 14px;
+            color: #c0c0c0;
+        }
+        pre {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+        .katex {
+            font-size: 1em;
+        }
+        .katex-display {
+            margin: 24px 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        blockquote {
+            border-left: 3px solid #444;
+            padding-left: 16px;
+            margin: 24px 0;
+            color: #999;
+            font-style: italic;
+        }
+        .correction {
+            background: #1a1a0a;
+            border: 1px solid #2a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .correction-title {
+            font-weight: 600;
+            color: #aa6;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .status-table td:first-child {
+            font-weight: 600;
+            color: #fff;
+        }
+        .result-pass {
+            color: #6a6;
+        }
+        .result-value {
+            font-family: 'SF Mono', monospace;
+            font-size: 13px;
+        }
+        a {
+            color: #6af;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            body {
+                font-size: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            .container {
+                padding: 40px 16px 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.15: Diagram Optimization</h1>
+                <p class="subtitle">Cost-Annotated Wiring Diagrams, Categorical Rewriting, and Resource-Aware Execution</p>
+                <p class="author">Bogdan Banu &middot; <a href="mailto:bogdan@banu.be">bogdan@banu.be</a></p>
+                <span class="version-note">operon-ai v0.15.0</span>
+            </header>
+
+            <div class="abstract">
+                <p class="abstract-title">Summary</p>
+                <p>
+                    Operon v0.15 bridges the gap between wiring diagrams as documentation and wiring
+                    diagrams as <strong>optimizable formal objects</strong>. Cost annotations enrich
+                    the wiring category over $(\mathbb{R}_{\geq 0}, +, 0)$, making resource consumption
+                    compositional. A static analyzer identifies parallelism, dead wires, critical paths,
+                    and cost hotspots. Rewriting passes&mdash;behavior-preserving endofunctors&mdash;transform
+                    diagrams into more efficient equivalents. A resource-aware executor gates module
+                    scheduling on MetabolicState, connecting diagram optimization to the metabolic
+                    intelligence framework. The release adds 36 new tests (863 total, zero regressions),
+                    a new paper section (&sect;7), and 1 example.
+                </p>
+            </div>
+
+            <h2>1. The Problem: Diagrams Without Economics</h2>
+
+            <p>
+                v0.14 gave us composable coalgebras, morphogen diffusion, and optic-based routing.
+                The wiring diagram system can describe complex multi-agent topologies with typed ports,
+                integrity labels, prism routing, and traversal transforms. But it has a blind spot:
+                <em>all modules are treated as equally cheap</em>.
+            </p>
+
+            <p>
+                The <code>DiagramExecutor</code> uses naive topological sort. It doesn&rsquo;t know
+                that one module costs 5 ATP and another costs 500. It can&rsquo;t identify that two
+                modules could run in parallel. It doesn&rsquo;t notice that a prism wire can never
+                fire. And it certainly doesn&rsquo;t adapt its behavior when the system is running
+                low on energy.
+            </p>
+
+            <p>
+                Biology solved this problem long ago. Cells don&rsquo;t blindly run every metabolic
+                pathway at full throttle. They perform <em>Flux Balance Analysis</em>&mdash;identifying
+                rate-limiting enzymes, pruning vestigial branches, parallelizing independent pathways,
+                and downregulating non-essential reactions under ATP depletion. The pathway structure
+                itself reveals optimization opportunities.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Abbott &amp; Zardini Insight</p>
+                <p>
+                    Abbott &amp; Zardini (2025) demonstrated that category-theoretic string diagrams
+                    are not just documentation&mdash;they are optimizable formal objects. They derived
+                    FlashAttention &ldquo;on a napkin&rdquo; by analyzing diagram structure to reveal
+                    parallelism and resource opportunities. Operon v0.15 extends this insight to
+                    <em>dynamic</em> multi-agent systems with coalgebraic state, where optimization
+                    decisions depend on runtime metabolic conditions.
+                </p>
+            </div>
+
+            <h2>2. Cost-Annotated Diagrams</h2>
+
+            <p>
+                The foundation is a simple dataclass:
+            </p>
+
+<pre>
+@dataclass(frozen=True)
+class ResourceCost:
+    atp: int = 0           # Energy cost (ATP units)
+    latency_ms: float = 0  # Time cost
+    memory_mb: float = 0   # Memory footprint
+
+    def __add__(self, other):
+        return ResourceCost(
+            atp=self.atp + other.atp,
+            latency_ms=self.latency_ms + other.latency_ms,
+            memory_mb=self.memory_mb + other.memory_mb,
+        )
+</pre>
+
+            <p>
+                <code>ResourceCost</code> composes additively&mdash;the cost of a path through the
+                diagram is the sum of the costs along it. Formally, this is an enrichment of the wiring
+                category over the commutative monoid $(\mathbb{R}_{\geq 0}^3, +, \mathbf{0})$.
+            </p>
+
+            <p>
+                Costs are attached at two levels:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Module cost</strong>&mdash;<code>ModuleSpec</code> gains an optional
+                    <code>cost: ResourceCost</code> field. This is the cost of running the module
+                    (enzyme catalysis).
+                </li>
+                <li>
+                    <strong>Wire cost</strong>&mdash;<code>Wire</code> gains <code>cost: int = 0</code>
+                    (ATP units). This is the transmission cost (metabolite transport between compartments).
+                </li>
+            </ul>
+
+            <p>
+                A second new field, <code>essential: bool = True</code>, marks whether a module can
+                be skipped under metabolic stress. Essential modules (like the Validator in a pipeline)
+                always execute; non-essential modules (like an Enricher or Logger) can be dropped when
+                ATP is scarce.
+            </p>
+
+<pre>
+diagram.add_module(ModuleSpec(
+    "Validator",
+    inputs={"data": pt}, outputs={"valid": pt},
+    cost=ResourceCost(atp=10, latency_ms=20.0),
+    essential=True,  # always runs, even when starving
+))
+diagram.add_module(ModuleSpec(
+    "Enricher",
+    inputs={"data": pt}, outputs={"enriched": pt},
+    cost=ResourceCost(atp=30, latency_ms=50.0),
+    essential=False,  # skipped under ATP depletion
+))
+</pre>
+
+            <p>
+                All annotations are backward-compatible. Modules without cost annotations default to
+                zero cost. Modules without <code>essential</code> default to <code>True</code>.
+                Existing code is unaffected.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>ResourceCost</code>,
+                <code>ModuleSpec.cost</code>, <code>ModuleSpec.essential</code>,
+                <code>Wire.cost</code> in <code>operon_ai/core/wagent.py</code>
+            </div>
+
+            <h2>3. Static Analysis</h2>
+
+            <p>
+                The analyzer examines a <code>WiringDiagram</code> without executing it, extracting
+                structural information that guides optimization.
+            </p>
+
+            <h3>3.1 Dependency Graph and Parallel Groups</h3>
+
+            <p>
+                <code>dependency_graph()</code> builds the adjacency list of module dependencies.
+                <code>find_independent_groups()</code> uses topological layering to identify sets of
+                modules with no mutual dependencies&mdash;these can execute concurrently.
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart LR
+                        A["Parser (5 ATP)"] -->|wire| B["Validator (10 ATP)"]
+                        A -->|wire| C["Enricher (30 ATP)"]
+                        A -->|wire| D["Logger (2 ATP)"]
+                        B --> E["Output (3 ATP)"]
+                        C --> E
+                        D --> E
+                </div>
+            </div>
+
+<pre>
+groups = find_independent_groups(diagram)
+# [{'Parser'}, {'Validator', 'Enricher', 'Logger'}, {'Output'}]
+#                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#                These three can execute in parallel
+</pre>
+
+            <h3>3.2 Dead Wire Detection</h3>
+
+            <p>
+                A wire is &ldquo;dead&rdquo; if it carries a <code>PrismOptic</code> whose accepted
+                types have no intersection with the source port&rsquo;s <code>DataType</code>.
+                Such a wire can never transmit data&mdash;the prism will always reject.
+            </p>
+
+<pre>
+# Source outputs JSON, but the prism only accepts ERROR
+dead_prism = PrismOptic(accept=frozenset({DataType.ERROR}))
+diagram.connect("Parser", "out", "ErrorSink", "err", optic=dead_prism)
+
+dead = find_dead_wires(diagram)
+# [Wire(Parser.out -> ErrorSink.err)]
+</pre>
+
+            <div class="insight">
+                <p class="insight-title">Biological Parallel</p>
+                <p>
+                    Dead wires are vestigial metabolic pathways&mdash;enzymes that never encounter
+                    their substrate. Cells downregulate these through transcriptional silencing.
+                    The optimizer eliminates them outright.
+                </p>
+            </div>
+
+            <h3>3.3 Critical Path</h3>
+
+            <p>
+                The critical path is the longest cost-weighted path through the dependency DAG.
+                It determines the minimum execution time under maximal parallelism&mdash;no
+                schedule can complete faster than the critical path cost.
+            </p>
+
+            <div class="definition">
+                <p class="definition-title">Definition: Critical Path</p>
+                <p>
+                    For a cost-annotated diagram $D = (M, W, c_M, c_W)$, the critical path is:
+                </p>
+                <div class="equation">
+                    $$\text{CP}(D) = \arg\max_{P \in \text{Paths}(D)} \sum_{m \in P} c_M(m) + \sum_{w \in P} c_W(w)$$
+                </div>
+                <p>
+                    In metabolic terms, this is the rate-limiting pathway&mdash;the bottleneck
+                    whose throughput constrains the entire system.
+                </p>
+            </div>
+
+<pre>
+path, cost = critical_path(diagram)
+# path = ['Parser', 'Enricher', 'Output']
+# cost = ResourceCost(atp=38, latency_ms=62.0)
+#
+# The Enricher branch (30 ATP) dominates over
+# Validator (10 ATP) and Logger (2 ATP)
+</pre>
+
+            <h3>3.4 Optimization Suggestions</h3>
+
+            <p>
+                <code>suggest_optimizations()</code> returns human-readable suggestions combining
+                all analyses:
+            </p>
+
+<pre>
+suggestions = suggest_optimizations(diagram)
+# [parallel]   Modules ['Enricher', 'Logger', 'Validator'] can execute concurrently
+# [dead_wire]  Wire Parser.out -> ErrorSink.err can never transmit
+# [cost_hotspot] Module 'Enricher' consumes 30 ATP (58% of total)
+</pre>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/core/analyzer.py</code>
+            </div>
+
+            <h2>4. Rewriting Rules as Endofunctors</h2>
+
+            <p>
+                Each optimization pass is an endofunctor $F : \mathbf{WDiag} \to \mathbf{WDiag}$
+                on the category of wiring diagrams. The critical property: $F$ preserves input-output
+                behavior. An optimized diagram is <em>bisimilar</em> to the original&mdash;no observer
+                can distinguish them.
+            </p>
+
+            <div class="theorem">
+                <p class="theorem-title">Theorem: Optimization Soundness</p>
+                <p>
+                    If $F$ only removes wires that provably never transmit (dead wire elimination)
+                    or reorders modules within the same topological layer (cost-order scheduling),
+                    then $F(D)$ is bisimilar to $D$ for all diagrams $D$.
+                </p>
+            </div>
+
+            <p>
+                Three concrete passes are implemented:
+            </p>
+
+            <table>
+                <tr><th>Pass</th><th>Effect</th><th>Biological Analogy</th></tr>
+                <tr>
+                    <td><code>EliminateDeadWires</code></td>
+                    <td>Remove provably-dead prism wires</td>
+                    <td>Pruning vestigial metabolic branches</td>
+                </tr>
+                <tr>
+                    <td><code>ParallelGrouping</code></td>
+                    <td>Identify concurrent execution groups</td>
+                    <td>Independent pathway compartmentalization</td>
+                </tr>
+                <tr>
+                    <td><code>CostOrderSchedule</code></td>
+                    <td>Prefer cheaper modules first within groups</td>
+                    <td>Low-$K_m$ enzyme preferential activation</td>
+                </tr>
+            </table>
+
+            <p>
+                Passes compose via the <code>optimize()</code> pipeline:
+            </p>
+
+<pre>
+optimized = optimize(diagram)
+# OptimizedDiagram(
+#   passes_applied=['eliminate_dead_wires', 'parallel_grouping', 'cost_order_schedule'],
+#   eliminated_wires=[Wire(Parser.out -> ErrorSink.err)],
+#   parallel_groups=[{'Parser'}, {'Logger', 'Validator', 'Enricher'}, {'Output'}],
+#   schedule=['Parser', 'Logger', 'Validator', 'Enricher', 'Output'],
+# )
+</pre>
+
+            <p>
+                Note the schedule: within the parallel group, Logger (2 ATP) comes before Validator
+                (10 ATP) comes before Enricher (30 ATP). Cheaper modules first, so if a budget cap
+                is hit mid-group, the expensive modules are the ones that get skipped.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>OptimizationPass</code>,
+                <code>EliminateDeadWires</code>, <code>ParallelGrouping</code>,
+                <code>CostOrderSchedule</code>, <code>optimize()</code> in
+                <code>operon_ai/core/optimizer.py</code>
+            </div>
+
+            <h2>5. Resource-Aware Execution</h2>
+
+            <p>
+                The <code>ResourceAwareExecutor</code> replaces the naive topological-sort executor
+                with metabolic-state-gated scheduling. It takes an <code>ATP_Store</code> and adapts
+                its behavior based on energy availability:
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+                    flowchart TB
+                        subgraph FEASTING["NORMAL / FEASTING"]
+                            direction LR
+                            F1["All modules execute"]
+                            F2["Independent groups in parallel"]
+                            F1 --- F2
+                        end
+                        subgraph CONSERVING["CONSERVING"]
+                            direction LR
+                            C1["Cheap modules execute"]
+                            C2["Expensive non-essential deferred"]
+                            C1 --- C2
+                        end
+                        subgraph STARVING["STARVING"]
+                            direction LR
+                            S1["Essential modules only"]
+                            S2["Non-essential skipped"]
+                            S1 --- S2
+                        end
+                        FEASTING -->|"ATP depleting"| CONSERVING
+                        CONSERVING -->|"ATP critical"| STARVING
+                </div>
+            </div>
+
+<pre>
+# Normal state: full parallel execution
+store = ATP_Store(budget=200, silent=True)
+executor = ResourceAwareExecutor(optimized, store, max_workers=4)
+# ... register handlers ...
+report = executor.execute(external_inputs={...})
+# report.execution_order = ['Parser', 'Logger', 'Enricher', 'Validator', 'Output']
+# report.skipped_modules = []
+# report.total_cost = ResourceCost(atp=50)
+
+# Starving state: non-essential modules skipped
+store2 = ATP_Store(budget=100, silent=True)
+store2.consume(92, "drain")  # 8% remaining -> STARVING
+executor2 = ResourceAwareExecutor(optimized, store2)
+report2 = executor2.execute(external_inputs={...})
+# report2.skipped_modules = ['Logger', 'Enricher']
+# Only essential modules (Parser, Validator) execute
+</pre>
+
+            <p>
+                The executor also deducts wire transmission costs from the ATP store. Each module
+                execution and wire transmission is metered, producing a complete
+                <code>ResourceAwareReport</code> with total cost and skipped module tracking.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Biological Parallel</p>
+                <p>
+                    This directly mirrors cellular starvation response. Under ATP depletion, cells
+                    shut down biosynthetic pathways (non-essential) to conserve energy for survival
+                    functions (essential). The <code>essential</code> flag is the software equivalent
+                    of marking a gene as required for viability under stress conditions.
+                </p>
+            </div>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>ResourceAwareExecutor</code>,
+                <code>ResourceAwareReport</code> in <code>operon_ai/core/wiring_runtime.py</code>
+            </div>
+
+            <h2>6. BudgetOptic</h2>
+
+            <p>
+                The <code>BudgetOptic</code> provides wire-level cost capping. It tracks cumulative
+                cost across transmissions and blocks further data flow once the budget is exhausted:
+            </p>
+
+<pre>
+budget = BudgetOptic(max_cost=10)
+budget.can_transmit(DataType.JSON, IntegrityLabel.VALIDATED)  # True
+
+budget.add_cost(8)   # 8/10 spent
+budget.remaining     # 2
+
+budget.add_cost(5)   # 13/10 spent -> over budget
+budget.can_transmit(DataType.JSON, IntegrityLabel.VALIDATED)  # False
+</pre>
+
+            <p>
+                This is allosteric feedback inhibition at the wire level: once a pathway has consumed
+                its energy budget, the pathway shuts down. <code>BudgetOptic</code> composes with
+                existing optics via <code>ComposedOptic</code>, so you can combine cost capping with
+                prism routing or traversal transforms on the same wire.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>BudgetOptic</code> in
+                <code>operon_ai/core/optics.py</code>
+            </div>
+
+            <h2>7. Paper Section</h2>
+
+            <p>
+                A new paper section (&sect;7, <em>Diagram Optimization via Categorical Rewriting</em>)
+                formalizes the above. Key definitions:
+            </p>
+
+            <div class="definition">
+                <p class="definition-title">Definition: Cost-Annotated Wiring Diagram</p>
+                <p>
+                    A tuple $(M, W, c_M, c_W)$ where $M$ is a finite set of modules with typed ports,
+                    $W$ is a set of wires, $c_M : M \to \mathbb{R}_{\geq 0}^3$ assigns resource costs
+                    to modules, and $c_W : W \to \mathbb{Z}_{\geq 0}$ assigns transmission costs to wires.
+                    The path cost is $\sum c_M(m_i) + \sum c_W(w_i)$.
+                </p>
+            </div>
+
+            <p>
+                The section also positions operon&rsquo;s approach relative to Abbott &amp; Zardini:
+                where they optimize static algorithm pipelines, operon optimizes <em>coalgebraic</em>
+                systems with internal state. The MetabolicState-gated executor makes optimization
+                decisions that depend on runtime conditions&mdash;a feature absent from purely
+                structural diagram analysis.
+            </p>
+
+            <h2>8. Test Coverage</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Diagram Analyzer</td>
+                    <td class="result-value">17</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Diagram Optimizer</td>
+                    <td class="result-value">12</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Resource-Aware Executor</td>
+                    <td class="result-value">7</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Existing (regression)</td>
+                    <td class="result-value">827</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr style="border-top: 2px solid #333;">
+                    <td><strong>Total</strong></td>
+                    <td class="result-value"><strong>863</strong></td>
+                    <td class="result-pass"><strong>All pass</strong></td>
+                </tr>
+            </table>
+
+            <h2>9. Example</h2>
+
+            <table>
+                <tr><th>Example</th><th>Feature</th></tr>
+                <tr>
+                    <td><code>65_diagram_optimization.py</code></td>
+                    <td>Cost annotations, static analysis, optimizer passes, naive vs. resource-aware execution, BudgetOptic</td>
+                </tr>
+            </table>
+
+            <h2>10. What&rsquo;s Next</h2>
+
+            <p>
+                With cost-annotated diagrams and resource-aware execution in place, several
+                directions open up:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Learned Rewriting Rules</strong>&mdash;The current optimization passes are
+                    hand-crafted. Learning rewriting rules from execution traces&mdash;identifying
+                    recurring subdiagram patterns and their optimized replacements&mdash;would connect
+                    diagram optimization to program synthesis and equality saturation techniques.
+                </li>
+                <li>
+                    <strong>Cost Profiling</strong>&mdash;Automatically measuring actual module
+                    execution costs and feeding them back as annotations, replacing manual cost
+                    estimates with empirical data.
+                </li>
+                <li>
+                    <strong>Multi-Objective Optimization</strong>&mdash;Balancing ATP, latency, and
+                    memory simultaneously rather than using the current single-objective critical path.
+                    Pareto-optimal schedules for different resource trade-off preferences.
+                </li>
+                <li>
+                    <strong>Tissue-Level Optimization</strong>&mdash;Extending diagram optimization
+                    across tissue boundaries, where inter-tissue wires carry different cost profiles
+                    than intra-tissue wires.
+                </li>
+            </ul>
+
+            <blockquote>
+                Code and examples: <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+            </blockquote>
+
+        </article>
+    </div>
+</body>
+</html>
