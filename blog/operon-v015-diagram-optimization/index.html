@@ -402,12 +402,12 @@
             <div class="insight">
                 <p class="insight-title">The Abbott &amp; Zardini Insight</p>
                 <p>
-                    Abbott &amp; Zardini (2025) demonstrated that category-theoretic string diagrams
-                    are not just documentation&mdash;they are optimizable formal objects. They derived
-                    FlashAttention &ldquo;on a napkin&rdquo; by analyzing diagram structure to reveal
-                    parallelism and resource opportunities. Operon v0.15 extends this insight to
-                    <em>dynamic</em> multi-agent systems with coalgebraic state, where optimization
-                    decisions depend on runtime metabolic conditions.
+                    Abbott &amp; Zardini (2025) introduced Neural Circuit Diagrams&mdash;a diagrammatic
+                    scheme with explicit memory hierarchy awareness&mdash;and used them to derive
+                    FlashAttention by proving SoftMax-Contraction is streamable and applying group
+                    partitioning for GPU tiling. Operon v0.15 extends this insight to <em>dynamic</em>
+                    multi-agent systems with coalgebraic state, where optimization decisions depend
+                    on runtime metabolic conditions.
                 </p>
             </div>
 
@@ -788,10 +788,11 @@ budget.can_transmit(DataType.JSON, IntegrityLabel.VALIDATED)  # False
 
             <p>
                 The section also positions operon&rsquo;s approach relative to Abbott &amp; Zardini:
-                where they optimize static algorithm pipelines, operon optimizes <em>coalgebraic</em>
-                systems with internal state. The MetabolicState-gated executor makes optimization
-                decisions that depend on runtime conditions&mdash;a feature absent from purely
-                structural diagram analysis.
+                where they optimize IO transfer costs across GPU memory hierarchies, operon optimizes
+                <em>coalgebraic</em> systems with internal state. The key differentiators are optimization
+                target (IO costs vs. agent orchestration), dynamic state (runtime metabolic gating vs.
+                static analysis), and scope of composition (multi-agent workflows vs. single-algorithm
+                pipelines).
             </p>
 
             <h2>8. Test Coverage</h2>
