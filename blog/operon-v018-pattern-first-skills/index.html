@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.18: Pattern-First Skills - Bogdan Banu</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+        }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.18: Pattern-First Skills</h1>
+                <p class="subtitle">Skill Organisms, Provider-Bound Agents, and a Thinner Front Door for Multi-Agent Workflows</p>
+                <p class="author">
+                    Bogdan Banu · March 2026 ·
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.18.0</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.17 made operon feel like a language for reasoning about
+                    agent architecture. v0.18 is the complementary move: make
+                    that language easier to use without asking every engineer to
+                    learn the substrate first. The release adds a pattern-first
+                    API, a provider-bound skill runtime that can mix
+                    deterministic stages with fast and deep models, and a small
+                    component model that lets telemetry attach to a workflow
+                    without rewriting the workflow itself. In retrospect, the
+                    small v0.16 provider work also matters more than it looked,
+                    because it is what makes this release practical rather than
+                    just tidy.
+                </p>
+            </div>
+
+            <h2>1. What Felt Missing After v0.17</h2>
+
+            <p>
+                The strongest feedback I got after the epistemic release was
+                also the fairest: operon still exposed too much of its formal
+                vocabulary directly. I like that vocabulary. It makes the
+                architecture precise. But most engineers do not wake up wanting
+                to think in optics, coalgebras, or epistemic partitions. They
+                want to know whether a workflow gets safer, cheaper, easier to
+                inspect, or easier to reconfigure.
+            </p>
+
+            <p>
+                That pushed the next release in a much more practical
+                direction. Instead of adding another theoretical layer, v0.18
+                adds a thinner public layer on top of the existing substrate.
+                The point is not to remove the structure. The point is to let
+                people start from the useful pattern and only descend into the
+                structure when they actually need it.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Goal</p>
+                <p>
+                    Keep the formal substrate intact, but stop making it the
+                    price of admission.
+                </p>
+            </div>
+
+            <h2>2. The New Pattern-First Front Door</h2>
+
+            <p>
+                The first part of v0.18 is a new public layer in
+                <code>operon_ai.patterns</code>. It adds three simpler entry
+                points:
+            </p>
+
+            <ul>
+                <li><code>advise_topology(...)</code> for architecture guidance from task shape, tool count, and error tolerance.</li>
+                <li><code>reviewer_gate(...)</code> for the common one-worker-plus-reviewer pattern.</li>
+                <li><code>specialist_swarm(...)</code> for centralized specialist decomposition.</li>
+            </ul>
+
+<pre>
+from operon_ai import advise_topology, reviewer_gate, specialist_swarm
+
+advice = advise_topology(
+    task_shape="sequential",
+    tool_count=2,
+    subtask_count=3,
+    error_tolerance=0.02,
+)
+
+gate = reviewer_gate(
+    executor=lambda prompt: f"EXECUTE: {prompt}",
+    reviewer=lambda prompt, candidate: "safe" in prompt.lower(),
+)
+
+swarm = specialist_swarm(
+    roles=["legal", "security", "finance"],
+    workers={...},
+)
+</pre>
+
+            <p>
+                What I like here is that the objects still carry the formal
+                shape underneath. The wrappers expose <code>.diagram</code> and
+                <code>.analysis</code>. So this is not a second system. It is a
+                friendlier entrance to the first one.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/patterns/advisor.py</code>,
+                <code>operon_ai/patterns/review.py</code>,
+                <code>operon_ai/patterns/swarm.py</code>
+            </div>
+
+            <h2>3. Skill Organisms</h2>
+
+            <p>
+                The second part of the release is the piece I care about most:
+                a runtime for skills that behaves more like a small organism
+                than a single prompt wrapper. A skill can now be assembled out
+                of named stages. Some stages can be deterministic handlers.
+                Some can bind to a fast model for fixed classification work.
+                Others can bind to a deeper model for fuzzier planning.
+            </p>
+
+            <div class="diagram">
+                <div class="mermaid">
+flowchart LR
+    U[Task]
+    I[Intake<br/>deterministic]
+    R[Router<br/>fast / cheap]
+    P[Planner<br/>deep / fuzzy]
+    T[TelemetryProbe]
+    U --> I --> R --> P
+    I -. events .-> T
+    R -. events .-> T
+    P -. events .-> T
+                </div>
+            </div>
+
+            <p>
+                This is implemented through <code>skill_organism(...)</code>,
+                <code>SkillStage</code>, and <code>TelemetryProbe</code>. The
+                result is a runtime where model choice becomes part of the
+                structure instead of something scattered across handwritten
+                scripts.
+            </p>
+
+<pre>
+from operon_ai import MockProvider, Nucleus, SkillStage, TelemetryProbe, skill_organism
+
+fast = Nucleus(provider=MockProvider(...))
+deep = Nucleus(provider=MockProvider(...))
+telemetry = TelemetryProbe()
+
+organism = skill_organism(
+    stages=[
+        SkillStage(name="intake", role="Normalizer", handler=lambda task: {"request": task}),
+        SkillStage(name="router", role="Classifier", instructions="Return a deterministic routing label.", mode="fixed"),
+        SkillStage(name="planner", role="Planner", instructions="Use the routing result to propose the next action.", mode="fuzzy"),
+    ],
+    fast_nucleus=fast,
+    deep_nucleus=deep,
+    components=[telemetry],
+)
+
+result = organism.run("Customer says the refund never posted.")
+</pre>
+
+            <p>
+                The practical value is not just that this looks nicer. It means
+                you can add pieces like telemetry, review, or later health
+                mechanisms without rewriting the skill itself. The structure is
+                explicit, but the public API is no longer hostile to normal
+                engineering use.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/patterns/organism.py</code>,
+                <code>examples/69_skill_organism_runtime.py</code>
+            </div>
+
+            <h2>4. Why v0.16 Matters in Retrospect</h2>
+
+            <p>
+                I do think it is relevant to mention v0.16 here, even though it
+                was a smaller release and I did not give it its own post at the
+                time. v0.16 added the OpenAI-compatible provider path and
+                generally made the <code>Nucleus</code> provider layer more
+                practical to use across backends.
+            </p>
+
+            <p>
+                At the time, that felt like a pragmatic integration improvement.
+                In retrospect, it was also the bridge to v0.18. The new skill
+                runtime only becomes useful because stages can bind to real
+                provider-backed nuclei instead of being trapped in the old
+                pedagogical <code>BioAgent</code> mock path.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Relationship</p>
+                <p>
+                    v0.17 made the architecture language explicit. v0.16 made
+                    the provider layer flexible enough. v0.18 combines those two
+                    threads into something engineers can actually build on.
+                </p>
+            </div>
+
+            <h2>5. Examples and Spaces</h2>
+
+            <p>
+                The release adds two practical entry points to the examples:
+            </p>
+
+            <ul>
+                <li><code>examples/68_pattern_first_api.py</code> for the new thin wrappers.</li>
+                <li><code>examples/69_skill_organism_runtime.py</code> for provider-bound, multi-model skills.</li>
+            </ul>
+
+            <p>
+                I also retuned the two epistemic Hugging Face Spaces around this
+                more practical entry path. The Epistemic Space now leads with a
+                Pattern Advisor, and the Diagram Builder now starts from useful
+                presets like reviewer gate and specialist swarm instead of
+                making people type raw diagrams first.
+            </p>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <a href="https://huggingface.co/spaces/coredipper/operon-epistemic">operon-epistemic</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-diagram-builder">operon-diagram-builder</a>
+            </div>
+
+            <h2>6. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Targeted agent + pattern runtime tests</td>
+                    <td class="result-value">27</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Skill organism example smoke path</td>
+                    <td class="result-value">1</td>
+                    <td class="result-pass">Passes</td>
+                </tr>
+                <tr>
+                    <td>Full regression suite at release</td>
+                    <td class="result-value">928</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <p>
+                The package is also now published as <code>0.18.0</code> on
+                PyPI. That matters less as a badge than as a signal that the
+                pattern-first layer is no longer just sitting on a branch.
+            </p>
+
+            <h2>7. The Real Change</h2>
+
+            <p>
+                I do not think the real story of v0.18 is “we added three
+                helpers.” The real story is that operon is starting to separate
+                its internal precision from its external ergonomics.
+            </p>
+
+            <p>
+                That is a necessary move if the framework is going to become
+                useful outside the subset of people, myself included, who enjoy
+                the substrate for its own sake. The structure still matters. The
+                epistemic layer still matters. But the next phase of the project
+                has to be about making those ideas easy to use in a workflow
+                before asking anyone to admire the mathematics underneath it.
+            </p>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-epistemic">operon-epistemic</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-diagram-builder">operon-diagram-builder</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
