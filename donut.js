@@ -62,7 +62,7 @@
         A += vA; B += vB;
         var sw = SW, sh = SH;
         var cx = sw / 2 | 0, cy = sh / 2 | 0;
-        var sx = sw * 0.375, sy = sh * 0.629;
+        var sx = Math.min(sw * 0.5, sh) * 0.75, sy = sx * 0.5;
         var $ = [], r = [], len = sw * sh;
         for (var e = 0; e < len; e++) {
             $[e] = e % sw === sw - 1 ? "\n" : " ";
