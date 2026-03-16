@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.17: Epistemic Topology - Bogdan Banu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({
+                startOnLoad: true,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#1a1a1a',
+                    primaryTextColor: '#d0d0d0',
+                    primaryBorderColor: '#333',
+                    lineColor: '#666',
+                    secondaryColor: '#111',
+                    tertiaryColor: '#0f0f0f',
+                    background: '#111',
+                    mainBkg: '#1a1a1a',
+                    nodeBorder: '#444',
+                    clusterBkg: '#111',
+                    titleColor: '#fff',
+                    edgeLabelBackground: '#111'
+                },
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+        });
+    </script>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .diagram {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .diagram .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background: transparent;
+        }
+        .diagram .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .definition, .theorem {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .definition-title, .theorem-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+        }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.17: Epistemic Topology</h1>
+                <p class="subtitle">Observation Profiles, Topology Classification, and Structural Predictions for Multi-Agent Systems</p>
+                <p class="author">
+                    Bogdan Banu · March 2026 ·
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.17.0</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.17 is the point where operon stopped feeling to me like a growing collection
+                    of motifs and started feeling like a language for reasoning about agent
+                    architecture. The release adds an epistemic layer to both the framework and the
+                    white paper: observation profiles, topology classification, and four structural
+                    predictions about error amplification, sequential overhead, parallelism, and
+                    tool coordination. It also ships the new machinery as code, example, and public
+                    demos, then checks the story against Kim et al.'s scaling study without
+                    pretending that qualitative agreement is stronger than it is.
+                </p>
+            </div>
+
+            <h2>1. The Question After v0.16</h2>
+
+            <p>
+                The previous releases built out the biological stack: membranes, chaperones,
+                metabolic control, multicellular composition, coalgebraic state machines,
+                morphogen diffusion, optics, and resource-aware diagram optimization.
+                v0.16 added a pragmatic bridge to the wider ecosystem via an
+                OpenAI-compatible provider layer.
+            </p>
+
+            <p>
+                What changed after that was the question I kept coming back to while writing the
+                paper and while looking at the library. It was no longer just how to compose more
+                motifs. It became: <em>what does a wiring diagram let each agent actually know?</em>
+                That question mattered because the failures I kept seeing in multi-agent systems
+                were usually structural, not mysterious. A long sequential pipeline necessarily pays
+                handoff cost. Independent workers necessarily widen the error surface. Fragmenting
+                tools across agents necessarily creates remote-tool planning overhead. The structure
+                comes first; the symptoms come later.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Shift in One Sentence</p>
+                <p>
+                    v0.17 is the point where operon stops just collecting motifs and starts treating
+                    topology itself as an analyzable object.
+                </p>
+            </div>
+
+            <h2>2. Observation as Architecture</h2>
+
+            <p>
+                The new paper section reinterprets a wiring diagram as an observation structure.
+                I like this move because it did not require inventing a new layer out of nowhere.
+                The wires, optics, and filters were already there. The epistemic view just makes
+                explicit what they imply. Each module's knowledge is determined by the values that
+                can reach its input ports, after any optic or denaturation filter on the wire has
+                acted.
+            </p>
+
+            <div class="definition">
+                <p class="definition-title">Definition: Observation Profile</p>
+                <p>
+                    For a module $m$, the observation profile is the set of source modules it can
+                    observe directly or transitively through incoming wires, together with whether
+                    those wires carry optics or denaturation filters. Two modules belong to the same
+                    epistemic class if they have the same observable sources under the same filter
+                    pattern.
+                </p>
+            </div>
+
+            <p>
+                This gives three concrete objects:
+            </p>
+
+            <ul>
+                <li><strong>Observation profiles</strong> for individual modules.</li>
+                <li><strong>Epistemic partitions</strong> grouping modules with equivalent visibility.</li>
+                <li><strong>Topology classes</strong> such as independent, sequential, centralized, and hybrid.</li>
+            </ul>
+
+            <div class="diagram">
+                <div class="mermaid">
+flowchart TD
+    D[Dispatcher]
+    A[Analyzer<br/>PrismOptic]
+    E[Enricher<br/>Denature]
+    S[Synthesizer]
+    D -->|o1| A
+    D -->|o2| E
+    A -->|out| S
+    E -->|out| S
+                </div>
+            </div>
+
+            <p>
+                The diamond above is a good example of why this matters. Both intermediate modules
+                depend on the same upstream dispatcher, but they do not receive the same epistemic
+                object: one branch is prism-filtered, the other is denatured. Structurally adjacent
+                is not the same thing as epistemically equivalent.
+            </p>
+
+            <h2>3. Four Topology Classes, Four Predictable Behaviors</h2>
+
+            <table>
+                <tr>
+                    <th>Topology</th>
+                    <th>Observation Structure</th>
+                    <th>Main Consequence</th>
+                </tr>
+                <tr>
+                    <td><strong>Independent</strong></td>
+                    <td>No inter-module wires; each module sees only itself.</td>
+                    <td>Maximum parallelism, but no shared visibility or review bottleneck.</td>
+                </tr>
+                <tr>
+                    <td><strong>Sequential</strong></td>
+                    <td>Later modules see earlier ones only through lossy handoffs.</td>
+                    <td>Handoff overhead accumulates and can dominate task cost.</td>
+                </tr>
+                <tr>
+                    <td><strong>Centralized</strong></td>
+                    <td>A hub pools worker outputs and can compare them before release.</td>
+                    <td>Error suppression improves if the hub can detect inconsistencies.</td>
+                </tr>
+                <tr>
+                    <td><strong>Hybrid</strong></td>
+                    <td>Mixed fan-out, fan-in, and partial parallelism.</td>
+                    <td>Most realistic systems live here; tradeoffs depend on local structure.</td>
+                </tr>
+            </table>
+
+            <p>
+                From that observation model, the new Section 6 derives four architecture-level
+                results:
+            </p>
+
+            <ol>
+                <li>Independent workers amplify failure opportunities.</li>
+                <li>Sequential handoffs introduce unavoidable reconstruction cost.</li>
+                <li>Parallel specialist swarms help only when subtasks are close to epistemically independent.</li>
+                <li>Large distributed toolsets create a second-order planning tax.</li>
+            </ol>
+
+            <h2>4. The Reference Implementation</h2>
+
+            <p>
+                I did not want this to become one of those sections that looks convincing in a paper
+                and then never gets exercised in code. The core of the release is therefore the new
+                <code>operon_ai.core.epistemic</code> module.
+            </p>
+
+<pre>
+from operon_ai import epistemic_analyze
+
+report = epistemic_analyze(diagram, detection_rate=0.75, comm_cost_ratio=0.4)
+
+print(report.classification.topology_class.value)
+print(report.error_bound.amplification_ratio)
+print(report.sequential.overhead_ratio)
+print(report.speedup.speedup)
+print(report.density.planning_cost_ratio)
+</pre>
+
+            <p>
+                Under the hood, the module exposes:
+            </p>
+
+            <ul>
+                <li><code>observation_profiles(diagram)</code></li>
+                <li><code>epistemic_partition(diagram)</code></li>
+                <li><code>classify_topology(diagram)</code></li>
+                <li><code>error_amplification_bound(...)</code></li>
+                <li><code>sequential_penalty(...)</code></li>
+                <li><code>parallel_speedup(...)</code></li>
+                <li><code>tool_density(...)</code></li>
+                <li><code>recommend_topology(...)</code></li>
+                <li><code>analyze(...)</code> as the single entry point</li>
+            </ul>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>operon_ai/core/epistemic.py</code>,
+                exported via <code>operon_ai.__init__</code> as <code>epistemic_analyze</code>
+            </div>
+
+            <h2>5. New Example and Two New Spaces</h2>
+
+            <p>
+                The release also adds a dedicated example,
+                <code>examples/67_epistemic_topology.py</code>. I wanted one place where the new
+                ideas were visible without reading the whole paper. It constructs four canonical
+                diagrams&mdash;independent, sequential, centralized fan-in, and a hybrid diamond&mdash;then
+                prints their observation profiles, partitions, topology classes, theorem outputs,
+                and topology recommendations.
+            </p>
+
+            <p>
+                Two new Hugging Face Spaces package the same ideas as interactive tools:
+            </p>
+
+            <ul>
+                <li>
+                    <strong>Epistemic Topology Explorer</strong>&mdash;preset diagrams, observation profiles,
+                    theorem dashboard, topology advisor.
+                </li>
+                <li>
+                    <strong>Diagram Builder</strong>&mdash;define your own modules and wires in a small text
+                    format and compare two candidate topologies side by side.
+                </li>
+            </ul>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong> <code>examples/67_epistemic_topology.py</code>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-epistemic">operon-epistemic</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-diagram-builder">operon-diagram-builder</a>
+            </div>
+
+            <h2>6. Kim et al. as an External Check</h2>
+
+            <p>
+                The important paper-side task after adding the epistemic section was not to produce
+                stronger rhetoric, but to test whether the new explanation lines up with an external
+                empirical study. The reference point here is Kim et al.,
+                <a href="https://arxiv.org/abs/2512.08296"><em>Towards a Science of Scaling Agent Systems</em></a>.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">A Deliberate Restraint</p>
+                <p>
+                    The Kim comparison is qualitative, not a direct parameter fit. Their reported
+                    metrics are architecture-level aggregates across benchmarks. The operon theorems
+                    are simplified mechanistic models. The right question is whether the predicted
+                    ordering and regime changes match, not whether benchmark percentages are literal
+                    theorem variables.
+                </p>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Epistemic Claim</th>
+                    <th>Kim et al. Observation</th>
+                    <th>Interpretation</th>
+                </tr>
+                <tr>
+                    <td>Independent workers amplify errors more than centralized review.</td>
+                    <td>Independent error amplification <strong>17.2x</strong>; centralized <strong>4.4x</strong>.</td>
+                    <td>Strong qualitative match to the presence or absence of a validation bottleneck.</td>
+                </tr>
+                <tr>
+                    <td>Sequential decomposition adds handoff cost without creating new observations.</td>
+                    <td>PlanCraft degrades under all multi-agent topologies, from <strong>-39.1%</strong> to <strong>-70.1%</strong>.</td>
+                    <td>Fits the case where manufactured coordination is pure overhead.</td>
+                </tr>
+                <tr>
+                    <td>Parallel specialist swarms help when subtasks are close to independent.</td>
+                    <td>Finance-Agent centralized MAS improves by <strong>+80.8%</strong> over SAS.</td>
+                    <td>Consistent with a decomposable-task regime, not a literal speedup fit.</td>
+                </tr>
+                <tr>
+                    <td>Tool fragmentation creates a coordination tax.</td>
+                    <td>Workbench shows strong efficiency-tools interaction: <strong>&beta; = -0.267</strong>, <strong>p &lt; 0.001</strong>.</td>
+                    <td>Matches the prediction that remote-tool discovery and planning can dominate.</td>
+                </tr>
+            </table>
+
+            <p>
+                For me, the payoff of that comparison was mostly epistemic honesty. The white paper
+                now says something narrower and better: the new formal layer provides a mechanistic
+                interpretation of external scaling regularities, not an overfitted benchmark story.
+            </p>
+
+            <h2>7. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Epistemic Analyzer</td>
+                    <td class="result-value">32</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Example Smoke Path</td>
+                    <td class="result-value">1</td>
+                    <td class="result-pass">Passes</td>
+                </tr>
+                <tr>
+                    <td>Full Regression Suite (time of writing)</td>
+                    <td class="result-value">913</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <h2>8. What Still Feels Missing</h2>
+
+            <p>
+                The strongest feedback from another engineer trying to use operon was also the
+                fairest: the framework still exposes too much of its formal vocabulary directly.
+            </p>
+
+            <p>
+                I think that criticism is right. The category-theoretic layer is useful for making
+                the architecture precise, but most engineers should be able to use reviewer gates,
+                specialist swarms, topology advice, and safe defaults without having to think in
+                terms of optics, coalgebras, or epistemic partitions unless they want to.
+            </p>
+
+            <p>
+                So the next step after v0.17 is probably not another theoretical layer. It is a
+                thinner, pattern-first API that hides most of the substrate while preserving the
+                structure that makes the analysis possible. In a way, that feels like the right
+                sequel to this release: first make the architecture language explicit, then make it
+                easier to use.
+            </p>
+
+            <blockquote>
+                Code, paper, and demos:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-epistemic">operon-epistemic</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-diagram-builder">operon-diagram-builder</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
