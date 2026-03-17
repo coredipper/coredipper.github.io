@@ -1,0 +1,139 @@
+::selection { background: #505050; }
+::-moz-selection { background: #505050; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background: #000; }
+body {
+    background: #0a0a0a;
+    color: #d0d0d0;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.75;
+    font-size: 17px;
+}
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 32px;
+    font-family: 'SF Mono', 'Monaco', monospace;
+    font-size: 14px;
+}
+nav a {
+    color: #888;
+    text-decoration: none;
+}
+nav a:hover,
+nav a.active {
+    color: #fff;
+}
+header {
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #222;
+}
+h1 {
+    font-size: 34px;
+    line-height: 1.25;
+    color: #fff;
+    margin-bottom: 10px;
+}
+.subtitle {
+    color: #9a9a9a;
+    font-size: 18px;
+    max-width: 760px;
+}
+h2 {
+    font-size: 24px;
+    color: #fff;
+    margin: 40px 0 18px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1e1e1e;
+}
+h3 {
+    font-size: 19px;
+    color: #ededed;
+    margin: 28px 0 12px;
+}
+p {
+    margin-bottom: 16px;
+}
+ul, ol {
+    margin: 16px 0 16px 24px;
+}
+li {
+    margin-bottom: 8px;
+}
+a {
+    color: #8ab4f8;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+code, pre {
+    font-family: 'SF Mono', 'Monaco', monospace;
+}
+code {
+    font-size: 0.92em;
+    background: #111;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+pre {
+    background: #0f0f0f;
+    border: 1px solid #1a1a1a;
+    border-radius: 6px;
+    padding: 18px;
+    overflow-x: auto;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.55;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+.note {
+    background: #111;
+    border-left: 3px solid #333;
+    padding: 18px;
+    margin: 24px 0;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 20px 0 12px;
+}
+.card {
+    display: block;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 16px;
+    color: #d0d0d0;
+    text-decoration: none;
+}
+.card:hover {
+    border-color: #333;
+    background: #151515;
+    text-decoration: none;
+}
+.card-title {
+    display: block;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.footer {
+    margin-top: 56px;
+    padding-top: 18px;
+    border-top: 1px solid #1e1e1e;
+    color: #888;
+    font-family: 'SF Mono', 'Monaco', monospace;
+    font-size: 13px;
+}

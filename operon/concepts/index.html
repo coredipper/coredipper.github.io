@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concepts and Architecture - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/theory/">Theory</a>
+            <a href="/operon/api/">API</a>
+        </nav>
+
+        <header>
+            <h1>Concepts and Architecture</h1>
+            <p class="subtitle">How the current layers of the library fit together.</p>
+        </header>
+
+        <p>Operon is built around the idea that agent reliability depends heavily on structure.</p>
+
+        <h2>Core View</h2>
+        <p>The library borrows from biology not as decoration, but as a source of reusable control motifs: review bottlenecks, consensus gates, bounded resource use, self-repair and surveillance, and explicit interfaces between stages.</p>
+
+        <h2>Current Practical Layers</h2>
+
+        <h3>Pattern-first API</h3>
+        <p>The recommended front door for engineers:</p>
+        <ul>
+            <li>topology advice</li>
+            <li>reviewer gates</li>
+            <li>specialist swarms</li>
+            <li>skill organisms</li>
+        </ul>
+
+        <h3>Organelles</h3>
+        <p>Shared infrastructural components such as <code>Nucleus</code>, <code>Membrane</code>, <code>Mitochondria</code>, <code>Chaperone</code>, and <code>Lysosome</code>.</p>
+
+        <h3>State and Coordination</h3>
+        <p>ATP budgeting, histone memory, surveillance and healing, and morphogen-style coordination.</p>
+
+        <h3>Typed Wiring and Analysis</h3>
+        <p>The lower-level layer models modules, ports, wires, and topology explicitly so the library can reason about architecture instead of treating everything as an opaque chain.</p>
+
+        <h2>What Changed Recently</h2>
+        <ul>
+            <li><code>v0.17</code> made the epistemic topology story explicit</li>
+            <li><code>v0.18</code> made the practical front door thinner</li>
+        </ul>
+    </div>
+</body>
+</html>

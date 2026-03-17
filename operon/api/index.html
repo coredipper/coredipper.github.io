@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Overview - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/pattern-first-api/">Patterns</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">Repo</a>
+        </nav>
+
+        <header>
+            <h1>API Overview</h1>
+            <p class="subtitle">A lightweight map of the current library surface.</p>
+        </header>
+
+        <h2>Recommended Public Layer</h2>
+        <p><code>operon_ai.patterns</code></p>
+        <ul>
+            <li><code>advise_topology(...)</code></li>
+            <li><code>reviewer_gate(...)</code></li>
+            <li><code>specialist_swarm(...)</code></li>
+            <li><code>skill_organism(...)</code></li>
+        </ul>
+
+        <h2>Core Runtime and Analysis</h2>
+        <p><code>operon_ai.core</code> includes typed wiring, epistemic analysis, coalgebraic utilities, denaturation, and optics.</p>
+
+        <h2>Organelles</h2>
+        <p><code>operon_ai.organelles</code> includes <code>Nucleus</code>, <code>Membrane</code>, <code>Mitochondria</code>, <code>Chaperone</code>, <code>Ribosome</code>, and <code>Lysosome</code>.</p>
+
+        <h2>State / Memory</h2>
+        <p><code>operon_ai.state</code> covers ATP / metabolism, genome, histone memory, and lifecycle-related state.</p>
+        <p><code>operon_ai.memory</code> currently covers episodic memory and is the natural home for future richer substrate layers.</p>
+
+        <h2>Coordination / Surveillance / Healing</h2>
+        <ul>
+            <li><code>operon_ai.coordination</code></li>
+            <li><code>operon_ai.surveillance</code></li>
+            <li><code>operon_ai.health</code></li>
+            <li><code>operon_ai.healing</code></li>
+        </ul>
+
+        <p>For concrete usage, start from the examples rather than reading namespaces in isolation.</p>
+    </div>
+</body>
+</html>

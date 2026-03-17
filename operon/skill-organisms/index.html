@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Organisms - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/pattern-first-api/">Pattern-First API</a>
+            <a href="/operon/examples/">Examples</a>
+            <a href="https://github.com/coredipper/operon/blob/main/examples/69_skill_organism_runtime.py" target="_blank" rel="noopener">Example</a>
+        </nav>
+
+        <header>
+            <h1>Skill Organisms</h1>
+            <p class="subtitle">Structured workflows made of multiple stages, not one giant prompt.</p>
+        </header>
+
+        <p><code>skill_organism(...)</code> is the current practical runtime for building one coherent workflow out of multiple stages.</p>
+
+        <h2>Why It Exists</h2>
+        <p>A lot of real multi-agent workflows are not “many agents everywhere.” They look more like normalize input, route cheaply, do ambiguous work with a stronger model, and attach telemetry or review without rewriting the workflow.</p>
+
+        <h2>Core Pieces</h2>
+        <ul>
+            <li><code>SkillStage</code></li>
+            <li><code>SkillOrganism</code></li>
+            <li><code>TelemetryProbe</code></li>
+        </ul>
+
+        <p>Stages can be deterministic handlers or provider-bound agents using a fast nucleus or a deep nucleus.</p>
+
+        <h2>Practical Pattern</h2>
+        <ol>
+            <li>intake or normalization stage</li>
+            <li>cheap routing or classification stage</li>
+            <li>deeper planning or synthesis stage</li>
+            <li>optional attached telemetry or review</li>
+        </ol>
+
+        <h2>Shared State vs Components</h2>
+        <p><code>shared_state</code> is still useful for lightweight orchestration data.</p>
+        <p>Attachable components are for concerns you do not want to hardcode into the workflow itself: telemetry now, and later review, health, safety, or richer memory layers.</p>
+
+        <h2>Recommended Example</h2>
+        <p>Start with <a href="https://github.com/coredipper/operon/blob/main/examples/69_skill_organism_runtime.py" target="_blank" rel="noopener"><code>examples/69_skill_organism_runtime.py</code></a>.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon Documentation</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/">&larr; Home</a>
+            <a href="/about/">About</a>
+            <a href="/blog/">Blog</a>
+            <a href="/operon/" class="active">Docs</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+
+        <header>
+            <h1>Operon Documentation</h1>
+            <p class="subtitle">Biologically inspired architectures for more reliable AI agent systems.</p>
+        </header>
+
+        <p>Operon is a research-grade Python library for building agent systems with explicit control structure. The current recommended entry point is the pattern-first API, with the deeper wiring and theory layers still available underneath.</p>
+
+        <h2>Start Here</h2>
+        <div class="grid">
+            <a class="card" href="/operon/getting-started/">
+                <span class="card-title">Getting Started</span>
+                Install the library and start from the smallest practical entry path.
+            </a>
+            <a class="card" href="/operon/pattern-first-api/">
+                <span class="card-title">Pattern-First API</span>
+                Topology advice, reviewer gates, specialist swarms, and skill organisms.
+            </a>
+            <a class="card" href="/operon/skill-organisms/">
+                <span class="card-title">Skill Organisms</span>
+                Multi-stage workflows with fast/deep model routing and attachable components.
+            </a>
+            <a class="card" href="/operon/examples/">
+                <span class="card-title">Examples</span>
+                Where to start in the example catalog without reading everything in order.
+            </a>
+        </div>
+
+        <h2>Deeper Material</h2>
+        <div class="grid">
+            <a class="card" href="/operon/concepts/">
+                <span class="card-title">Concepts and Architecture</span>
+                The library’s current layers and the role of structure.
+            </a>
+            <a class="card" href="/operon/theory/">
+                <span class="card-title">Theory and Papers</span>
+                The whitepaper, the epistemic topology paper, and how to read them.
+            </a>
+            <a class="card" href="/operon/api/">
+                <span class="card-title">API Overview</span>
+                A lightweight map of the namespaces and their intended use.
+            </a>
+            <a class="card" href="/operon/spaces/">
+                <span class="card-title">Hugging Face Spaces</span>
+                Interactive demos for topology and diagram exploration.
+            </a>
+            <a class="card" href="/operon/releases/">
+                <span class="card-title">Release Notes</span>
+                Recent direction and public writing around v0.17 and v0.18.
+            </a>
+        </div>
+
+        <div class="note">
+            <p>The pattern-first API is now the public front door:</p>
+            <p><code>advise_topology(...)</code>, <code>reviewer_gate(...)</code>, <code>specialist_swarm(...)</code>, and <code>skill_organism(...)</code>.</p>
+        </div>
+
+        <div class="footer">
+            Docs source lives in the Operon repo under <code>docs/site/</code>.
+        </div>
+    </div>
+</body>
+</html>

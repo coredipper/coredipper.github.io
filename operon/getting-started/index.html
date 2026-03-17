@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/pattern-first-api/">Pattern-First API</a>
+            <a href="/operon/examples/">Examples</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+
+        <header>
+            <h1>Getting Started</h1>
+            <p class="subtitle">The shortest path into Operon if you care about practical value first.</p>
+        </header>
+
+        <h2>Installation</h2>
+        <pre><code>pip install operon-ai</code></pre>
+
+        <p>For provider-backed workflows, configure the model backend you want through the existing <code>Nucleus</code> provider layer.</p>
+
+        <h2>Recommended First Steps</h2>
+        <ol>
+            <li>Start with the <a href="/operon/pattern-first-api/">Pattern-First API</a>.</li>
+            <li>Run the pattern-first example and the skill-organism example.</li>
+            <li>Use the <a href="/operon/examples/">Examples</a> page to find the shortest path into the rest of the library.</li>
+        </ol>
+
+        <h2>First Practical Questions</h2>
+        <p>If you are evaluating Operon, the right first questions are usually:</p>
+        <ul>
+            <li>should this stay single-agent?</li>
+            <li>does it need a reviewer bottleneck?</li>
+            <li>is it actually decomposable into specialists?</li>
+            <li>should fixed work go to a cheap model and fuzzy work to a stronger one?</li>
+        </ul>
+
+        <h2>Minimal Entry Points</h2>
+        <ul>
+            <li><code>advise_topology(...)</code> for architecture guidance</li>
+            <li><code>reviewer_gate(...)</code> for one-worker-plus-reviewer</li>
+            <li><code>specialist_swarm(...)</code> for centralized specialist decomposition</li>
+            <li><code>skill_organism(...)</code> for multi-stage workflows with attachable components</li>
+        </ul>
+    </div>
+</body>
+</html>

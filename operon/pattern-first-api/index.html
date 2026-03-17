@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern-First API - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/getting-started/">Getting Started</a>
+            <a href="/operon/skill-organisms/">Skill Organisms</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+
+        <header>
+            <h1>Pattern-First API</h1>
+            <p class="subtitle">The recommended public layer for most users.</p>
+        </header>
+
+        <p>The pattern-first layer gives you practical entry points while preserving the structure underneath.</p>
+
+        <h2><code>advise_topology(...)</code></h2>
+        <p>Use this when you want a recommendation from task shape and operating constraints.</p>
+        <ul>
+            <li>task shape</li>
+            <li>tool count</li>
+            <li>subtask count</li>
+            <li>error tolerance</li>
+        </ul>
+
+        <h2><code>reviewer_gate(...)</code></h2>
+        <p>Use this when one worker should act, but only through an explicit review bottleneck.</p>
+        <p>Good fit for risky actions, approvals, migrations, and structured validation.</p>
+
+        <h2><code>specialist_swarm(...)</code></h2>
+        <p>Use this when work is genuinely decomposable into specialist roles and then aggregated centrally.</p>
+        <p>Good fit for expert-panel workflows and multi-perspective review.</p>
+
+        <h2><code>skill_organism(...)</code></h2>
+        <p>Use this when you want one coherent workflow made of multiple stages:</p>
+        <ul>
+            <li>deterministic handlers</li>
+            <li>cheap / fast provider-backed stages</li>
+            <li>deeper reasoning stages</li>
+            <li>attachable runtime components like telemetry</li>
+        </ul>
+
+        <h2>Escape Hatch</h2>
+        <p>These wrappers do not hide the structure permanently. You can still inspect the generated diagram and analysis when you need to:</p>
+        <ul>
+            <li><code>gate.diagram</code></li>
+            <li><code>gate.analysis</code></li>
+            <li><code>swarm.diagram</code></li>
+            <li><code>swarm.analysis</code></li>
+        </ul>
+    </div>
+</body>
+</html>
