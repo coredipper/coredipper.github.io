@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bi-Temporal Memory - Operon</title>
+    <link rel="stylesheet" href="/operon/styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/operon/skill-organisms/">Skill Organisms</a>
+            <a href="/operon/examples/">Examples</a>
+        </nav>
+
+        <header>
+            <h1>Bi-Temporal Memory</h1>
+            <p class="subtitle">Append-only factual memory with dual time axes for auditable decision-making.</p>
+        </header>
+
+        <p><code>BiTemporalMemory</code> tracks facts along two independent time axes:</p>
+        <ul>
+            <li><strong>Valid time</strong> &mdash; when a fact is true in the world.</li>
+            <li><strong>Record time</strong> &mdash; when the system learned about it.</li>
+        </ul>
+
+        <p>Unlike <code>HistoneStore</code> (epigenetic marks) or <code>EpisodicMemory</code> (tiered decay), bi-temporal memory is append-only &mdash; corrections close old records and create new ones, so the full history is always reconstructible.</p>
+
+        <h2>Why Two Time Axes?</h2>
+        <p>A single timestamp conflates two different questions:</p>
+        <ol>
+            <li>&ldquo;What is true now?&rdquo; (valid-time query)</li>
+            <li>&ldquo;What did the system believe at decision time?&rdquo; (record-time query)</li>
+        </ol>
+        <p>These diverge whenever facts are ingested with delay or corrected retroactively &mdash; the norm in compliance, healthcare, and finance workflows.</p>
+
+        <h2>Quick Start</h2>
+<pre><code>from operon_ai import BiTemporalMemory
+
+mem = BiTemporalMemory()
+
+# Record: risk tier is "medium" (valid day 1, ingested day 3)
+fact = mem.record_fact("client:42", "risk_tier", "medium",
+                       valid_from=day1, recorded_from=day3, source="crm")
+
+# Correct: actually "high", retroactive to day 1 (recorded day 5)
+mem.correct_fact(fact.fact_id, "high",
+                 valid_from=day1, recorded_from=day5, source="manual_review")</code></pre>
+
+        <h2>Querying</h2>
+        <p>Three retrieval methods correspond to three questions:</p>
+<pre><code># What is true at day 2? (active records only)
+mem.retrieve_valid_at(at=day2, subject="client:42")        # &rarr; "high"
+
+# What had the system recorded by day 2?
+mem.retrieve_known_at(at=day2, subject="client:42")         # &rarr; [] (not yet ingested)
+
+# What did the system believe on day 2, given what it knew by day 4?
+mem.retrieve_belief_state(at_valid=day2, at_record=day4)    # &rarr; "medium"
+
+# Same question, given what it knows by day 6 (after correction)?
+mem.retrieve_belief_state(at_valid=day2, at_record=day6)    # &rarr; "high"</code></pre>
+
+        <h2>History and Audit</h2>
+<pre><code># Full correction history, sorted by record time
+mem.history("client:42")
+
+# What changed between two points on either axis?
+mem.diff_between(day4, day6, axis="record")
+
+# World-time timeline, sorted by valid_from
+mem.timeline_for("client:42")</code></pre>
+
+        <h2>Append-Only Semantics</h2>
+        <p>Corrections never mutate existing records. Instead:</p>
+        <ol>
+            <li>The old record&rsquo;s <code>recorded_to</code> is set (closing it on the record-time axis).</li>
+            <li>A new record is appended with <code>supersedes</code> pointing to the old <code>fact_id</code>.</li>
+        </ol>
+        <p>This means any past belief state is always reconstructible &mdash; the foundation for compliance auditing.</p>
+
+        <h2>Data Model</h2>
+        <table>
+            <thead>
+                <tr><th>Type</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>BiTemporalFact</code></td><td>Immutable fact with dual time intervals (frozen dataclass)</td></tr>
+                <tr><td><code>BiTemporalQuery</code></td><td>Filter spec for point-in-time queries</td></tr>
+                <tr><td><code>BiTemporalMemory</code></td><td>Mutable store with append-only write semantics</td></tr>
+                <tr><td><code>FactSnapshot</code></td><td>Query result container</td></tr>
+                <tr><td><code>CorrectionResult</code></td><td>Result of <code>correct_fact()</code></td></tr>
+            </tbody>
+        </table>
+        <p>All five are exported from the top level: <code>from operon_ai import BiTemporalMemory, BiTemporalFact, ...</code></p>
+
+        <h2>Relationship to Other Memory Systems</h2>
+        <table>
+            <thead>
+                <tr><th>System</th><th>Time Model</th><th>Mutation</th><th>Use Case</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>HistoneStore</code></td><td>Single timestamp</td><td>Mutable marks</td><td>Epigenetic metadata on retrieval</td></tr>
+                <tr><td><code>EpisodicMemory</code></td><td>Single timestamp</td><td>Mutable (decay, promote)</td><td>Tiered memory with relevance scoring</td></tr>
+                <tr><td><code>BiTemporalMemory</code></td><td>Dual timestamps</td><td>Append-only</td><td>Auditable fact tracking with corrections</td></tr>
+            </tbody>
+        </table>
+
+        <h2>Examples</h2>
+        <ul>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/69_bitemporal_memory.py" target="_blank" rel="noopener"><code>69_bitemporal_memory.py</code></a> &mdash; core valid-time vs record-time divergence</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/70_bitemporal_compliance_audit.py" target="_blank" rel="noopener"><code>70_bitemporal_compliance_audit.py</code></a> &mdash; multi-fact compliance audit</li>
+        </ul>
+    </div>
+</body>
+</html>
