@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.19: Bi-Temporal Memory - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+        }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.19: Bi-Temporal Memory</h1>
+                <p class="subtitle">Append-Only Facts, Dual Time Axes, and Belief-State Reconstruction for Auditable Agent Systems</p>
+                <p class="author">
+                    Bogdan Banu · March 2026 ·
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.19.0</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.18 gave operon a thinner front door. v0.19 goes deeper in
+                    the opposite direction: it adds a memory subsystem that tracks
+                    not just what is true, but when it became true and when the
+                    system learned about it. These are two different questions, and
+                    conflating them is the source of a whole class of bugs in
+                    agent systems that ingest delayed or corrected information.
+                    The new <code>BiTemporalMemory</code> is append-only &mdash;
+                    corrections close old records and create new ones, so any
+                    past belief state can always be reconstructed. This is the
+                    foundation for compliance auditing, temporal reasoning, and
+                    eventually richer forms of agent self-knowledge.
+                </p>
+            </div>
+
+            <h2>1. The Problem with a Single Timestamp</h2>
+
+            <p>
+                Most agent memory systems give each fact a single timestamp:
+                when was this stored? That works fine as long as the system
+                learns about things exactly when they happen. In practice,
+                that is almost never the case.
+            </p>
+
+            <p>
+                A client&rsquo;s risk tier changes on Monday. The CRM sync
+                runs on Wednesday. A manual review on Friday discovers the
+                tier should have been &ldquo;high,&rdquo; not
+                &ldquo;medium.&rdquo; Now there are three different moments
+                in play, and a single timestamp cannot distinguish between
+                them.
+            </p>
+
+            <p>
+                This is not a niche scenario. It is the norm in compliance,
+                healthcare, finance, and anywhere else where facts arrive
+                with delay or get corrected retroactively. And it matters
+                for agents because the question &ldquo;what did the system
+                believe when it made that decision?&rdquo; is not the same
+                as &ldquo;what is true now?&rdquo;
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Core Distinction</p>
+                <p>
+                    <strong>Valid time</strong> is when a fact is true in the
+                    world. <strong>Record time</strong> is when the system
+                    learned about it. These diverge whenever information
+                    arrives late or gets corrected &mdash; and an agent that
+                    conflates them cannot explain its own past decisions.
+                </p>
+            </div>
+
+            <h2>2. Bi-Temporal Data in Databases</h2>
+
+            <p>
+                The idea is not new. Snodgrass formalized bi-temporal data
+                models in the 1990s, and SQL:2011 added standard syntax for
+                temporal tables with <code>PERIOD FOR</code> and
+                <code>AS OF</code> semantics. What is newer is bringing this
+                into the agent memory layer directly, where the two time
+                axes govern what the agent can retrieve and reason about at
+                any given point.
+            </p>
+
+            <p>
+                The implementation in operon is deliberately simple. It is
+                an in-memory append-only store with no database dependency.
+                The point is not to compete with temporal databases. The
+                point is to give agent workflows the right retrieval
+                semantics without requiring external infrastructure.
+            </p>
+
+            <h2>3. The Data Model</h2>
+
+            <p>
+                A <code>BiTemporalFact</code> is a frozen dataclass with
+                two time intervals:
+            </p>
+
+<pre>
+<code>BiTemporalFact(
+    fact_id="a1b2c3d4",
+    subject="client:42",
+    predicate="risk_tier",
+    value="medium",
+    valid_from=day1,       # when the fact became true in the world
+    valid_to=None,         # None = still true (open-ended)
+    recorded_from=day3,    # when the system ingested it
+    recorded_to=None,      # None = currently active record
+    source="crm",
+    confidence=1.0,
+    tags=(),
+    supersedes=None,       # points to the fact this corrects
+)</code>
+</pre>
+
+            <p>
+                The frozen dataclass is a deliberate departure from the
+                mutable dataclasses used elsewhere in operon&rsquo;s memory
+                layer. The justification is simple: in an append-only store,
+                corrections produce new facts rather than mutating existing
+                ones. Immutability is not a constraint here &mdash; it is
+                the semantics.
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>Type</th><th>Purpose</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>BiTemporalFact</code></td><td>Immutable fact with dual time intervals</td></tr>
+                    <tr><td><code>BiTemporalQuery</code></td><td>Filter spec for point-in-time queries</td></tr>
+                    <tr><td><code>BiTemporalMemory</code></td><td>Mutable store with append-only write semantics</td></tr>
+                    <tr><td><code>FactSnapshot</code></td><td>Query result container</td></tr>
+                    <tr><td><code>CorrectionResult</code></td><td>Result of <code>correct_fact()</code></td></tr>
+                </tbody>
+            </table>
+
+            <h2>4. Write Semantics: Record, Correct, Never Mutate</h2>
+
+            <p>
+                The store exposes two write operations.
+                <code>record_fact()</code> appends a new fact.
+                <code>correct_fact()</code> closes the old record by
+                setting its <code>recorded_to</code> and appends a new
+                fact with <code>supersedes</code> pointing back to the
+                original.
+            </p>
+
+<pre>
+<code>from operon_ai import BiTemporalMemory
+
+mem = BiTemporalMemory()
+
+# Day 1: risk tier becomes "medium" in the world
+# Day 3: system ingests it
+fact = mem.record_fact("client:42", "risk_tier", "medium",
+                       valid_from=day1, recorded_from=day3, source="crm")
+
+# Day 5: manual review corrects to "high", retroactive to day 1
+correction = mem.correct_fact(fact.fact_id, "high",
+                              valid_from=day1, recorded_from=day5,
+                              source="manual_review")</code>
+</pre>
+
+            <p>
+                The old fact is never deleted or overwritten. Its
+                <code>recorded_to</code> is set to the correction time,
+                closing it on the record-time axis. The new fact carries a
+                fresh <code>fact_id</code> and an open
+                <code>recorded_to</code>. Both coexist in the store. This
+                is what makes past belief states reconstructible.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Why Append-Only</p>
+                <p>
+                    If you mutate facts in place, you lose the ability to
+                    answer &ldquo;what did the system believe at decision
+                    time?&rdquo; That question is the foundation of
+                    compliance auditing. Append-only semantics make it
+                    structurally impossible to lose that information.
+                </p>
+            </div>
+
+            <h2>5. Three Retrieval Questions</h2>
+
+            <p>
+                The dual time axes give rise to three distinct retrieval
+                modes, each answering a different question:
+            </p>
+
+            <h3>What is true at time T?</h3>
+
+<pre>
+<code># Active records valid at day 2
+mem.retrieve_valid_at(at=day2, subject="client:42")  # &rarr; "high"</code>
+</pre>
+
+            <p>
+                This filters on the valid-time axis and only returns
+                currently active records (those with open
+                <code>recorded_to</code>). It reflects the corrected
+                world-state.
+            </p>
+
+            <h3>What had the system recorded by time T?</h3>
+
+<pre>
+<code># What was known by day 2?
+mem.retrieve_known_at(at=day2, subject="client:42")  # &rarr; [] (nothing yet)</code>
+</pre>
+
+            <p>
+                This filters on the record-time axis only. It answers
+                &ldquo;what information had arrived by this point?&rdquo;
+                without judging whether it was valid. Since the fact was
+                not ingested until day 3, the result is empty.
+            </p>
+
+            <h3>What did the system believe at time T?</h3>
+
+<pre>
+<code># Belief state: valid at day 2, known by day 4
+mem.retrieve_belief_state(at_valid=day2, at_record=day4)  # &rarr; "medium"
+
+# Same question, but known by day 6 (after correction)
+mem.retrieve_belief_state(at_valid=day2, at_record=day6)  # &rarr; "high"</code>
+</pre>
+
+            <p>
+                This is the intersection: facts that were both valid at
+                <code>at_valid</code> and recorded by <code>at_record</code>.
+                It reconstructs exactly what the agent would have believed
+                at any past moment. The first query returns
+                &ldquo;medium&rdquo; because the correction had not arrived
+                yet. The second returns &ldquo;high&rdquo; because it had.
+            </p>
+
+            <h2>6. History, Diff, and Timeline</h2>
+
+            <p>
+                Three more methods support auditing and debugging:
+            </p>
+
+            <ul>
+                <li><code>history(subject)</code> &mdash; all facts for a subject, including closed records, sorted by record time. Shows the full correction chain.</li>
+                <li><code>diff_between(t1, t2, axis)</code> &mdash; facts that appear at <code>t2</code> but not <code>t1</code> on the specified axis. Useful for &ldquo;what changed between these two points?&rdquo;</li>
+                <li><code>timeline_for(subject)</code> &mdash; all facts sorted by valid time. Shows the world-time narrative including superseded records.</li>
+            </ul>
+
+<pre>
+<code># Full correction history
+mem.history("client:42")
+
+# What changed on the record-time axis between day 4 and day 6?
+mem.diff_between(day4, day6, axis="record")
+
+# World-time narrative
+mem.timeline_for("client:42")</code>
+</pre>
+
+            <h2>7. Relationship to Existing Memory Systems</h2>
+
+            <p>
+                Operon already has two memory subsystems, and bi-temporal
+                memory is not a replacement for either. They solve
+                different problems:
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>System</th><th>Time Model</th><th>Mutation</th><th>Use Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>HistoneStore</code></td>
+                        <td>Single timestamp</td>
+                        <td>Mutable marks</td>
+                        <td>Epigenetic metadata on retrieval</td>
+                    </tr>
+                    <tr>
+                        <td><code>EpisodicMemory</code></td>
+                        <td>Single timestamp</td>
+                        <td>Mutable (decay, promote)</td>
+                        <td>Tiered memory with relevance scoring</td>
+                    </tr>
+                    <tr>
+                        <td><code>BiTemporalMemory</code></td>
+                        <td>Dual timestamps</td>
+                        <td>Append-only</td>
+                        <td>Auditable fact tracking with corrections</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <code>HistoneStore</code> annotates retrievals with
+                epigenetic marks &mdash; access frequency, recency, context.
+                <code>EpisodicMemory</code> manages tiered decay and
+                promotion between working, short-term, and long-term memory.
+                Neither tracks corrections or supports dual-axis retrieval.
+                <code>BiTemporalMemory</code> fills a different niche:
+                domains where the audit trail is the point.
+            </p>
+
+            <h2>8. Article Updates</h2>
+
+            <p>
+                v0.19 also updates the research article in four places:
+            </p>
+
+            <ul>
+                <li><strong>Related work</strong> (Section 2): new subsection on temporal databases and bi-temporal data models, citing Snodgrass and SQL:2011.</li>
+                <li><strong>Categorical mapping</strong> (Section 3): new paragraph formalizing the dual-interval state space as temporal coalgebra.</li>
+                <li><strong>Discussion</strong> (Section 6): new subsection on temporal epistemics &mdash; what did the agent know, and when did it know it?</li>
+                <li><strong>Implementation</strong> (Section 8): new subsection documenting the <code>BiTemporalMemory</code> implementation.</li>
+            </ul>
+
+            <p>
+                The article is built with <a href="https://tectonic-typesetting.github.io/">tectonic</a>. The temporal coalgebra formalization is the most interesting addition: it describes how the dual time intervals form a product of interval domains, and how corrections trace paths through that product space.
+            </p>
+
+            <h2>9. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Bi-temporal memory unit tests</td>
+                    <td class="result-value">41</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Example 69 smoke path (valid vs record divergence)</td>
+                    <td class="result-value">1</td>
+                    <td class="result-pass">Passes</td>
+                </tr>
+                <tr>
+                    <td>Example 70 smoke path (compliance audit)</td>
+                    <td class="result-value">1</td>
+                    <td class="result-pass">Passes</td>
+                </tr>
+                <tr>
+                    <td>Full regression suite at release</td>
+                    <td class="result-value">928+</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/memory/bitemporal.py</code>,
+                <code>examples/69_bitemporal_memory.py</code>,
+                <code>examples/70_bitemporal_compliance_audit.py</code>
+            </div>
+
+            <h2>10. What Comes Next</h2>
+
+            <p>
+                Bi-temporal memory is Phase 1 of a longer roadmap. The
+                next phases build on this foundation: causal event logging
+                that tracks why decisions were made, not just what facts
+                were available; persistent storage backends so the
+                append-only log survives process restarts; and eventually
+                temporal reasoning primitives that let agents query their
+                own epistemic history as part of planning.
+            </p>
+
+            <p>
+                The deeper motivation is that agents that cannot explain
+                their past decisions are agents you cannot trust with
+                consequential ones. Bi-temporal memory is the first step
+                toward that kind of accountability &mdash; not as a
+                governance layer bolted on after the fact, but as a
+                structural property of the memory system itself.
+            </p>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://coredipper.github.io/operon/bitemporal-memory/">bi-temporal memory docs</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
