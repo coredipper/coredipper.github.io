@@ -91,9 +91,10 @@ mem.timeline_for("client:42")</code></pre>
                 <tr><td><code>BiTemporalMemory</code></td><td>Mutable store with append-only write semantics</td></tr>
                 <tr><td><code>FactSnapshot</code></td><td>Query result container</td></tr>
                 <tr><td><code>CorrectionResult</code></td><td>Result of <code>correct_fact()</code></td></tr>
+                <tr><td><code>SubstrateView</code></td><td>Frozen read-only envelope of facts for stage handlers (v0.20.0)</td></tr>
             </tbody>
         </table>
-        <p>All five are exported from the top level: <code>from operon_ai import BiTemporalMemory, BiTemporalFact, ...</code></p>
+        <p>All types are exported from the top level: <code>from operon_ai import BiTemporalMemory, BiTemporalFact, SubstrateView, ...</code></p>
 
         <h2>Relationship to Other Memory Systems</h2>
         <table>
@@ -107,10 +108,29 @@ mem.timeline_for("client:42")</code></pre>
             </tbody>
         </table>
 
+        <h2>SkillOrganism Integration</h2>
+        <p>Since v0.20.0, <code>BiTemporalMemory</code> can serve as a shared substrate for <code>SkillOrganism</code> workflows. Pass <code>substrate=BiTemporalMemory()</code> to <code>skill_organism(...)</code>, then use per-stage hooks to read and write facts:</p>
+
+        <table>
+            <thead>
+                <tr><th><code>SkillStage</code> field</th><th>Purpose</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>read_query</code></td><td>Subject string or callable &rarr; <code>SubstrateView</code> injected before stage runs</td></tr>
+                <tr><td><code>fact_extractor</code></td><td>Callable &rarr; emits assert/correct/invalidate events after stage runs</td></tr>
+                <tr><td><code>emit_output_fact</code></td><td>Convenience flag: auto-records <code>(task, stage.name, output)</code></td></tr>
+                <tr><td><code>fact_tags</code></td><td>Default tags applied to all facts emitted by this stage</td></tr>
+            </tbody>
+        </table>
+
+        <p>Handlers receive the <code>SubstrateView</code> as an additional argument (via arity-aware dispatch &mdash; existing handlers are unaffected). See <a href="/operon/skill-organisms/">Skill Organisms</a> for the full three-layer context model.</p>
+
         <h2>Examples</h2>
         <ul>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/69_bitemporal_memory.py" target="_blank" rel="noopener"><code>69_bitemporal_memory.py</code></a> &mdash; core valid-time vs record-time divergence</li>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/70_bitemporal_compliance_audit.py" target="_blank" rel="noopener"><code>70_bitemporal_compliance_audit.py</code></a> &mdash; multi-fact compliance audit</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py" target="_blank" rel="noopener"><code>71_bitemporal_skill_organism.py</code></a> &mdash; multi-stage organism with substrate</li>
+            <li><a href="https://huggingface.co/spaces/coredipper/operon-bitemporal" target="_blank" rel="noopener">Bi-Temporal Memory Explorer</a> &mdash; interactive HuggingFace Space</li>
         </ul>
     </div>
 </body>
