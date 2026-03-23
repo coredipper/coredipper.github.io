@@ -71,6 +71,9 @@
 
         <p>This enables the audit question: &ldquo;what did the organism know when stage X made its decision?&rdquo; &mdash; answered via <code>retrieve_belief_state()</code> on the append-only history.</p>
 
+        <h3>Cognitive mode annotations</h3>
+        <p>Since v0.22, stages can declare a <code>CognitiveMode</code>: <code>OBSERVATIONAL</code> (System A &mdash; passive sensing) or <code>ACTION_ORIENTED</code> (System B &mdash; active decision-making). When not set, the mode is inferred from the existing <code>mode</code> field. The watcher detects mismatches and reports A/B balance via <code>mode_balance()</code>.</p>
+
         <h3>Attachable components</h3>
         <p>For cross-cutting concerns you do not want to hardcode: telemetry (<code>TelemetryProbe</code>), runtime monitoring (<code>WatcherComponent</code> &mdash; classifies signals as epistemic/somatic/species-specific, can retry/escalate/halt), review and safety policies, and custom lifecycle hooks via <code>SkillRuntimeComponent</code>.</p>
 
@@ -79,6 +82,7 @@
             <li><a href=”https://github.com/coredipper/operon/blob/main/examples/68_skill_organism_runtime.py” target=”_blank” rel=”noopener”><code>68_skill_organism_runtime.py</code></a> &mdash; deterministic intake, fast routing, deep planning, attached telemetry</li>
             <li><a href=”https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py” target=”_blank” rel=”noopener”><code>71_bitemporal_skill_organism.py</code></a> &mdash; multi-stage workflow with bi-temporal substrate, belief-state reconstruction, and temporal diffs</li>
             <li><a href=”https://github.com/coredipper/operon/blob/main/examples/73_watcher_component.py” target=”_blank” rel=”noopener”><code>73_watcher_component.py</code></a> &mdash; runtime monitoring with signal classification and retry/escalate/halt interventions</li>
+            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/76_cognitive_modes.py” target=”_blank” rel=”noopener”><code>76_cognitive_modes.py</code></a> &mdash; System A/B cognitive mode annotations with watcher mode balance</li>
         </ul>
     </div>
 </body>
