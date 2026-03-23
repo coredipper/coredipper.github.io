@@ -689,27 +689,163 @@ organism = skill_organism(
     components=[watcher, telemetry],
 )</code></pre>
 
-            <h2>6. Convergence Signal</h2>
+            <h2>6. The BIGMAS Insight: Why Routing Decisions Reveal Failure</h2>
 
             <p>
                 The most interesting intervention is the one that stops the organism
-                entirely. Hao et al. (BIGMAS) demonstrated empirically that incorrect
-                multi-agent runs require systematically more routing decisions than
-                successful ones &mdash; 9.4 vs 7.3 mean decisions on planning tasks.
-                The watcher operationalizes this finding: when the ratio of cumulative
-                interventions to observed stages exceeds
-                <code>max_intervention_rate</code> (default 0.5), it emits a
-                non-convergence HALT.
+                entirely. The theoretical grounding comes from a second paper:
+                <a href="https://arxiv.org/abs/2603.15371">&ldquo;Brain-Inspired
+                Graph Multi-Agent Systems for LLM Reasoning&rdquo;</a> by Hao, Dai,
+                Qin, and Yu (Chinese Academy of Sciences, March 2026). The paper
+                proposes BIGMAS &mdash; a multi-agent framework inspired by Global
+                Workspace Theory (GWT) &mdash; and in the process reveals an
+                empirical regularity that turns out to be directly useful for
+                Operon&rsquo;s watcher.
+            </p>
+
+            <h3>Global Workspace Theory in Multi-Agent Systems</h3>
+
+            <p>
+                GWT, originally a theory of human consciousness, posits that
+                flexible cognition arises from the dynamic formation of coalitions
+                among distributed specialized processors, coordinated via a shared
+                central workspace. BIGMAS operationalizes this for LLM reasoning:
+            </p>
+
+            <ol>
+                <li><strong>Problem-adaptive graph design.</strong> A
+                    <code>GraphDesigner</code> agent analyzes each problem and
+                    autonomously constructs a task-specific directed agent graph
+                    &mdash; nodes are specialized roles (generator, validator,
+                    analyzer, optimizer), edges are information flow. No fixed
+                    topology; the structure adapts to the problem.</li>
+                <li><strong>Centralized workspace.</strong> All agents coordinate
+                    exclusively through a shared workspace with four partitions:
+                    context (read-only problem), work (read-write intermediate
+                    results), system metadata (execution history), and answer
+                    (final output). No point-to-point communication.</li>
+                <li><strong>Global orchestrator.</strong> A routing agent sees
+                    the full workspace state and complete execution history before
+                    deciding which node activates next. This avoids the
+                    partial-information bottleneck of reactive systems like ReAct.</li>
+            </ol>
+
+            <div class="insight">
+                <p class="insight-title">Operon Mapping: BIGMAS Architecture</p>
+                <p>
+                    BIGMAS&rsquo;s workspace partitions map directly onto
+                    Operon&rsquo;s three-layer context model: <code>Bctx</code>
+                    (problem context) &rarr; topology layer;
+                    <code>Bwork</code> (intermediate results) &rarr;
+                    <code>shared_state</code> ephemeral layer;
+                    <code>Bsys</code> (execution metadata) &rarr; telemetry +
+                    watcher signals. The orchestrator role maps to the
+                    <code>WatcherComponent</code> &mdash; both make routing
+                    decisions conditioned on global state rather than local
+                    observation.
+                </p>
+            </div>
+
+            <h3>The Empirical Finding</h3>
+
+            <p>
+                BIGMAS was evaluated across six frontier LLMs (DeepSeek-V3.2,
+                Claude 4.5 Sonnet, Gemini 2.5 Pro, GPT-5) on three combinatorial
+                reasoning benchmarks. The results showed consistent improvements
+                &mdash; even GPT-5 went from 91% to 98% on Tower of London &mdash;
+                and crucially, gains were <em>orthogonal</em> to model-level
+                reasoning enhancements. Applying BIGMAS to LRMs (models with
+                extended chain-of-thought) yielded additional gains on top of the
+                thinking-mode improvements, proving that architectural coordination
+                and individual model capability are complementary.
             </p>
 
             <p>
-                This is approximately 20 lines of code in the decision function, but
-                it encodes a structural insight: an organism that keeps needing
-                corrections is not converging. Continuing to retry and escalate is
-                worse than stopping and reporting the failure. The pattern library
-                can then record the failed run, demoting the template for future
-                tasks with similar fingerprints.
+                But the most useful finding for Operon was in the routing analysis.
+                The paper measured how many orchestrator routing decisions each run
+                required and found a systematic pattern:
             </p>
+
+            <table>
+                <thead>
+                    <tr><th>Task</th><th>Correct Runs (mean decisions)</th><th>Incorrect Runs (mean decisions)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Game24</td><td>1.1</td><td>1.7</td></tr>
+                    <tr><td>Six Fives</td><td>2.9</td><td>4.6</td></tr>
+                    <tr><td>Tower of London</td><td>7.3</td><td>9.4</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                Incorrect runs consistently required more routing decisions than
+                successful ones across all tasks. The orchestrator continued cycling
+                through nodes in unsuccessful attempts, accumulating calls without
+                converging. The paper notes this as an &ldquo;emergent proxy for
+                instance-level difficulty and non-convergence&rdquo; and suggests it
+                could inform early-stopping mechanisms.
+            </p>
+
+            <h3>Operationalizing the Signal</h3>
+
+            <p>
+                That is exactly what Operon&rsquo;s watcher does. The
+                <code>_check_convergence()</code> method tracks the ratio of
+                cumulative interventions (retries + escalations) to observed stages.
+                When this ratio exceeds <code>max_intervention_rate</code>
+                (default 0.5), the watcher emits a non-convergence HALT. This is
+                approximately 20 lines of code in the decision function, but it
+                encodes the BIGMAS empirical insight: an organism that keeps needing
+                corrections is not converging, and continuing to retry is worse than
+                stopping.
+            </p>
+
+            <p>
+                The pattern library can then record the failed run, demoting the
+                template for future tasks with similar fingerprints. This closes the
+                loop: BIGMAS provides the signal (routing decisions correlate with
+                failure), the watcher operationalizes it (intervention rate as
+                convergence proxy), and the pattern library learns from it (failed
+                runs lower template scores).
+            </p>
+
+            <h3>What Operon Borrows, What It Doesn&rsquo;t</h3>
+
+            <p>
+                Operon borrows the convergence signal but not the architecture.
+                BIGMAS uses a single centralized workspace with a global orchestrator
+                that sees everything. Operon uses distributed component hooks where
+                the watcher sees stage results sequentially. BIGMAS constructs a
+                fresh graph per problem instance. Operon retrieves templates from a
+                scored library. BIGMAS validates workspace writes with a structured
+                protocol. Operon validates through stage-level type coercion and
+                bi-temporal append-only semantics.
+            </p>
+
+            <p>
+                The architectural differences are deliberate. BIGMAS optimizes for
+                single-problem reasoning depth. Operon optimizes for multi-run
+                pattern learning across many problems. BIGMAS&rsquo;s per-problem
+                graph design is expensive (the paper reports 18-37% of total tokens
+                spent on graph design alone) but appropriate for complex combinatorial
+                problems. Operon&rsquo;s template retrieval is cheap (a dict lookup +
+                scoring function) and appropriate for repeated enterprise workflows
+                where the same topology works across many similar tasks.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Complementary, Not Competing</p>
+                <p>
+                    BIGMAS and Operon sit at different points on the
+                    adaptation-cost spectrum. BIGMAS pays high per-problem cost
+                    for maximum structural adaptation. Operon pays low per-problem
+                    cost by amortizing adaptation across many runs via the pattern
+                    library. A hybrid &mdash; use BIGMAS-style graph design for
+                    novel problems, then register successful graphs as Operon
+                    templates for future retrieval &mdash; is a natural Phase 4
+                    extension.
+                </p>
+            </div>
 
             <h2>7. Decision Priority</h2>
 
