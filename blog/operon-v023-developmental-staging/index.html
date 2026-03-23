@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.23: Developmental Staging - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body { background-color: #0a0a0a; color: #d0d0d0; font-family: 'Georgia', 'Times New Roman', serif; line-height: 1.8; font-size: 17px; }
+        .container { max-width: 720px; margin: 0 auto; padding: 60px 24px 120px; }
+        nav { margin-bottom: 48px; font-family: 'SF Mono', 'Monaco', monospace; }
+        nav a { color: #888; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        nav a:hover { color: #fff; }
+        header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #222; }
+        h1 { font-size: 28px; font-weight: 600; color: #fff; margin-bottom: 12px; line-height: 1.3; }
+        .subtitle { font-size: 16px; color: #888; margin-bottom: 16px; font-style: italic; }
+        .author { font-size: 15px; color: #999; font-family: 'SF Mono', monospace; }
+        .author a { color: #999; text-decoration: none; border-bottom: 1px solid #444; }
+        .author a:hover { color: #fff; border-color: #888; }
+        .version-note { display: inline-block; margin-top: 12px; padding: 4px 12px; background: #1a2a1a; border-radius: 4px; font-size: 12px; color: #6a6; font-family: 'SF Mono', monospace; }
+        .abstract { background: #111; border-left: 3px solid #333; padding: 24px; margin: 32px 0; font-style: italic; color: #b0b0b0; }
+        .abstract-title { font-style: normal; font-weight: 600; color: #999; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        h2 { font-size: 22px; font-weight: 600; color: #fff; margin: 48px 0 24px; padding-bottom: 8px; border-bottom: 1px solid #222; }
+        h3 { font-size: 18px; font-weight: 600; color: #e0e0e0; margin: 32px 0 16px; }
+        p { margin-bottom: 16px; text-align: justify; }
+        ul, ol { margin: 16px 0 16px 24px; }
+        li { margin-bottom: 8px; }
+        pre { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 6px; padding: 20px; margin: 24px 0; overflow-x: auto; font-family: 'SF Mono', 'Monaco', monospace; font-size: 14px; line-height: 1.6; }
+        code { font-family: 'SF Mono', 'Monaco', monospace; font-size: 0.9em; background: #111; padding: 2px 5px; border-radius: 3px; }
+        pre code { background: transparent; padding: 0; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; vertical-align: top; }
+        th { color: #fff; font-weight: 600; background: #111; }
+        tr:hover { background: #0f0f0f; }
+        .insight { background: #0a1a2a; border: 1px solid #1a2a3a; border-radius: 6px; padding: 16px; margin: 24px 0; }
+        .insight-title { font-weight: 600; color: #6af; margin-bottom: 8px; font-size: 14px; }
+        .reference-impl { background: #0a1a0a; border: 1px solid #1a2a1a; border-radius: 6px; padding: 16px; margin: 24px 0; font-size: 14px; }
+        .reference-impl code { background: #111; }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote { margin: 32px 0; padding: 16px 24px; border-left: 3px solid #333; color: #b0b0b0; font-style: italic; }
+        a { color: #8ab4f8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.23: Developmental Staging</h1>
+                <p class="subtitle">Critical Periods, Capability Gating, and What Happens When Agents Grow Up</p>
+                <p class="author">
+                    Bogdan Banu &middot; March 2026 &middot;
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.23.0</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.22 gave Operon cognitive modes, sleep consolidation, social
+                    learning, and curiosity. v0.23 adds the developmental layer:
+                    organisms now progress through four maturity stages, capabilities
+                    are gated by developmental stage, critical periods close
+                    permanently as the organism matures, and mature organisms
+                    scaffold younger ones&rsquo; learning. This is the penultimate
+                    phase of the roadmap &mdash; the point where agents stop being
+                    uniformly capable and start growing up.
+                </p>
+            </div>
+
+            <h2>1. The Four Stages</h2>
+
+            <p>
+                The <code>DevelopmentController</code> wraps a <code>Telomere</code>
+                and maps the fraction of telomere consumed to one of four stages:
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>Stage</th><th>Consumed</th><th>Plasticity</th><th>Character</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>EMBRYONIC</strong></td><td>&lt;10%</td><td>1.0</td><td>Maximum learning, minimal capabilities</td></tr>
+                    <tr><td><strong>JUVENILE</strong></td><td>10&ndash;35%</td><td>0.75</td><td>Basic capabilities unlocked</td></tr>
+                    <tr><td><strong>ADOLESCENT</strong></td><td>35&ndash;70%</td><td>0.5</td><td>Most capabilities available</td></tr>
+                    <tr><td><strong>MATURE</strong></td><td>&gt;70%</td><td>0.25</td><td>Full capabilities, reduced plasticity</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                Transitions are one-directional. Even if telomeres are renewed
+                (the biological equivalent of telomerase), the developmental stage
+                never regresses. Once mature, always mature. This mirrors the
+                irreversibility of biological development.
+            </p>
+
+            <h2>2. Critical Periods</h2>
+
+            <p>
+                <code>CriticalPeriod</code> frozen dataclasses declare time-limited
+                learning windows. Each period specifies when it opens and when it
+                permanently closes:
+            </p>
+
+<pre><code>CriticalPeriod(
+    name="rapid_learning",
+    opens_at=DevelopmentalStage.EMBRYONIC,
+    closes_at=DevelopmentalStage.JUVENILE,
+    capability="fast template adoption from peers",
+)</code></pre>
+
+            <p>
+                Once the organism passes <code>closes_at</code>, the window is
+                shut forever. This models the neurodevelopmental insight that
+                some forms of learning are only possible during specific
+                developmental windows &mdash; language acquisition in humans,
+                imprinting in birds, phonetic discrimination in infants.
+            </p>
+
+            <h2>3. Capability Gating</h2>
+
+            <p>
+                The <code>Plasmid</code> frozen dataclass gains a
+                <code>min_stage</code> field. When a stage attempts to acquire a
+                tool via <code>Mitochondria.acquire()</code>, the system checks
+                whether the organism&rsquo;s current developmental stage meets the
+                minimum requirement. An embryonic organism cannot acquire a tool
+                marked <code>min_stage=&quot;adolescent&quot;</code>.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Why Gate Capabilities</p>
+                <p>
+                    Premature capability exposure is a failure mode. An organism
+                    that gains full tool access before it has learned basic
+                    patterns is analogous to giving a child unsupervised access
+                    to power tools. The developmental gating ensures capabilities
+                    are unlocked progressively, matching the organism&rsquo;s
+                    growing competence.
+                </p>
+            </div>
+
+            <h2>4. Teacher-Learner Scaffolding</h2>
+
+            <p>
+                <code>SocialLearning.scaffold_learner()</code> enables mature
+                organisms to guide younger ones. The teacher exports templates;
+                the scaffolding mechanism filters out templates too advanced for
+                the learner&rsquo;s current stage, applies a plasticity bonus
+                to the effective trust score (younger learners are more willing
+                to adopt), and delegates to the standard import mechanism.
+            </p>
+
+            <p>
+                As the learner matures, more templates become available. A
+                scaffold at EMBRYONIC might offer only basic single-stage
+                pipelines. The same scaffold at ADOLESCENT unlocks multi-stage
+                workflows. The teacher doesn&rsquo;t change &mdash; the
+                learner&rsquo;s readiness does.
+            </p>
+
+            <h2>5. The Full Arc</h2>
+
+            <p>
+                v0.23 completes the seven-layer progression that the roadmap
+                described:
+            </p>
+
+            <ol>
+                <li><strong>Structure</strong> (v0.17&ndash;0.18): typed wiring, topology advice</li>
+                <li><strong>Memory</strong> (v0.19&ndash;0.20): bi-temporal facts, auditable substrate</li>
+                <li><strong>Adaptation</strong> (v0.21): pattern library, watcher, adaptive assembly</li>
+                <li><strong>Cognition</strong> (v0.22): cognitive modes, sleep consolidation, social learning, curiosity</li>
+                <li><strong>Development</strong> (v0.23): critical periods, capability gating, scaffolding</li>
+            </ol>
+
+            <p>
+                One phase remains: Phase 8 (release integration + publication),
+                which ties everything together with cross-subsystem integration
+                tests, paper polish, and publication-grade evaluation runs.
+            </p>
+
+            <h2>6. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Development controller</td>
+                    <td class="result-value">18</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Full regression suite</td>
+                    <td class="result-value">1119</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/state/development.py</code>,
+                <code>operon_ai/organelles/plasmid.py</code>,
+                <code>operon_ai/coordination/social_learning.py</code>,
+                <code>examples/80&ndash;81</code>
+            </div>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-development">developmental staging space</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
