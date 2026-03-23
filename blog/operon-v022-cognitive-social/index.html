@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.22: Cognitive Architecture - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+        }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.22: The Cognitive Architecture</h1>
+                <p class="subtitle">Cognitive Modes, Sleep Consolidation, Social Learning, Curiosity, and What Happens When Agents Start Dreaming</p>
+                <p class="author">
+                    Bogdan Banu &middot; March 2026 &middot;
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.22.0 &ndash; v0.22.1</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.21 gave Operon adaptive structure: pattern libraries, watchers,
+                    and the feedback loop that connects them. v0.22 goes further into
+                    the cognitive architecture that Dupoux, LeCun, and Malik describe
+                    as the precondition for autonomous learning. Stages now declare
+                    whether they are System&nbsp;A (observational) or System&nbsp;B
+                    (action-oriented). A sleep consolidation cycle replays successful
+                    patterns, compresses them into templates, runs counterfactual
+                    analysis over corrected facts, and promotes histone marks from
+                    temporary to permanent. Organisms can share templates across
+                    libraries with trust-weighted adoption. And the watcher gains
+                    curiosity signals that trigger escalation when the agent encounters
+                    genuinely novel territory. This is the release where Operon starts
+                    dreaming, socializing, and getting curious.
+                </p>
+            </div>
+
+            <h2>1. Cognitive Modes: System A/B as Stage Annotations</h2>
+
+            <p>
+                Operon&rsquo;s fast/deep nucleus distinction started as cost
+                optimization: route cheap work to a small model, expensive work to
+                a large one. v0.22 reframes this as a cognitive architecture principle.
+                The <code>CognitiveMode</code> enum classifies stages as
+                <code>OBSERVATIONAL</code> (System&nbsp;A &mdash; passive sensing,
+                information gathering) or <code>ACTION_ORIENTED</code>
+                (System&nbsp;B &mdash; active decision-making, goal pursuit).
+            </p>
+
+<pre><code>from operon_ai import CognitiveMode, SkillStage
+
+SkillStage(name="classifier", role="Router", mode="fast",
+           cognitive_mode=CognitiveMode.OBSERVATIONAL)
+
+SkillStage(name="planner", role="Strategist", mode="deep",
+           cognitive_mode=CognitiveMode.ACTION_ORIENTED)</code></pre>
+
+            <p>
+                When not set, cognitive mode is inferred from the existing
+                <code>mode</code> field (fast &rarr; observational, deep &rarr;
+                action-oriented). The watcher detects mismatches between declared
+                mode and actual execution model, and <code>mode_balance()</code>
+                reports the System&nbsp;A/B distribution across a run.
+            </p>
+
+            <h2>2. Sleep Consolidation: When the Organism Dreams</h2>
+
+            <p>
+                The <code>SleepConsolidation</code> class composes five existing
+                components &mdash; <code>AutophagyDaemon</code>,
+                <code>PatternLibrary</code>, <code>EpisodicMemory</code>,
+                <code>HistoneStore</code>, and <code>BiTemporalMemory</code>
+                &mdash; into a five-step post-batch consolidation cycle:
+            </p>
+
+            <ol>
+                <li><strong>Prune</strong> stale context via autophagy</li>
+                <li><strong>Replay</strong> successful run records into episodic
+                    memory with tier promotion (WORKING &rarr; EPISODIC)</li>
+                <li><strong>Compress</strong> recurring high-success patterns into
+                    consolidated <code>PatternTemplate</code> instances</li>
+                <li><strong>Counterfactual replay</strong> &mdash; diff bi-temporal
+                    corrections since each run and ask: &ldquo;would the outcome
+                    have changed with updated facts?&rdquo;</li>
+                <li><strong>Promote</strong> frequently-accessed ACETYLATION histone
+                    marks to permanent METHYLATION</li>
+            </ol>
+
+            <div class="insight">
+                <p class="insight-title">Why Consolidation Matters</p>
+                <p>
+                    Without consolidation, the organism accumulates raw experience
+                    without distilling it. Pattern libraries grow but don&rsquo;t
+                    sharpen. Episodic memories decay without promotion. Histone marks
+                    expire before they can become permanent lessons. The sleep cycle
+                    is the mechanism that converts operational history into structural
+                    knowledge &mdash; exactly what Dupoux et al. describe as
+                    imagination-based learning during rest.
+                </p>
+            </div>
+
+            <h2>3. Social Learning: Horizontal Gene Transfer</h2>
+
+            <p>
+                The <code>SocialLearning</code> module enables cross-organism
+                template sharing, following the biological analogy of horizontal
+                gene transfer in bacteria. Organism&nbsp;A exports successful
+                templates; Organism&nbsp;B imports them with trust-weighted
+                adoption.
+            </p>
+
+<pre><code>from operon_ai import SocialLearning, PatternLibrary
+
+sl_a = SocialLearning(organism_id="A", library=lib_a)
+exchange = sl_a.export_templates(min_success_rate=0.6)
+
+sl_b = SocialLearning(organism_id="B", library=lib_b)
+result = sl_b.import_from_peer(exchange)
+# result.adopted_template_ids — which templates B adopted
+# result.trust_score_used — trust B has for A</code></pre>
+
+            <h3>Epistemic Vigilance</h3>
+
+            <p>
+                The <code>TrustRegistry</code> implements epistemic vigilance:
+                per-peer trust scores are updated via exponential moving average
+                over adoption outcomes. When an imported template succeeds, trust
+                in the source peer increases. When it fails, trust decreases.
+                Trust below a configurable threshold blocks adoption entirely.
+            </p>
+
+            <p>
+                This is not blind imitation. It is calibrated trust &mdash; the
+                organism learns which peers provide useful templates and which
+                provide noise, and adjusts its adoption behavior accordingly.
+                Provenance tracking traces every adopted template back to its
+                source peer, closing the feedback loop.
+            </p>
+
+            <h2>4. Curiosity Signals: Intrinsic Motivation</h2>
+
+            <p>
+                The watcher gains a new signal source: curiosity. When the
+                <code>EpiplexityMonitor</code> detects EXPLORING status (high
+                embedding novelty &mdash; the agent is encountering genuinely
+                unfamiliar territory), the watcher emits a curiosity signal.
+                If the signal value exceeds <code>curiosity_escalation_threshold</code>
+                and the stage uses a fast model, the watcher recommends ESCALATE
+                to engage the deep model for more thorough investigation.
+            </p>
+
+            <p>
+                This operationalizes intrinsic motivation: the organism actively
+                seeks deeper understanding of novel inputs rather than processing
+                them with cheap statistical pattern matching. The curiosity signal
+                is an epistemic signal (same category as epiplexity) with
+                <code>source=&quot;curiosity&quot;</code>, keeping the three-category
+                taxonomy intact while adding a new dimension within the epistemic
+                category.
+            </p>
+
+            <h2>5. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Cognitive mode (v0.22.0)</td>
+                    <td class="result-value">9</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Sleep consolidation (v0.22.0)</td>
+                    <td class="result-value">9</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Social learning (v0.22.1)</td>
+                    <td class="result-value">20</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Curiosity signals (v0.22.1)</td>
+                    <td class="result-value">10</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Full regression suite</td>
+                    <td class="result-value">1101</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/healing/consolidation.py</code>,
+                <code>operon_ai/coordination/social_learning.py</code>,
+                <code>operon_ai/patterns/watcher.py</code>,
+                <code>operon_ai/patterns/types.py</code>,
+                <code>examples/76&ndash;79</code>
+            </div>
+
+            <h2>6. What Comes Next</h2>
+
+            <p>
+                v0.22 delivers the cognitive architecture layer. Two phases remain
+                on the roadmap: Phase&nbsp;7 (developmental staging &mdash; critical
+                periods, capability gating, telomere-based maturation) and
+                Phase&nbsp;8 (release integration &mdash; cross-subsystem tests,
+                large-scope bi-temporal adapters, paper polish, publication-grade
+                eval runs).
+            </p>
+
+            <p>
+                The progression is now six layers deep:
+                <strong>structure</strong> (v0.17&ndash;0.18) &rarr;
+                <strong>memory</strong> (v0.19&ndash;0.20) &rarr;
+                <strong>adaptation</strong> (v0.21) &rarr;
+                <strong>cognition</strong> (v0.22) &rarr;
+                <strong>development</strong> (v0.23) &rarr;
+                <strong>publication</strong> (v0.23.x).
+                Each layer assumes the previous one is stable. The cognitive
+                extensions &mdash; dreaming, socializing, getting curious &mdash;
+                are only possible because the adaptive loop, the pattern library,
+                and the watcher were already in place.
+            </p>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-consolidation">consolidation space</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-social">social learning space</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
