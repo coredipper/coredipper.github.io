@@ -205,12 +205,12 @@
         <article>
             <header>
                 <h1>Operon v0.21: Adaptive Foundations</h1>
-                <p class="subtitle">Pattern Repository, Watcher Component, and the Static Scaffolding for Dynamic Assembly</p>
+                <p class="subtitle">Pattern Repository, Watcher Component, Adaptive Assembly, and the Experience Pool That Learns from Its Own Interventions</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
                 </p>
-                <span class="version-note">Release: v0.21.0</span>
+                <span class="version-note">Release: v0.21.0 &ndash; v0.21.1</span>
             </header>
 
             <div class="abstract">
@@ -880,33 +880,83 @@ organism = skill_organism(
                 modification.
             </p>
 
-            <h2>9. What This Enables</h2>
+            <h2>9. Closing the Loop: Adaptive Assembly (v0.21.1)</h2>
 
             <p>
-                Phase 3 is scaffolding, not the full adaptive story. With a
-                repository that can score templates and a watcher that can intervene,
-                Phase 4 can close the loop:
+                With the scaffolding in place, v0.21.1 closes the adaptive loop.
+                The <code>AdaptiveSkillOrganism</code> wrapper composes the full
+                lifecycle: fingerprint &rarr; retrieve &rarr; assemble &rarr;
+                run &rarr; record.
             </p>
 
-            <ul>
-                <li><code>adaptive_skill_organism(task)</code> &mdash; fingerprint
-                    the task, retrieve the best template, instantiate the organism,
-                    attach a watcher, run, and record the outcome.</li>
-                <li>Experience pool &mdash; the watcher&rsquo;s intervention log
-                    feeds back into the repository, so future assembly benefits from
-                    past interventions.</li>
-                <li>Run-to-run improvement &mdash; templates that work get promoted;
-                    templates that fail get demoted. The library becomes an
-                    evolutionary memory that improves with use.</li>
-            </ul>
+<pre><code>from operon_ai import adaptive_skill_organism, PatternLibrary, TaskFingerprint
+
+lib = PatternLibrary()
+# ... register templates ...
+
+adaptive = adaptive_skill_organism(
+    "Prepare a Q4 earnings analysis.",
+    fingerprint=TaskFingerprint(
+        task_shape="sequential", tool_count=3, subtask_count=3,
+        required_roles=("researcher", "strategist"),
+    ),
+    library=lib,
+    fast_nucleus=fast,
+    deep_nucleus=deep,
+    handlers={"intake": intake_fn, "research": research_fn, "strategy": strategy_fn},
+)
+
+result = adaptive.run("Prepare a Q4 earnings analysis.")
+# result.template — which template was selected
+# result.record — PatternRunRecord stored in library
+# result.watcher_summary — signal/intervention counts</code></pre>
 
             <p>
-                That is the progression the roadmap describes:
-                <strong>structure &rarr; memory &rarr; adaptation</strong>.
-                v0.17&ndash;0.18 gave explicit structure. v0.19&ndash;0.20 gave
-                auditable memory. v0.21 gives the static scaffolding for adaptation.
-                v0.22 will close the dynamic loop.
+                The factory <code>adaptive_skill_organism()</code> auto-fingerprints
+                the task if no fingerprint is provided, queries
+                <code>PatternLibrary.top_templates_for()</code> for the best
+                template, and calls <code>assemble_pattern()</code> to dispatch
+                on topology &mdash; <code>skill_organism</code>,
+                <code>reviewer_gate</code>, <code>specialist_swarm</code>, or
+                <code>single_worker</code>. A <code>WatcherComponent</code> and
+                <code>TelemetryProbe</code> are automatically attached.
             </p>
+
+            <h3>Experience Pool</h3>
+
+            <p>
+                After each run, the wrapper records a
+                <code>PatternRunRecord</code> in the library (closing the scoring
+                feedback loop) and populates the watcher&rsquo;s experience pool
+                with <code>ExperienceRecord</code> instances for each intervention.
+                The experience pool persists across runs: when rule-based decision
+                logic returns no intervention, the watcher consults past experiences
+                with matching (stage, signal category, fingerprint shape) and
+                recommends the intervention kind that was most often successful.
+            </p>
+
+            <p>
+                Rule-based decisions always take priority. Experience is a fallback.
+                This ensures backward compatibility &mdash; an empty experience
+                pool changes nothing &mdash; while allowing the watcher to learn
+                from operational history.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Evo-Devo Inner Loop, Realized</p>
+                <p>
+                    One organism run is one developmental lifetime. The library&rsquo;s
+                    scoring across many lifetimes is evolutionary selection. Templates
+                    that consistently succeed rise in the rankings; those that fail
+                    sink. The experience pool adds Lamarckian refinement on top:
+                    not just which templates work, but which interventions work
+                    within those templates. This is the progression the roadmap
+                    describes: <strong>structure &rarr; memory &rarr;
+                    adaptation</strong>. v0.17&ndash;0.18 gave explicit structure.
+                    v0.19&ndash;0.20 gave auditable memory. v0.21 delivers
+                    adaptation.
+                </p>
+            </div>
 
             <h2>10. Validation</h2>
 
@@ -928,8 +978,18 @@ organism = skill_organism(
                     <td class="result-pass">All pass</td>
                 </tr>
                 <tr>
+                    <td>Adaptive assembly unit tests (v0.21.1)</td>
+                    <td class="result-value">15</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Experience pool unit tests (v0.21.1)</td>
+                    <td class="result-value">14</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
                     <td>Full regression suite at release</td>
-                    <td class="result-value">1024</td>
+                    <td class="result-value">1053</td>
                     <td class="result-pass">All pass</td>
                 </tr>
             </table>
@@ -938,38 +998,35 @@ organism = skill_organism(
                 <strong>Reference Implementation:</strong>
                 <code>operon_ai/patterns/repository.py</code>,
                 <code>operon_ai/patterns/watcher.py</code>,
+                <code>operon_ai/patterns/adaptive.py</code>,
                 <code>operon_ai/patterns/organism.py</code>,
                 <code>examples/72_pattern_repository.py</code>,
-                <code>examples/73_watcher_component.py</code>
+                <code>examples/73_watcher_component.py</code>,
+                <code>examples/74_adaptive_assembly.py</code>,
+                <code>examples/75_experience_driven_watcher.py</code>
             </div>
 
             <h2>11. What Comes Next</h2>
 
             <p>
-                v0.21 provides the components. v0.22 (Phase 4) will compose them
-                into the adaptive assembly loop:
-                <code>adaptive_skill_organism()</code> will fingerprint a task,
-                retrieve a template, construct an organism, attach a watcher,
-                run, and record the outcome. The watcher&rsquo;s intervention
-                history becomes an experience pool that recommends actions for
-                similar future situations. This is the inner loop of the evo-devo
-                framework described in &sect;2 &mdash; one organism run is one
-                developmental lifetime; the library&rsquo;s scoring is natural
-                selection.
+                v0.21 delivers both the scaffolding (v0.21.0) and the adaptive
+                loop (v0.21.1). With patterns stored, scored, and automatically
+                assembled, and with interventions learned from operational history,
+                the next phases build the cognitive extensions that Dupoux, LeCun,
+                and Malik predict will emerge from a working System&nbsp;M.
             </p>
 
             <p>
-                Beyond that, the roadmap maps directly onto the emergent cognitive
-                modes the paper predicts. Phase&nbsp;5 implements learning through
-                imagination: <code>SleepConsolidation</code> replays episodic
-                memories from bi-temporal storage, compresses successful patterns
-                into templates, and runs <code>counterfactual_replay()</code> to
-                ask &ldquo;what would have happened with different facts?&rdquo;
-                Phase&nbsp;6 implements learning through communication:
+                Phase&nbsp;5 implements learning through imagination:
+                <code>SleepConsolidation</code> replays episodic memories from
+                bi-temporal storage, compresses successful patterns into templates,
+                and runs <code>counterfactual_replay()</code> to ask &ldquo;what
+                would have happened with different facts?&rdquo; Phase&nbsp;6
+                implements learning through communication:
                 <code>SocialLearning</code> extends <code>QuorumSensing</code> so
-                organisms can adopt templates that worked for peer organisms,
-                with epistemic vigilance (trust calibrated to track record)
-                preventing blind imitation.
+                organisms can adopt templates that worked for peer organisms, with
+                epistemic vigilance (trust calibrated to track record) preventing
+                blind imitation.
             </p>
 
             <p>
@@ -977,10 +1034,11 @@ organism = skill_organism(
                 requires all three systems working together. System&nbsp;A alone
                 gives you pattern recognition without grounding. System&nbsp;B
                 alone gives you trial-and-error without abstraction. System&nbsp;M
-                alone gives you monitoring without anything to monitor. The value
-                is in the composition &mdash; and the composition requires
-                scaffolding before it requires dynamics. That is what v0.21
-                provides: the scaffolding on which the adaptive loop will be built.
+                alone gives you monitoring without anything to monitor. v0.21
+                is the first release where all three systems are operational and
+                connected &mdash; the static scaffolding, the adaptive loop, and
+                the experience pool compose into a working whole. The cognitive
+                extensions are what comes next; the foundation is now in place.
             </p>
 
             <blockquote>
@@ -988,7 +1046,8 @@ organism = skill_organism(
                 <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
                 <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
                 <a href="https://coredipper.github.io/operon/skill-organisms/">skill organisms docs</a>,
-                <a href="https://huggingface.co/spaces/coredipper/operon-watcher">watcher dashboard</a>
+                <a href="https://huggingface.co/spaces/coredipper/operon-watcher">watcher dashboard</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-adaptive">adaptive assembly</a>
             </blockquote>
         </article>
     </div>
