@@ -72,12 +72,13 @@
         <p>This enables the audit question: &ldquo;what did the organism know when stage X made its decision?&rdquo; &mdash; answered via <code>retrieve_belief_state()</code> on the append-only history.</p>
 
         <h3>Attachable components</h3>
-        <p>For cross-cutting concerns you do not want to hardcode: telemetry (<code>TelemetryProbe</code>), review and safety policies, and custom lifecycle hooks via <code>SkillRuntimeComponent</code>.</p>
+        <p>For cross-cutting concerns you do not want to hardcode: telemetry (<code>TelemetryProbe</code>), runtime monitoring (<code>WatcherComponent</code> &mdash; classifies signals as epistemic/somatic/species-specific, can retry/escalate/halt), review and safety policies, and custom lifecycle hooks via <code>SkillRuntimeComponent</code>.</p>
 
         <h2>Recommended Examples</h2>
         <ul>
             <li><a href=”https://github.com/coredipper/operon/blob/main/examples/68_skill_organism_runtime.py” target=”_blank” rel=”noopener”><code>68_skill_organism_runtime.py</code></a> &mdash; deterministic intake, fast routing, deep planning, attached telemetry</li>
             <li><a href=”https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py” target=”_blank” rel=”noopener”><code>71_bitemporal_skill_organism.py</code></a> &mdash; multi-stage workflow with bi-temporal substrate, belief-state reconstruction, and temporal diffs</li>
+            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/73_watcher_component.py” target=”_blank” rel=”noopener”><code>73_watcher_component.py</code></a> &mdash; runtime monitoring with signal classification and retry/escalate/halt interventions</li>
         </ul>
     </div>
 </body>

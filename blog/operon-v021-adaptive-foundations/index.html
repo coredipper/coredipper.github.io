@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.21: Adaptive Foundations - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .reference-impl {
+            background: #0a1a0a;
+            border: 1px solid #1a2a1a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        .reference-impl code {
+            background: #111;
+        }
+        .status-table .result-pass { color: #6a6; }
+        .status-table .result-value { color: #fff; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.21: Adaptive Foundations</h1>
+                <p class="subtitle">Pattern Repository, Watcher Component, and the Static Scaffolding for Dynamic Assembly</p>
+                <p class="author">
+                    Bogdan Banu &middot; March 2026 &middot;
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.21.0</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    v0.19 gave Operon temporal epistemics. v0.20 wired it into the
+                    runtime. v0.21 adds the other missing piece: the ability to learn
+                    from experience and intervene when things go wrong. A
+                    <code>PatternLibrary</code> stores reusable collaboration templates
+                    that can be scored and retrieved by task fingerprint. A
+                    <code>WatcherComponent</code> monitors stage execution, classifies
+                    signals into three categories (epistemic, somatic, species-specific),
+                    and can request retry, escalation, or halt. Together they form the
+                    static scaffolding for Phase 4&rsquo;s dynamic assembly &mdash;
+                    the point where Operon starts choosing its own structure.
+                </p>
+            </div>
+
+            <h2>1. What Was Missing</h2>
+
+            <p>
+                After v0.20, Operon could build explicit multi-stage workflows, attach
+                telemetry, and maintain auditable bi-temporal state. What it could not
+                do was remember which workflow shapes worked for which kinds of tasks,
+                or detect and recover from runtime degradation without manual
+                intervention.
+            </p>
+
+            <p>
+                In biological terms: the organism had structure and memory, but no
+                immune response and no evolutionary selection. A cell that cannot
+                detect stagnation and cannot learn from prior infections is fragile
+                in exactly the ways that matter for production agent systems.
+            </p>
+
+            <h2>2. The Pattern Repository</h2>
+
+            <p>
+                The <code>PatternLibrary</code> is evolutionary memory for collaboration
+                patterns. It stores <code>PatternTemplate</code> instances &mdash;
+                blueprints describing a topology, stage specifications, and default
+                intervention policies &mdash; and retrieves them by matching against
+                a <code>TaskFingerprint</code>.
+            </p>
+
+<pre><code>from operon_ai import PatternLibrary, PatternTemplate, TaskFingerprint
+
+lib = PatternLibrary()
+
+# Register a template
+lib.register_template(PatternTemplate(
+    template_id=lib.make_id(),
+    name="Enterprise Review",
+    topology="skill_organism",
+    stage_specs=(
+        {"name": "research", "role": "Researcher", "mode": "fuzzy"},
+        {"name": "strategy", "role": "Strategist", "mode": "deep"},
+        {"name": "critique", "role": "Critic", "mode": "fuzzy"},
+    ),
+    intervention_policy={"max_retries": 2},
+    fingerprint=TaskFingerprint(
+        task_shape="sequential", tool_count=4,
+        subtask_count=3, required_roles=("researcher", "strategist", "critic"),
+    ),
+))
+
+# Later: retrieve ranked matches for a new task
+ranked = lib.top_templates_for(TaskFingerprint(
+    task_shape="sequential", tool_count=3,
+    subtask_count=4, required_roles=("researcher", "analyst"),
+))</code></pre>
+
+            <h3>Scoring</h3>
+
+            <p>
+                The <code>top_templates_for()</code> method scores each template
+                using a weighted combination of six factors:
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>Factor</th><th>Weight</th><th>Metric</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Task shape</td><td>0.30</td><td>Exact match (1.0 or 0.0)</td></tr>
+                    <tr><td>Tool count</td><td>0.15</td><td>1 / (1 + |delta|)</td></tr>
+                    <tr><td>Subtask count</td><td>0.15</td><td>1 / (1 + |delta|)</td></tr>
+                    <tr><td>Role overlap</td><td>0.20</td><td>Jaccard similarity</td></tr>
+                    <tr><td>Tag overlap</td><td>0.10</td><td>Jaccard similarity</td></tr>
+                    <tr><td>Success rate</td><td>0.10</td><td>Historical win rate (default 0.5)</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                The success rate component closes the feedback loop: as
+                <code>PatternRunRecord</code> instances accumulate, templates that
+                consistently succeed rise in the rankings, while those that fail
+                sink. This is the evo-devo outer loop described by Dupoux, LeCun,
+                and Malik: the template is the genome; run-record scoring is natural
+                selection.
+            </p>
+
+            <h2>3. The Watcher Component</h2>
+
+            <p>
+                The <code>WatcherComponent</code> is a
+                <code>SkillRuntimeComponent</code> that observes stage execution and
+                classifies signals into three categories, following the System A/B/M
+                taxonomy proposed by Dupoux, LeCun, and Malik:
+            </p>
+
+            <ol>
+                <li><strong>Epistemic</strong> &mdash; epiplexity and prediction error.
+                    Sourced from <code>EpiplexityMonitor</code>. Low epiplexity means
+                    the agent is repeating itself without learning &mdash; the
+                    stagnation signal.</li>
+                <li><strong>Somatic</strong> &mdash; ATP and metabolic state. Sourced
+                    from <code>ATP_Store</code>. When the budget is nearly exhausted,
+                    the organism is running on fumes.</li>
+                <li><strong>Species-specific</strong> &mdash; immune threats and
+                    membrane alerts. Sourced from <code>ImmuneSystem</code>. A
+                    confirmed or critical threat means the agent&rsquo;s behavior has
+                    diverged from its baseline in a way that looks adversarial.</li>
+            </ol>
+
+            <div class="insight">
+                <p class="insight-title">Why Three Categories</p>
+                <p>
+                    The distinction matters because the appropriate intervention depends
+                    on the signal type. Epistemic stagnation calls for escalation to a
+                    more capable model. Somatic depletion calls for conservation or halt.
+                    Immune threats call for immediate quarantine. Collapsing all signals
+                    into a single &ldquo;health score&rdquo; loses the information
+                    needed to choose the right response.
+                </p>
+            </div>
+
+            <h2>4. The Intervention Mechanism</h2>
+
+            <p>
+                When the watcher decides to intervene, it writes a
+                <code>WatcherIntervention</code> to <code>shared_state</code> under
+                a reserved key. The organism&rsquo;s run loop checks for this key
+                after all component <code>on_stage_result</code> hooks complete:
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>Intervention</th><th>Run Loop Behavior</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>RETRY</code></td><td>Re-execute the current stage. The retry result replaces the original.</td></tr>
+                    <tr><td><code>ESCALATE</code></td><td>Re-execute using the deep nucleus. Only applies to agent-backed stages.</td></tr>
+                    <tr><td><code>HALT</code></td><td>Break the stage loop immediately. No further stages execute.</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                Component hooks are <em>not</em> re-invoked after retry or escalation.
+                This prevents recursive intervention loops: the watcher decided to
+                retry; the retry result stands. The next stage&rsquo;s hooks will
+                fire normally.
+            </p>
+
+<pre><code>from operon_ai import WatcherComponent, WatcherConfig, skill_organism
+
+watcher = WatcherComponent(
+    config=WatcherConfig(max_intervention_rate=0.5),
+    epiplexity_monitor=monitor,  # optional
+    budget=atp_store,            # optional
+)
+
+organism = skill_organism(
+    stages=[...],
+    fast_nucleus=fast,
+    deep_nucleus=deep,
+    components=[watcher, telemetry],
+)</code></pre>
+
+            <h2>5. Convergence Signal</h2>
+
+            <p>
+                The most interesting intervention is the one that stops the organism
+                entirely. Hao et al. (BIGMAS) demonstrated empirically that incorrect
+                multi-agent runs require systematically more routing decisions than
+                successful ones &mdash; 9.4 vs 7.3 mean decisions on planning tasks.
+                The watcher operationalizes this finding: when the ratio of cumulative
+                interventions to observed stages exceeds
+                <code>max_intervention_rate</code> (default 0.5), it emits a
+                non-convergence HALT.
+            </p>
+
+            <p>
+                This is approximately 20 lines of code in the decision function, but
+                it encodes a structural insight: an organism that keeps needing
+                corrections is not converging. Continuing to retry and escalate is
+                worse than stopping and reporting the failure. The pattern library
+                can then record the failed run, demoting the template for future
+                tasks with similar fingerprints.
+            </p>
+
+            <h2>6. Decision Priority</h2>
+
+            <p>
+                The watcher evaluates signals in a fixed priority order:
+            </p>
+
+            <ol>
+                <li>Intervention rate exceeded &rarr; <strong>HALT</strong> (non-convergence)</li>
+                <li>Critical immune threat &rarr; <strong>HALT</strong></li>
+                <li>Critical epiplexity &rarr; <strong>ESCALATE</strong> (or HALT if already deep)</li>
+                <li>Stagnant epiplexity on fast model &rarr; <strong>ESCALATE</strong></li>
+                <li>Stage failure with retries remaining &rarr; <strong>RETRY</strong></li>
+                <li>Otherwise &rarr; no intervention</li>
+            </ol>
+
+            <p>
+                Higher-priority signals always win. A critical immune threat triggers
+                HALT even if the epiplexity looks fine. This is intentional: the
+                categories are not weighted against each other; they are checked in
+                order of severity.
+            </p>
+
+            <h2>7. Zero Overhead When Not Attached</h2>
+
+            <p>
+                Both new components are entirely opt-in. An organism with no
+                <code>WatcherComponent</code> in its <code>components</code> list
+                never checks for intervention keys. The
+                <code>PatternLibrary</code> is a standalone object with no coupling
+                to the run loop. Existing tests (987 from v0.20) pass without
+                modification.
+            </p>
+
+            <h2>8. What This Enables</h2>
+
+            <p>
+                Phase 3 is scaffolding, not the full adaptive story. With a
+                repository that can score templates and a watcher that can intervene,
+                Phase 4 can close the loop:
+            </p>
+
+            <ul>
+                <li><code>adaptive_skill_organism(task)</code> &mdash; fingerprint
+                    the task, retrieve the best template, instantiate the organism,
+                    attach a watcher, run, and record the outcome.</li>
+                <li>Experience pool &mdash; the watcher&rsquo;s intervention log
+                    feeds back into the repository, so future assembly benefits from
+                    past interventions.</li>
+                <li>Run-to-run improvement &mdash; templates that work get promoted;
+                    templates that fail get demoted. The library becomes an
+                    evolutionary memory that improves with use.</li>
+            </ul>
+
+            <p>
+                That is the progression the roadmap describes:
+                <strong>structure &rarr; memory &rarr; adaptation</strong>.
+                v0.17&ndash;0.18 gave explicit structure. v0.19&ndash;0.20 gave
+                auditable memory. v0.21 gives the static scaffolding for adaptation.
+                v0.22 will close the dynamic loop.
+            </p>
+
+            <h2>9. Validation</h2>
+
+            <table class="status-table">
+                <tr><th>Suite</th><th>Tests</th><th>Status</th></tr>
+                <tr>
+                    <td>Pattern repository unit tests</td>
+                    <td class="result-value">16</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Watcher component unit tests</td>
+                    <td class="result-value">16</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Organism intervention integration tests</td>
+                    <td class="result-value">5</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+                <tr>
+                    <td>Full regression suite at release</td>
+                    <td class="result-value">1024</td>
+                    <td class="result-pass">All pass</td>
+                </tr>
+            </table>
+
+            <div class="reference-impl">
+                <strong>Reference Implementation:</strong>
+                <code>operon_ai/patterns/repository.py</code>,
+                <code>operon_ai/patterns/watcher.py</code>,
+                <code>operon_ai/patterns/organism.py</code>,
+                <code>examples/72_pattern_repository.py</code>,
+                <code>examples/73_watcher_component.py</code>
+            </div>
+
+            <h2>10. What Comes Next</h2>
+
+            <p>
+                v0.21 provides the components. v0.22 (Phase 4) will compose them
+                into the adaptive assembly loop:
+                <code>adaptive_skill_organism()</code> will fingerprint a task,
+                retrieve a template, construct an organism, attach a watcher,
+                run, and record the outcome. The watcher&rsquo;s intervention
+                history becomes an experience pool that recommends actions for
+                similar future situations.
+            </p>
+
+            <p>
+                Beyond that, the roadmap continues into cognitive architecture
+                (System A/B mode annotations, sleep/consolidation cycles) and
+                developmental staging (critical periods, capability gating). Each
+                layer assumes the previous one is stable &mdash; which is why the
+                static scaffolding ships before the dynamic loop, and why the
+                dynamic loop ships before the cognitive extensions.
+            </p>
+
+            <p>
+                The deeper point is unchanged: agents that cannot learn from their
+                own operational history, and that cannot detect and recover from
+                degradation, are agents that require constant human supervision.
+                The pattern library and the watcher are the first steps toward
+                agents that supervise themselves &mdash; not by hiding the
+                architecture, but by making the adaptation explicit and inspectable.
+            </p>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://coredipper.github.io/operon/skill-organisms/">skill organisms docs</a>,
+                <a href="https://huggingface.co/spaces/coredipper/operon-watcher">watcher dashboard</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
