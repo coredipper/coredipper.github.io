@@ -309,16 +309,152 @@
                 </p>
             </div>
 
-            <h2>5. What Comes Next</h2>
+            <h2>5. Proving It with TLA+</h2>
+
+            <p>
+                The convergence of three independently developed systems creates
+                coordination problems that benefit from formal specification.
+                Murat Demirbas&rsquo;s
+                <a href="https://muratbuffalo.blogspot.com/2026/03/tla-mental-models.html">&ldquo;TLA+ Mental Models&rdquo;</a>
+                (March 2026) describes seven mental models for effective
+                formal specification. They map directly onto the convergence
+                architecture.
+            </p>
+
+            <h3>The Illegal Knowledge Problem</h3>
+
+            <p>
+                Demirbas identifies a critical pitfall: guards that read global
+                state atomically represent &ldquo;illegal knowledge&rdquo; no
+                real process could possess. Operon&rsquo;s
+                <code>WatcherComponent</code> currently reads
+                <code>shared_state</code> atomically &mdash; fine in a single
+                process, but in a distributed deployment via Swarms, no single
+                watcher can atomically observe all stages across nodes.
+            </p>
+
+            <p>
+                TLA+ refinement identifies which guards are
+                <strong>locally stable</strong> &mdash; they can only be changed
+                by the local organism&rsquo;s own actions:
+            </p>
+
+            <ul>
+                <li>&ldquo;My own developmental stage&rdquo; &mdash; only my
+                    own <code>tick()</code> can advance it</li>
+                <li>&ldquo;My own intervention count&rdquo; &mdash; only my
+                    watcher increments it</li>
+                <li>&ldquo;A fact&rsquo;s append-only history&rdquo; &mdash;
+                    no action can delete a bi-temporal fact</li>
+            </ul>
+
+            <p>
+                Versus guards that require coordination:
+            </p>
+
+            <ul>
+                <li>&ldquo;Peer&rsquo;s trust score&rdquo; &mdash; another
+                    organism&rsquo;s <code>record_outcome()</code> can change it</li>
+                <li>&ldquo;Library&rsquo;s template rankings&rdquo; &mdash; other
+                    organisms&rsquo; <code>record_run()</code> shifts scores</li>
+                <li>&ldquo;Peer&rsquo;s developmental stage&rdquo; &mdash; needed
+                    for <code>scaffold_learner()</code> but potentially stale</li>
+            </ul>
+
+            <p>
+                Demirbas&rsquo;s insight: &ldquo;If you can make your guards
+                locally stable, the protocol requires less coordination and
+                tolerates communication delays gracefully.&rdquo; The locally
+                stable guards are the operations that can be implemented
+                without distributed locking. The convergence adapters should
+                be designed around this distinction.
+            </p>
+
+            <h3>Safety Invariants</h3>
+
+            <p>
+                Six safety invariants that the convergence must preserve:
+            </p>
+
+            <ol>
+                <li><strong>Template adoption safety:</strong> an organism never
+                    acquires a template with <code>min_stage</code> &gt; its
+                    current developmental stage</li>
+                <li><strong>Trust monotonicity:</strong> trust scores only change
+                    via <code>record_outcome()</code>, never by direct mutation</li>
+                <li><strong>Bi-temporal append-only:</strong> facts are never
+                    deleted, only superseded</li>
+                <li><strong>Critical period irreversibility:</strong> once a
+                    critical period closes, it never reopens</li>
+                <li><strong>Convergence budget:</strong> intervention rate never
+                    exceeds threshold without triggering HALT</li>
+                <li><strong>Developmental monotonicity:</strong> stages never
+                    regress, even if telomeres are renewed</li>
+            </ol>
+
+            <p>
+                These are not just test assertions. They are the contracts that
+                inter-layer adapters must preserve. A Swarms adapter that imports
+                an Operon template must preserve template adoption safety. An
+                AnimaWorks consolidation bridge must preserve bi-temporal
+                append-only semantics. TLA+ model checking can verify these
+                contracts hold across all interleavings &mdash; something unit
+                tests cannot do.
+            </p>
+
+            <h3>Atomicity That Needs Refinement</h3>
+
+            <p>
+                The current implementation assumes single-process atomicity
+                everywhere. For distributed deployment, these assumptions break:
+            </p>
+
+            <table>
+                <thead>
+                    <tr><th>Operation</th><th>Current</th><th>Distributed</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>register_template()</code></td><td>Atomic dict write</td><td>Replicated write with lag</td></tr>
+                    <tr><td><code>consolidate()</code></td><td>Single batch</td><td>Concurrent organisms</td></tr>
+                    <tr><td><code>on_stage_result()</code></td><td>Atomic state write</td><td>Async heartbeat signal</td></tr>
+                    <tr><td><code>record_outcome()</code></td><td>Atomic EMA update</td><td>Concurrent trust updates</td></tr>
+                    <tr><td><code>import_from_peer()</code></td><td>Atomic mutation</td><td>Network partition mid-adoption</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                The TLA+ methodology: start with coarse-grained atomicity
+                (current implementation), systematically split into finer steps,
+                reverify safety at each step. The payoff is that fine-grained
+                actions give Swarms maximum scheduling freedom and AnimaWorks
+                maximum heartbeat concurrency &mdash; while the model checker
+                proves the invariants still hold.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Three Candidate Specs</p>
+                <p>
+                    <strong>TemplateExchangeProtocol.tla</strong> &mdash; models
+                    peer exchange with trust scoring; proves adoption preserves
+                    safety invariants. <strong>DevelopmentalGating.tla</strong>
+                    &mdash; models lifecycle with critical periods; proves
+                    capability gating is never violated under concurrent
+                    adoption. <strong>ConvergenceDetection.tla</strong> &mdash;
+                    models the intervention-rate signal across distributed
+                    organisms; proves non-convergence is always detected within
+                    bounded steps.
+                </p>
+            </div>
+
+            <h2>6. What Comes Next</h2>
 
             <p>
                 The roadmap is complete. The code is stable. The paper is
                 publication-ready. What remains is the convergence work:
                 building the adapters that connect Operon&rsquo;s structural
                 layer to AnimaWorks&rsquo; cognitive runtime and Swarms&rsquo;
-                enterprise orchestration. That investigation is scoped but not
-                yet started &mdash; it requires the enriched capabilities that
-                only became available with v0.23.1.
+                enterprise orchestration, with TLA+ specifications proving the
+                inter-layer contracts hold under distributed interleavings.
             </p>
 
             <p>
@@ -328,8 +464,11 @@
                 human supervision. Agents that get full capabilities before
                 they have matured are agents that fail in preventable ways.
                 The roadmap addressed all three. The convergence investigation
-                is about making those guarantees available to agents that
-                actually run in production.
+                &mdash; with formal verification via TLA+ &mdash; is about
+                making those guarantees available to agents that actually run
+                in production, with mathematical proof that the guarantees
+                survive the transition from single-process library to
+                distributed deployment.
             </p>
 
             <blockquote>
