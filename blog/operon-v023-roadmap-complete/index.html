@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon: Roadmap Complete - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body { background-color: #0a0a0a; color: #d0d0d0; font-family: 'Georgia', 'Times New Roman', serif; line-height: 1.8; font-size: 17px; }
+        .container { max-width: 720px; margin: 0 auto; padding: 60px 24px 120px; }
+        nav { margin-bottom: 48px; font-family: 'SF Mono', 'Monaco', monospace; }
+        nav a { color: #888; text-decoration: none; font-size: 14px; transition: color 0.2s; }
+        nav a:hover { color: #fff; }
+        header { text-align: center; margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid #222; }
+        h1 { font-size: 28px; font-weight: 600; color: #fff; margin-bottom: 12px; line-height: 1.3; }
+        .subtitle { font-size: 16px; color: #888; margin-bottom: 16px; font-style: italic; }
+        .author { font-size: 15px; color: #999; font-family: 'SF Mono', monospace; }
+        .author a { color: #999; text-decoration: none; border-bottom: 1px solid #444; }
+        .author a:hover { color: #fff; border-color: #888; }
+        .version-note { display: inline-block; margin-top: 12px; padding: 4px 12px; background: #1a2a1a; border-radius: 4px; font-size: 12px; color: #6a6; font-family: 'SF Mono', monospace; }
+        .abstract { background: #111; border-left: 3px solid #333; padding: 24px; margin: 32px 0; font-style: italic; color: #b0b0b0; }
+        .abstract-title { font-style: normal; font-weight: 600; color: #999; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        h2 { font-size: 22px; font-weight: 600; color: #fff; margin: 48px 0 24px; padding-bottom: 8px; border-bottom: 1px solid #222; }
+        p { margin-bottom: 16px; text-align: justify; }
+        ul, ol { margin: 16px 0 16px 24px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #222; vertical-align: top; }
+        th { color: #fff; font-weight: 600; background: #111; }
+        tr:hover { background: #0f0f0f; }
+        .insight { background: #0a1a2a; border: 1px solid #1a2a3a; border-radius: 6px; padding: 16px; margin: 24px 0; }
+        .insight-title { font-weight: 600; color: #6af; margin-bottom: 8px; font-size: 14px; }
+        blockquote { margin: 32px 0; padding: 16px 24px; border-left: 3px solid #333; color: #b0b0b0; font-style: italic; }
+        a { color: #8ab4f8; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon: Roadmap Complete</h1>
+                <p class="subtitle">Eight Phases, Six Layers, 1130 Tests, and What It Means to Build Agents That Grow Up</p>
+                <p class="author">
+                    Bogdan Banu &middot; March 2026 &middot;
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.23.1</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    The eight-phase roadmap that began with bi-temporal memory in
+                    v0.19 is now complete. Operon has grown from a library of typed
+                    wiring patterns into a cognitive architecture where agents have
+                    auditable memory, adaptive structure selection, sleep consolidation,
+                    social learning, curiosity, and developmental staging with critical
+                    periods. This post recaps the arc, the numbers, and what comes next.
+                </p>
+            </div>
+
+            <h2>1. The Arc</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Phase</th><th>Layer</th><th>Version</th><th>Key Deliverable</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Memory</td><td>v0.19</td><td>Bi-temporal facts with dual time axes</td></tr>
+                    <tr><td>2</td><td>Memory</td><td>v0.20</td><td>Substrate integration, three-layer context model</td></tr>
+                    <tr><td>3</td><td>Adaptation</td><td>v0.21.0</td><td>PatternLibrary + WatcherComponent</td></tr>
+                    <tr><td>4</td><td>Adaptation</td><td>v0.21.1</td><td>Adaptive assembly + experience pool</td></tr>
+                    <tr><td>5</td><td>Cognition</td><td>v0.22.0</td><td>Cognitive modes + sleep consolidation</td></tr>
+                    <tr><td>6</td><td>Cognition</td><td>v0.22.1</td><td>Social learning + curiosity signals</td></tr>
+                    <tr><td>7</td><td>Development</td><td>v0.23.0</td><td>Developmental staging + critical periods</td></tr>
+                    <tr><td>8</td><td>Integration</td><td>v0.23.1</td><td>Memory adapters + integration tests + paper polish</td></tr>
+                </tbody>
+            </table>
+
+            <p>
+                The progression &mdash; <strong>structure &rarr; memory &rarr;
+                adaptation &rarr; cognition &rarr; development &rarr;
+                integration</strong> &mdash; mirrors the biological sequence from
+                genome (fixed structure) through epigenetics (learned bias) to
+                neural development (plastic then crystallizing). Each layer assumes
+                the previous one is stable.
+            </p>
+
+            <h2>2. By the Numbers</h2>
+
+            <table>
+                <thead>
+                    <tr><th>Metric</th><th>Count</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Tests</td><td>1,130</td></tr>
+                    <tr><td>Examples</td><td>81</td></tr>
+                    <tr><td>HuggingFace Spaces</td><td>8 (new in this roadmap)</td></tr>
+                    <tr><td>PyPI releases</td><td>v0.19.0 through v0.23.1</td></tr>
+                    <tr><td>Blog posts</td><td>6 (v0.19 through v0.23)</td></tr>
+                    <tr><td>New modules</td><td>repository, watcher, adaptive, consolidation, social_learning, development, adapters</td></tr>
+                    <tr><td>New types</td><td>40+</td></tr>
+                </tbody>
+            </table>
+
+            <h2>3. What the Paper Now Says</h2>
+
+            <p>
+                The article abstract has been rewritten. It no longer describes
+                just structural safety patterns. It describes a six-layer
+                progression from typed interfaces through temporal epistemics,
+                adaptive structure, cognitive architecture, and developmental
+                staging. The conclusion traces the arc from v0.17 through v0.23
+                and identifies the remaining open directions: convergence with
+                operational runtimes (AnimaWorks, Swarms), production benchmarks
+                (BFCL, AgentDojo), adversarial robustness, and learned diagram
+                optimization.
+            </p>
+
+            <h2>4. The Integration Tests</h2>
+
+            <p>
+                Phase 8&rsquo;s five integration tests prove the full stack works:
+            </p>
+
+            <ol>
+                <li>Organism with bi-temporal substrate and watcher &mdash; facts
+                    recorded, watcher observes, belief state reconstructible</li>
+                <li>Adaptive assembly followed by sleep consolidation &mdash;
+                    run &rarr; consolidate &rarr; promote templates</li>
+                <li>Social learning with developmental gating &mdash; mature
+                    teacher scaffolds young learner, critical period closes</li>
+                <li>Full lifecycle &mdash; telomere &rarr; development &rarr;
+                    library &rarr; adaptive &rarr; consolidation</li>
+                <li>Memory adapters &mdash; histone and episodic memories bridged
+                    into bi-temporal fact store</li>
+            </ol>
+
+            <div class="insight">
+                <p class="insight-title">Why Integration Tests Matter Here</p>
+                <p>
+                    Each phase was tested in isolation. The integration tests prove
+                    that the subsystems compose: that a watcher can observe a
+                    substrate-equipped organism, that consolidation can distill
+                    adaptive runs, that scaffolding respects developmental gates.
+                    The individual unit tests prove correctness; the integration
+                    tests prove coherence.
+                </p>
+            </div>
+
+            <h2>5. What Comes Next</h2>
+
+            <p>
+                The roadmap is complete. The next directions are:
+            </p>
+
+            <ul>
+                <li><strong>Convergence investigation</strong> &mdash; combining
+                    Operon&rsquo;s structural guarantees with AnimaWorks&rsquo;
+                    cognitive runtime and Swarms&rsquo; enterprise orchestration
+                    (<a href="https://github.com/coredipper/operon/blob/main/docs/plans/2026-03-23-operon-animaworks-convergence.md">plan doc</a>)</li>
+                <li><strong>Production benchmarks</strong> &mdash; BFCL and AgentDojo
+                    evaluation at scale</li>
+                <li><strong>Paper submission</strong> &mdash; the article is
+                    publication-ready with the v0.23.1 polish</li>
+            </ul>
+
+            <p>
+                The deeper point remains the one from the first blog post: agents
+                that cannot explain their past decisions are agents you cannot
+                trust with consequential ones. The roadmap built the explanation
+                layer (bi-temporal memory), the adaptation layer (pattern library
+                + watcher), the cognitive layer (consolidation + social learning),
+                and the developmental layer (critical periods + scaffolding). What
+                started as typed wiring diagrams now has temporal epistemics,
+                dreams, curiosity, and the ability to grow up.
+            </p>
+
+            <blockquote>
+                Code and release:
+                <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>,
+                <a href="https://pypi.org/project/operon-ai/">operon-ai on PyPI</a>,
+                <a href="https://coredipper.github.io/operon/">documentation</a>
+            </blockquote>
+        </article>
+    </div>
+</body>
+</html>
