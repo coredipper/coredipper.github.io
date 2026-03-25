@@ -51,6 +51,12 @@
             <li><code>CognitiveMode</code> annotations: System A/B dual-process stage classification (v0.22)</li>
         </ul>
 
+        <h2><code>managed_organism(...)</code></h2>
+        <p>Use this when you want the full v0.19&ndash;0.23 stack in one call: adaptive assembly, watcher, bi-temporal substrate, developmental staging, and social learning &mdash; all opt-in. Returns a <code>ManagedOrganism</code> with <code>.run()</code>, <code>.consolidate()</code>, <code>.export_templates()</code>, <code>.scaffold()</code>, and <code>.status()</code> methods.</p>
+
+        <h2><code>consolidate(...)</code></h2>
+        <p>One-call sleep consolidation. Pass a <code>PatternLibrary</code>, get back a <code>ConsolidationResult</code>.</p>
+
         <h2>Escape Hatch</h2>
         <p>These wrappers do not hide the structure permanently. You can still inspect the generated diagram and analysis when you need to:</p>
         <ul>
