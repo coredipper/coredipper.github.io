@@ -19,7 +19,7 @@
             <p class="subtitle">Structural analysis adapters for external agent orchestration systems.</p>
         </header>
 
-        <p>The <code>operon_ai.convergence</code> package bridges external agent frameworks (Swarms, DeerFlow, AnimaWorks) into Operon's structural analysis layer. All adapters operate on serializable dicts &mdash; no external dependencies.</p>
+        <p>The <code>operon_ai.convergence</code> package bridges external agent frameworks (<a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>) into Operon's structural analysis layer. All adapters operate on serializable dicts &mdash; no external dependencies.</p>
 
         <h2>Four-Layer Architecture</h2>
         <pre><code>&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
@@ -33,7 +33,7 @@
 &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</code></pre>
 
         <h2>Phase C1 &mdash; Foundation Adapters</h2>
-        <p>Type-level bridges to Swarms, DeerFlow, and AnimaWorks. All produce <code>ExternalTopology</code>, consumed by <code>analyze_external_topology()</code> to apply Operon's four epistemic theorems as a structural linter.</p>
+        <p>Type-level bridges to <a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, and <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>. All produce <code>ExternalTopology</code>, consumed by <code>analyze_external_topology()</code> to apply Operon's four epistemic theorems as a structural linter.</p>
         <ul>
             <li><code>parse_swarm_topology()</code> &mdash; Swarms workflow patterns</li>
             <li><code>parse_animaworks_org()</code> &mdash; AnimaWorks org hierarchies</li>
