@@ -19,25 +19,29 @@
             <p class="subtitle">Structural analysis adapters for external agent orchestration systems.</p>
         </header>
 
-        <p>The <code>operon_ai.convergence</code> package bridges external agent frameworks (<a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>) into Operon's structural analysis layer. All adapters operate on serializable dicts &mdash; no external dependencies.</p>
+        <p>The <code>operon_ai.convergence</code> package bridges 5 external agent frameworks (<a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>, <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a>, <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a>) into Operon's structural analysis layer. All adapters operate on serializable dicts &mdash; no external dependencies.</p>
 
-        <h2>Four-Layer Architecture</h2>
+        <h2>Five-Layer Architecture</h2>
         <pre><code>&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+&#9474;  A-Evolve (evolution layer)                 &#9474;
+&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
 &#9474;  AnimaWorks (cognitive layer)               &#9474;
 &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
 &#9474;  AsyncThink (thinking layer)                &#9474;
 &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
-&#9474;  DeerFlow / Swarms (orchestration layer)    &#9474;
+&#9474;  Ralph / DeerFlow / Swarms (orchestration)  &#9474;
 &#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;
 &#9474;  Operon (structural layer)                  &#9474;
 &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</code></pre>
 
         <h2>Phase C1 &mdash; Foundation Adapters</h2>
-        <p>Type-level bridges to <a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, and <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>. All produce <code>ExternalTopology</code>, consumed by <code>analyze_external_topology()</code> to apply Operon's four epistemic theorems as a structural linter.</p>
+        <p>Type-level bridges to <a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>, <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a>, and <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a>. All produce <code>ExternalTopology</code>, consumed by <code>analyze_external_topology()</code> to apply Operon's four epistemic theorems as a structural linter.</p>
         <ul>
             <li><code>parse_swarm_topology()</code> &mdash; Swarms workflow patterns</li>
             <li><code>parse_animaworks_org()</code> &mdash; AnimaWorks org hierarchies</li>
             <li><code>parse_deerflow_session()</code> &mdash; DeerFlow session configs</li>
+            <li><code>parse_ralph_config()</code> &mdash; <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a> hat definitions</li>
+            <li><code>parse_aevolve_workspace()</code> &mdash; <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a> workspace manifests</li>
         </ul>
 
         <h2>Phase C2 &mdash; Template Exchange</h2>
@@ -60,7 +64,8 @@
 
         <h2>Phase C4 &mdash; Formal Verification</h2>
         <ul>
-            <li>3 TLA+ specs: TemplateExchangeProtocol, DevelopmentalGating, ConvergenceDetection</li>
+            <li>4 TLA+ specs: TemplateExchangeProtocol, DevelopmentalGating, ConvergenceDetection, EvolutionGating</li>
+            <li><code>EvolutionGating.tla</code> &mdash; models the A-Evolve Solve&rarr;Observe&rarr;Evolve&rarr;Gate&rarr;Reload loop with monotonic score safety</li>
             <li><code>DesignProblem</code> + <code>compose_series/parallel</code> + <code>feedback_fixed_point</code> &mdash; Zardini co-design</li>
         </ul>
 
@@ -70,6 +75,7 @@
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">89&ndash;91</a>: Template exchange, hybrid assembly, skill bridge</li>
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">92&ndash;95</a>: Memory bridge, PrimingView, heartbeat, async thinking</li>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/96_codesign_composition.py">96</a>: Co-design adapter composition</li>
+            <li><a href="https://github.com/coredipper/operon/tree/main/examples">97&ndash;98</a>: Ralph hat analysis, A-Evolve workspace analysis</li>
         </ul>
 
         <div class="footer">
