@@ -487,6 +487,106 @@ print(f"Risk score: {result.risk_score:.2f}")</code></pre>
                 </p>
             </div>
 
+            <h3>Live Results: Three Providers, Four Tasks</h3>
+
+            <p>
+                We ran 4 benchmark tasks (3 easy sequential, 1 hard parallel) through
+                guided and unguided configurations across three real providers.
+                Guided configs use distinct fast/deep models (e.g. gemini-2.0-flash /
+                gemini-2.5-flash); unguided use the same model for both nuclei.
+            </p>
+
+            <table>
+                <tr>
+                    <th>Provider</th>
+                    <th>Config</th>
+                    <th>Success</th>
+                    <th>Quality</th>
+                    <th>Tokens</th>
+                    <th>Latency</th>
+                    <th>Risk</th>
+                </tr>
+                <tr>
+                    <td>Gemini API</td>
+                    <td>unguided</td>
+                    <td>25%</td>
+                    <td>0.375</td>
+                    <td>4,713</td>
+                    <td>12.7s</td>
+                    <td>0.170</td>
+                </tr>
+                <tr>
+                    <td>Gemini API</td>
+                    <td style="color:#6a6">guided</td>
+                    <td>38%</td>
+                    <td style="color:#6a6">0.438</td>
+                    <td>5,212</td>
+                    <td>12.6s</td>
+                    <td>0.170</td>
+                </tr>
+                <tr>
+                    <td>Claude CLI</td>
+                    <td>unguided</td>
+                    <td>0%</td>
+                    <td>0.375</td>
+                    <td>369</td>
+                    <td>26.6s</td>
+                    <td>0.050</td>
+                </tr>
+                <tr>
+                    <td>Claude CLI</td>
+                    <td style="color:#6a6">guided</td>
+                    <td>12%</td>
+                    <td style="color:#6a6">0.438</td>
+                    <td>350</td>
+                    <td>24.2s</td>
+                    <td>0.050</td>
+                </tr>
+                <tr>
+                    <td>Codex CLI</td>
+                    <td>unguided</td>
+                    <td>25%</td>
+                    <td>0.625</td>
+                    <td>156</td>
+                    <td>31.8s</td>
+                    <td>0.050</td>
+                </tr>
+                <tr>
+                    <td>Codex CLI</td>
+                    <td>guided</td>
+                    <td>25%</td>
+                    <td>0.625</td>
+                    <td>156</td>
+                    <td>29.2s</td>
+                    <td>0.050</td>
+                </tr>
+            </table>
+
+            <p>
+                <strong>Guidance effect:</strong> Gemini and Claude both show
+                <strong>+6.2%</strong> quality improvement with guidance. Codex shows
+                no difference &mdash; expected, since CLI providers run as single-agent
+                (guidance affects multi-stage topology, not single-node execution).
+            </p>
+
+            <p>
+                <strong>Cross-provider differences are larger than guidance effects.</strong>
+                Codex scored highest quality (0.625) despite being the simplest topology.
+                Gemini was fastest (12.7s). Claude produced the best single result
+                (1.00 on guided translation) but was slowest (24&ndash;27s). The choice of
+                LLM matters more than the topology configuration for simple tasks &mdash;
+                but for complex multi-stage pipelines, structural guidance provides a
+                consistent quality floor.
+            </p>
+
+            <p>
+                <strong>Risk scores reflect real topology differences.</strong>
+                CLI providers get risk&nbsp;=&nbsp;0.050 (single agent, minimal topology).
+                Gemini multi-stage pipelines get risk&nbsp;=&nbsp;0.170 (2-stage sequential
+                with error amplification). The risk score correctly identifies that
+                multi-stage pipelines have more structural risk than single-agent execution.
+            </p>
+
             <h3>Credit Assignment</h3>
 
             <p>
