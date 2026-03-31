@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.25: The Compile-Decompile Loop, or How to Actually Compare Agent Frameworks - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .diagram {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 24px;
+            margin: 24px 0;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: center;
+            color: #aaa;
+        }
+        .diagram .arrow { color: #6af; }
+        .diagram .label { color: #6a6; }
+        .diagram .warn { color: #fa6; }
+        .comparison {
+            background: #0a0a1a;
+            border: 1px solid #1a1a2a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .comparison-title {
+            font-weight: 600;
+            color: #c8a0ff;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-family: 'SF Mono', monospace;
+        }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Operon v0.25: The Compile&ndash;Decompile Loop</h1>
+                <p class="subtitle">Why comparing agent frameworks requires a round-trip through structure, and what Scion taught us about isolation</p>
+                <p class="author">
+                    Bogdan Banu &middot; March 2026 &middot;
+                    <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
+                </p>
+                <span class="version-note">Release: v0.25.1</span>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Abstract</div>
+                <p>
+                    The multi-agent ecosystem now has at least six serious orchestration
+                    frameworks &mdash; <a href="https://github.com/kyegomez/swarms">Swarms</a>,
+                    <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>,
+                    <a href="https://github.com/AnimaWorks/AnimaWorks">AnimaWorks</a>,
+                    <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a>,
+                    <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a>, and
+                    <a href="https://github.com/GoogleCloudPlatform/scion">Scion</a> &mdash;
+                    each with different coordination philosophies. Operon v0.25 introduces an
+                    evaluation harness that answers a question none of them can answer on
+                    their own: does structural guidance actually reduce risk? The key mechanism
+                    is a compile&ndash;decompile round-trip: compile an Operon organism into
+                    any framework&rsquo;s native config, parse it back through an adapter into
+                    a source-agnostic intermediate representation, then apply epistemic bounds
+                    as a structural linter. This post explains why that loop matters, what the
+                    evaluation results show, and what Google&rsquo;s Scion project reveals
+                    about the future of agent isolation.
+                </p>
+            </div>
+
+            <h2>1. The Round-Trip That Makes Comparison Possible</h2>
+
+            <p>
+                If you want to compare agent frameworks, you need a common language. Not a
+                common API &mdash; the frameworks are too different for that &mdash; but a
+                common <em>structural representation</em> that captures what matters:
+                how many agents, how they communicate, and what topology they form.
+            </p>
+
+            <p>
+                Operon v0.24 introduced <code>ExternalTopology</code>: a frozen dataclass
+                that any framework&rsquo;s config can be parsed into. v0.25 closes the loop
+                by adding four <strong>compilers</strong> that go the other direction: from
+                Operon&rsquo;s internal representation <em>out</em> to each framework&rsquo;s
+                native format. This creates a bidirectional bridge:
+            </p>
+
+            <div class="diagram">
+                <pre style="background:transparent;border:none;text-align:center;margin:0;padding:0;">
+SkillOrganism
+      <span class="arrow">&darr;</span> <span class="label">compile</span>
+Framework Config  (Swarms dict, DeerFlow session, Ralph events, Scion grove)
+      <span class="arrow">&darr;</span> <span class="label">decompile</span>
+ExternalTopology  (source-agnostic IR)
+      <span class="arrow">&darr;</span> <span class="label">analyze</span>
+AdapterResult     (risk score, warnings, topology advice)
+      <span class="arrow">&darr;</span> <span class="label">derive</span>
+RunMetrics        (success probability, token cost, latency, interventions)</pre>
+            </div>
+
+            <p>
+                The compile step is lossy by design &mdash; each framework has different
+                expressivity. A Swarms <code>SequentialWorkflow</code> doesn&rsquo;t
+                know about cognitive modes. A Ralph hat config doesn&rsquo;t preserve
+                timeout values. A DeerFlow session collapses all stages into a
+                flat skill list. That&rsquo;s fine. The point isn&rsquo;t to preserve
+                every detail; it&rsquo;s to produce a config that each framework
+                would actually accept, then measure what structural properties
+                survive the round-trip.
+            </p>
+
+            <p>
+                The decompile step parses that native config back through the
+                same adapter that handles real framework configs. This means the
+                analysis pipeline doesn&rsquo;t know or care whether it&rsquo;s
+                looking at a config that came from Operon or one that was written
+                by hand in Swarms. Same code path, same epistemic bounds, same
+                risk scoring.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Why This Matters</p>
+                <p>
+                    The round-trip turns a subjective question (&ldquo;which framework
+                    is better?&rdquo;) into a structural one (&ldquo;which framework
+                    preserves more topology information, and does that reduce the
+                    risk score?&rdquo;). The answer is measurable and reproducible.
+                </p>
+            </div>
+
+            <h2>2. Four Compilers, Five Adapters</h2>
+
+            <p>
+                Each compiler is a pure function: <code>SkillOrganism &rarr; dict</code>.
+                No framework imports. No side effects. The output is a plain, JSON-serializable
+                dictionary that matches what each framework expects as input.
+            </p>
+
+            <table>
+                <tr>
+                    <th>Compiler</th>
+                    <th>Output Format</th>
+                    <th>Key Mapping</th>
+                </tr>
+                <tr>
+                    <td><code>organism_to_swarms()</code></td>
+                    <td>Swarms workflow config</td>
+                    <td>Stages &rarr; agents, order &rarr; edges, cognitive mode &rarr; GPT/Claude model tier</td>
+                </tr>
+                <tr>
+                    <td><code>organism_to_deerflow()</code></td>
+                    <td>DeerFlow session config</td>
+                    <td>Lead stage &rarr; assistant, rest &rarr; sub-agents with skill lists</td>
+                </tr>
+                <tr>
+                    <td><code>organism_to_ralph()</code></td>
+                    <td>Ralph hat config</td>
+                    <td>Stages &rarr; hats with event transitions, observational mode &rarr; backpressure gates</td>
+                </tr>
+                <tr>
+                    <td><code>organism_to_scion()</code></td>
+                    <td>Scion grove config</td>
+                    <td>Stages &rarr; containerized agents with git worktree isolation + dedicated watcher</td>
+                </tr>
+            </table>
+
+            <p>
+                The five adapters go the other direction. Each takes a framework&rsquo;s
+                native config dict and returns an <code>ExternalTopology</code>:
+            </p>
+
+<pre><code># Swarms round-trip
+compiled = organism_to_swarms(organism)
+topology = parse_swarm_topology(
+    pattern_name=compiled["workflow_type"],
+    agent_specs=compiled["agents"],
+    edges=compiled["edges"],
+)
+result = analyze_external_topology(topology)
+print(f"Risk score: {result.risk_score:.2f}")</code></pre>
+
+            <p>
+                Every adapter also has a <code>*_to_stages()</code> function that maps
+                framework-native concepts back to Operon&rsquo;s <code>SkillStage</code>
+                list, enabling full bidirectional template exchange. A Swarms pattern
+                discovered in production can be imported into Operon&rsquo;s pattern
+                library, analyzed, and re-exported to DeerFlow or Ralph.
+            </p>
+
+            <h2>3. The Evaluation Harness: Does Guidance Help?</h2>
+
+            <p>
+                The central question behind v0.25 is empirical: <strong>does Operon&rsquo;s
+                structural guidance actually reduce risk, or do agents self-organize
+                effectively without it?</strong>
+            </p>
+
+            <p>
+                The evaluation harness answers this by running 20 benchmark tasks
+                across 7 configurations. Each task has a difficulty tier (easy, medium,
+                hard), a set of required agent roles, and an expected topology shape
+                (sequential, parallel, or mixed). The configurations span guided and
+                unguided deployments:
+            </p>
+
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Configuration</th>
+                    <th>Guided?</th>
+                    <th>Compiler</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Operon adaptive</td>
+                    <td style="color:#6a6">Yes</td>
+                    <td>advise_topology + adaptive_skill_organism</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Swarms auto</td>
+                    <td style="color:#a66">No</td>
+                    <td>organism_to_swarms</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>DeerFlow default</td>
+                    <td style="color:#a66">No</td>
+                    <td>organism_to_deerflow</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>AnimaWorks default</td>
+                    <td style="color:#a66">No</td>
+                    <td>parse_animaworks_org</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Ralph default</td>
+                    <td style="color:#a66">No</td>
+                    <td>organism_to_ralph</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Scion unguided</td>
+                    <td style="color:#a66">No</td>
+                    <td>organism_to_scion (no watcher)</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Scion + Operon</td>
+                    <td style="color:#6a6">Yes</td>
+                    <td>organism_to_scion + watcher</td>
+                </tr>
+            </table>
+
+            <h3>The MockEvaluator: Real Analysis, Synthetic Execution</h3>
+
+            <p>
+                The evaluator doesn&rsquo;t call LLMs. Instead, it uses the
+                compile&ndash;decompile round-trip to derive metrics from
+                <em>real structural analysis</em>. For each task &times; config pair:
+            </p>
+
+            <ol>
+                <li>Build a <code>SkillOrganism</code> from the task&rsquo;s required roles</li>
+                <li>If guided, run <code>advise_topology(error_tolerance=0.01)</code> to inform stage mode assignment</li>
+                <li>Compile through the config&rsquo;s compiler to a native dict</li>
+                <li>Parse back through the adapter to <code>ExternalTopology</code></li>
+                <li>Run <code>analyze_external_topology()</code> to get the risk score</li>
+                <li>Derive metrics: success probability = <code>1 &minus; risk_score</code>, token cost from stage count, latency from sequential overhead</li>
+            </ol>
+
+            <p>
+                The noise is controlled: each task-config pair gets a deterministic
+                RNG seeded with <code>SHA-256(seed:task_id:config_id)</code>. Same seed,
+                same results. The harness produces ranking tables, per-config aggregate
+                metrics with Wilson 95% confidence intervals, and structural variation
+                summaries.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">Key Invariant</p>
+                <p>
+                    Guided configurations (Operon adaptive, Scion + Operon) should
+                    have lower mean risk scores than unguided configurations (Swarms auto,
+                    DeerFlow default, etc.). If they don&rsquo;t, the structural guidance
+                    isn&rsquo;t working. This is a falsifiable claim baked into the
+                    evaluation design.
+                </p>
+            </div>
+
+            <h3>Credit Assignment</h3>
+
+            <p>
+                Beyond aggregate risk, the harness includes credit assignment: for each
+                run, it attributes outcomes to individual stage contributions. Which
+                stage drove the risk score up? Which one reduced it? This lets you
+                identify structural bottlenecks &mdash; the single agent in a pipeline
+                whose error amplification dominates the topology&rsquo;s risk profile.
+            </p>
+
+            <h2>4. What Scion Reveals About Isolation</h2>
+
+            <p>
+                Google&rsquo;s <a href="https://github.com/GoogleCloudPlatform/scion">Scion</a>
+                is the newest entrant in this space, and it approaches multi-agent
+                orchestration from a fundamentally different angle. Where Swarms and
+                DeerFlow focus on in-process coordination, Scion starts with
+                <strong>container isolation</strong>: each agent runs in its own Docker
+                container with its own git worktree and isolated credentials.
+            </p>
+
+            <p>
+                Scion&rsquo;s <a href="https://googlecloudplatform.github.io/scion/philosophy/">philosophy</a>
+                is &ldquo;less is more&rdquo; &mdash; fewer agents, maximum isolation per agent,
+                minimal shared state. This is a direct contrast to the Swarms approach of
+                orchestrating dozens of lightweight agents in a single process. Both are
+                valid; they optimize for different failure modes.
+            </p>
+
+            <div class="comparison">
+                <p class="comparison-title">Scion vs. Swarms: Two Philosophies</p>
+                <table style="margin:8px 0 0 0;">
+                    <tr>
+                        <th>Dimension</th>
+                        <th>Scion</th>
+                        <th>Swarms</th>
+                    </tr>
+                    <tr>
+                        <td>Isolation model</td>
+                        <td>Container + git worktree per agent</td>
+                        <td>In-process, shared memory</td>
+                    </tr>
+                    <tr>
+                        <td>Agent count preference</td>
+                        <td>Few, heavily isolated</td>
+                        <td>Many, lightweight</td>
+                    </tr>
+                    <tr>
+                        <td>Communication</td>
+                        <td>Named message channels</td>
+                        <td>Direct function calls / edges</td>
+                    </tr>
+                    <tr>
+                        <td>Failure mode optimized for</td>
+                        <td>Blast radius (one agent can&rsquo;t corrupt another)</td>
+                        <td>Coordination overhead (minimize handoff latency)</td>
+                    </tr>
+                    <tr>
+                        <td>Observability</td>
+                        <td>Dedicated watcher agent + OTEL telemetry</td>
+                        <td>Framework-level logging</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p>
+                The Scion compiler in Operon (<code>organism_to_scion()</code>) produces
+                a &ldquo;grove&rdquo; config: each stage becomes a containerized agent
+                with <code>git_worktree: true</code> and <code>credentials: "isolated"</code>.
+                A dedicated <code>operon-watcher</code> agent is automatically injected
+                for telemetry monitoring and convergence detection. The watcher is the
+                only agent with shared credentials &mdash; it needs to observe all others.
+            </p>
+
+<pre><code># Scion compilation
+from operon_ai.convergence import organism_to_scion
+
+grove = organism_to_scion(organism, runtime="docker")
+
+# Each stage agent gets:
+# {
+#   "name": "researcher",
+#   "template": {"system_prompt": "...", "skills": [...]},
+#   "runtime_profile": "medium",
+#   "isolation": {
+#     "git_worktree": True,
+#     "credentials": "isolated"
+#   }
+# }
+
+# Plus an injected watcher:
+# {
+#   "name": "operon-watcher",
+#   "isolation": {"git_worktree": False, "credentials": "shared"}
+# }</code></pre>
+
+            <h3>The Scion Trade-Off in Numbers</h3>
+
+            <p>
+                When the evaluation harness compares &ldquo;Scion unguided&rdquo; (config 6)
+                against &ldquo;Scion + Operon&rdquo; (config 7), it measures whether
+                adding Operon&rsquo;s structural guidance on top of Scion&rsquo;s
+                container isolation produces measurably different risk profiles. The
+                two address orthogonal concerns:
+            </p>
+
+            <ul>
+                <li><strong>Scion alone</strong> provides runtime isolation &mdash; one agent&rsquo;s crash or credential leak doesn&rsquo;t propagate</li>
+                <li><strong>Operon on top</strong> provides structural analysis &mdash; error amplification, sequential penalty, and topology mismatch warnings detected before deployment</li>
+            </ul>
+
+            <p>
+                These are complementary, not competing. A topology with a 6.4x error
+                amplification bound is dangerous whether its agents run in Docker
+                containers or not. Container isolation prevents <em>runtime</em> cascades;
+                structural analysis prevents <em>logical</em> cascades. You want both.
+            </p>
+
+            <h2>5. Implications for the Agent Orchestration Ecosystem</h2>
+
+            <h3>Framework authors get a free structural linter</h3>
+
+            <p>
+                Writing an adapter is a single parse function. Once your framework can
+                produce an <code>ExternalTopology</code>, you get error amplification
+                bounds, sequential penalty estimates, tool density scores, and topology
+                recommendations &mdash; all computed from Operon&rsquo;s epistemic layer,
+                with no changes to your own code.
+            </p>
+
+            <h3>Template exchange becomes framework-portable</h3>
+
+            <p>
+                A coordination pattern discovered in Swarms can be imported into Operon&rsquo;s
+                <code>PatternLibrary</code>, scored against historical run records, and
+                re-exported as a DeerFlow session, a Ralph hat config, or a Scion grove.
+                The pattern travels; the framework binding doesn&rsquo;t.
+            </p>
+
+            <h3>Evaluation becomes apples-to-apples</h3>
+
+            <p>
+                The compile&ndash;decompile loop means every framework is evaluated against
+                the same structural analysis pipeline. The risk score doesn&rsquo;t
+                depend on which framework compiled the config &mdash; it depends on the
+                topology that emerged from the compilation. Framework A might produce
+                a deeper chain than Framework B for the same task; the risk score will
+                reflect that structural difference, not an implementation preference.
+            </p>
+
+            <h3>The &ldquo;less is more&rdquo; hypothesis is testable</h3>
+
+            <p>
+                Scion argues that fewer, more isolated agents are better. The Swarms
+                ecosystem argues that many lightweight agents enable richer coordination.
+                With the evaluation harness, this is no longer a philosophical debate.
+                Compile the same 20 tasks through both, decompile, analyze, compare risk
+                scores. The structural properties are measurable; the trade-offs are
+                quantifiable.
+            </p>
+
+            <div class="insight">
+                <p class="insight-title">The Deeper Point</p>
+                <p>
+                    Agent orchestration frameworks are not applications &mdash; they are
+                    <em>compilers</em>. They take a task description and produce a
+                    coordination topology. Operon treats them that way: the four compilers
+                    formalize the &ldquo;code generation&rdquo; step, the five adapters
+                    formalize the &ldquo;decompilation&rdquo; step, and the analysis
+                    pipeline is the type checker. The evaluation harness is a benchmark
+                    suite that tests the compiler&rsquo;s output quality.
+                </p>
+            </div>
+
+            <h2>6. Future Work: Prompt Optimization and Workflow Generation</h2>
+
+            <p>
+                v0.25 also introduces two protocol interfaces for capabilities that
+                are not yet fully implemented but whose contracts are now stable:
+            </p>
+
+            <ul>
+                <li>
+                    <strong><code>PromptOptimizer</code></strong> &mdash; a
+                    <code>@runtime_checkable Protocol</code> for prompt-level tuning.
+                    The reference implementation (<code>NoOpOptimizer</code>) is a
+                    pass-through; <code>EvolutionaryOptimizer</code> defines the
+                    extended protocol for mutation-based optimization with fitness gating.
+                    <code>attach_optimizer()</code> wires any implementation into all
+                    stages of an organism.
+                </li>
+                <li>
+                    <strong><code>WorkflowGenerator</code></strong> &mdash; a protocol
+                    for natural-language-to-topology generation. <code>HeuristicGenerator</code>
+                    provides rule-based workflow construction as a baseline;
+                    <code>ReasoningGenerator</code> defines the protocol for LLM-powered
+                    workflow synthesis. <code>generate_and_register()</code> integrates
+                    any generator with the <code>PatternLibrary</code>.
+                </li>
+            </ul>
+
+            <p>
+                These are deliberately defined as Protocols rather than abstract base
+                classes. Any object with the right method signatures satisfies the
+                contract &mdash; no inheritance required. This means DSPy optimizers,
+                LangChain generators, or custom implementations can plug in without
+                importing Operon.
+            </p>
+
+            <h2>7. The Numbers</h2>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>v0.24.1</th>
+                    <th>v0.25.1</th>
+                </tr>
+                <tr>
+                    <td>Convergence modules</td>
+                    <td>20</td>
+                    <td>22</td>
+                </tr>
+                <tr>
+                    <td>Tests</td>
+                    <td>1,474</td>
+                    <td>1,510</td>
+                </tr>
+                <tr>
+                    <td>Examples</td>
+                    <td>103</td>
+                    <td>106</td>
+                </tr>
+                <tr>
+                    <td>External frameworks</td>
+                    <td>5 (Swarms, DeerFlow, AnimaWorks, Ralph, A-Evolve)</td>
+                    <td>6 (+Scion)</td>
+                </tr>
+                <tr>
+                    <td>Compilers</td>
+                    <td>4</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>Adapters</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>TLA+ specifications</td>
+                    <td>4</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>Benchmark tasks</td>
+                    <td>&mdash;</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td>Evaluation configurations</td>
+                    <td>&mdash;</td>
+                    <td>7</td>
+                </tr>
+            </table>
+
+            <h2>8. Try It</h2>
+
+<pre><code>pip install operon-ai==0.25.1
+
+# Run the evaluation harness
+python examples/104_evaluation_harness.py
+
+# Try prompt optimization protocols
+python examples/105_prompt_optimization_interface.py
+
+# Generate and register a workflow
+python examples/106_workflow_generation_interface.py</code></pre>
+
+            <p>
+                The evaluation harness requires no API keys &mdash; it uses the
+                <code>MockEvaluator</code> with real structural analysis, not LLM calls.
+                Same seed produces identical results across machines.
+            </p>
+
+            <p>
+                Full documentation:
+                <a href="https://coredipper.github.io/operon/">coredipper.github.io/operon</a>.
+                Convergence companion paper:
+                <a href="https://coredipper.github.io/operon/convergence/">convergence</a>.
+            </p>
+
+            <div class="footer">
+                <p>
+                    Operon is an open-source project.
+                    <a href="https://github.com/coredipper/operon">Source on GitHub</a>.
+                    <a href="https://pypi.org/project/operon-ai/">PyPI</a>.
+                </p>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
