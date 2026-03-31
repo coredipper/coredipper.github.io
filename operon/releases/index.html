@@ -19,6 +19,25 @@
             <p class="subtitle">Recent direction and public writing around the project.</p>
         </header>
 
+        <h2>v0.25.0</h2>
+        <p>Focus:</p>
+        <ul>
+            <li>evaluation harness: 20 benchmark tasks &times; 7 configurations with MockEvaluator (Phase C6)</li>
+            <li>PromptOptimizer and WorkflowGenerator protocol families (Phase C7)</li>
+            <li>production runtime compilers, distributed watcher, LangGraph integration (Phase C5)</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+            <li>4 compilers (<code>organism_to_swarms</code>, <code>organism_to_deerflow</code>, <code>organism_to_ralph</code>, <code>organism_to_scion</code>) &mdash; compile organisms to deployment configs</li>
+            <li><code>DistributedWatcher</code> with <code>InMemoryTransport</code> and <code>HttpTransport</code> &mdash; transport-abstracted convergence detection</li>
+            <li><code>operon_watcher_node()</code> &mdash; LangGraph-compatible convergence detection node</li>
+            <li><code>MockEvaluator</code> &mdash; evaluation harness with structural variation and credit assignment</li>
+            <li><code>PromptOptimizer</code>, <code>EvolutionaryOptimizer</code>, <code>NoOpOptimizer</code> &mdash; prompt optimization protocols</li>
+            <li><code>WorkflowGenerator</code>, <code>ReasoningGenerator</code>, <code>HeuristicGenerator</code> &mdash; workflow generation protocols</li>
+            <li><code>attach_optimizer</code>, <code>generate_and_register</code> &mdash; integration helpers</li>
+            <li>Examples 99&ndash;106</li>
+        </ul>
+
         <h2>v0.24.0</h2>
         <p>Focus:</p>
         <ul>

@@ -69,6 +69,22 @@
             <li><code>DesignProblem</code> + <code>compose_series/parallel</code> + <code>feedback_fixed_point</code> &mdash; Zardini co-design</li>
         </ul>
 
+        <h2>Phase C6 &mdash; Evaluation Harness</h2>
+        <ul>
+            <li>20 benchmark tasks across 7 configurations (single, pipeline, fan-out, fan-in, diamond, full, stress)</li>
+            <li><code>MockEvaluator</code> using real structural analysis (topology advice, epistemic bounds, pattern scoring)</li>
+            <li>Structural variation analysis: measures how topology metrics change across task configurations</li>
+            <li>Credit assignment: attributes evaluation outcomes to individual stage contributions</li>
+        </ul>
+
+        <h2>Phase C7 &mdash; Prompt Optimization + Workflow Generation</h2>
+        <ul>
+            <li><code>PromptOptimizer</code> protocol with <code>EvolutionaryOptimizer</code> and <code>NoOpOptimizer</code> implementations</li>
+            <li><code>attach_optimizer</code> &mdash; attach optimizer to any SkillStage for prompt-level tuning</li>
+            <li><code>WorkflowGenerator</code> protocol with <code>ReasoningGenerator</code> and <code>HeuristicGenerator</code> implementations</li>
+            <li><code>generate_and_register</code> &mdash; generate workflow topology and register it in PatternLibrary</li>
+        </ul>
+
         <h2>Examples</h2>
         <ul>
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">86&ndash;88</a>: Adapter demos (Swarms, AnimaWorks, DeerFlow)</li>
@@ -76,6 +92,10 @@
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">92&ndash;95</a>: Memory bridge, PrimingView, heartbeat, async thinking</li>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/96_codesign_composition.py">96</a>: Co-design adapter composition</li>
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">97&ndash;98</a>: Ralph hat analysis, A-Evolve workspace analysis</li>
+            <li><a href="https://github.com/coredipper/operon/tree/main/examples">99&ndash;103</a>: Production runtime &mdash; 4 compilers and distributed watcher</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/104_evaluation_harness.py">104</a>: Evaluation harness with MockEvaluator</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/105_prompt_optimization.py">105</a>: Prompt optimization protocols</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/106_workflow_generation.py">106</a>: Workflow generation and registration</li>
         </ul>
 
         <div class="footer">
