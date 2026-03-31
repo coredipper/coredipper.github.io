@@ -356,7 +356,7 @@ RunMetrics        (success probability, token cost, latency, interventions)</pre
             </table>
 
             <p>
-                The five adapters go the other direction. Each takes a framework&rsquo;s
+                The six adapters go the other direction. Each takes a framework&rsquo;s
                 native config dict and returns an <code>ExternalTopology</code>:
             </p>
 
@@ -754,7 +754,7 @@ grove = organism_to_scion(organism, runtime="docker")
                     Agent orchestration frameworks are not applications &mdash; they are
                     <em>compilers</em>. They take a task description and produce a
                     coordination topology. Operon treats them that way: the four compilers
-                    formalize the &ldquo;code generation&rdquo; step, the five adapters
+                    formalize the &ldquo;code generation&rdquo; step, the six adapters
                     formalize the &ldquo;decompilation&rdquo; step, and the analysis
                     pipeline is the type checker. The evaluation harness is a benchmark
                     suite that tests the compiler&rsquo;s output quality.
@@ -807,12 +807,12 @@ grove = organism_to_scion(organism, runtime="docker")
                 <tr>
                     <td>Convergence modules</td>
                     <td>20</td>
-                    <td>22</td>
+                    <td>23</td>
                 </tr>
                 <tr>
                     <td>Tests</td>
                     <td>1,474</td>
-                    <td>1,510</td>
+                    <td>1,530</td>
                 </tr>
                 <tr>
                     <td>Examples</td>
@@ -832,7 +832,7 @@ grove = organism_to_scion(organism, runtime="docker")
                 <tr>
                     <td>Adapters</td>
                     <td>5</td>
-                    <td>5</td>
+                    <td>6</td>
                 </tr>
                 <tr>
                     <td>TLA+ specifications</td>
