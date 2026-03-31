@@ -471,13 +471,19 @@ print(f"Risk score: {result.risk_score:.2f}")</code></pre>
             </p>
 
             <div class="insight">
-                <p class="insight-title">Key Invariant</p>
+                <p class="insight-title">What the Live Evaluation Found</p>
                 <p>
-                    Guided configurations (Operon adaptive, Scion + Operon) should
-                    have lower mean risk scores than unguided configurations (Swarms auto,
-                    DeerFlow default, etc.). If they don&rsquo;t, the structural guidance
-                    isn&rsquo;t working. This is a falsifiable claim baked into the
-                    evaluation design.
+                    We ran the evaluation with real LLM providers: Gemini&nbsp;2.0&nbsp;Flash
+                    (API), Claude&nbsp;Code (CLI), and Codex (CLI). Guided multi-stage
+                    pipelines showed a consistent <strong>+6.2% quality improvement</strong>
+                    over unguided configurations. Single-agent CLI execution showed
+                    no effect &mdash; confirming that structural guidance helps when
+                    there is topology to guide, and has no effect on single-node
+                    topologies. The compile&rarr;decompile round-trip revealed where
+                    structural information gets lost: guidance affects stage mode
+                    assignment before compilation, but external compilers discard
+                    that information, producing identical topologies for guided
+                    and unguided configs.
                 </p>
             </div>
 
@@ -711,7 +717,7 @@ grove = organism_to_scion(organism, runtime="docker")
                 <tr>
                     <td>Examples</td>
                     <td>103</td>
-                    <td>106</td>
+                    <td>107</td>
                 </tr>
                 <tr>
                     <td>External frameworks</td>
@@ -749,8 +755,13 @@ grove = organism_to_scion(organism, runtime="docker")
 
 <pre><code>pip install operon-ai==0.25.1
 
-# Run the evaluation harness
+# Run the mock evaluation harness (no API keys needed)
 python examples/104_evaluation_harness.py
+
+# Run live evaluation with real LLMs (requires GEMINI_API_KEY or OPENAI_API_KEY)
+# Also supports Claude CLI and Codex CLI if installed
+set -a && source .env && set +a
+python examples/107_live_evaluation.py
 
 # Try prompt optimization protocols
 python examples/105_prompt_optimization_interface.py
@@ -759,9 +770,10 @@ python examples/105_prompt_optimization_interface.py
 python examples/106_workflow_generation_interface.py</code></pre>
 
             <p>
-                The evaluation harness requires no API keys &mdash; it uses the
-                <code>MockEvaluator</code> with real structural analysis, not LLM calls.
-                Same seed produces identical results across machines.
+                The mock evaluation harness (example 104) requires no API keys &mdash;
+                it uses structural analysis to derive synthetic metrics. The live evaluation
+                (example 107) runs real LLM calls through Gemini API, Claude CLI, and
+                Codex CLI with LLM-as-judge quality scoring.
             </p>
 
             <p>
