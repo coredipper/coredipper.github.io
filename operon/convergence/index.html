@@ -85,6 +85,16 @@
             <li><code>generate_and_register</code> &mdash; generate workflow topology and register it in PatternLibrary</li>
         </ul>
 
+        <h2>Phase C8 &mdash; Harness Search + Live Evaluation (Planned)</h2>
+        <p>Integrates <a href="https://arxiv.org/abs/2603.28052">Meta-Harness</a> (Lee et al., Stanford/MIT 2026) insights: filesystem-backed trace stores for evolutionary search, Pareto convergence detection, causal diagnosis safety properties, and cross-framework harness template exchange.</p>
+        <ul>
+            <li><code>FilesystemOptimizer</code> &mdash; extends <code>EvolutionaryOptimizer</code> with full-history filesystem access (source + traces + scores per candidate)</li>
+            <li><code>HarnessSearchDP</code> &mdash; wraps Meta-Harness outer loop as a Zardini <code>DesignProblem</code></li>
+            <li><code>LiveEvaluator</code> &mdash; real LLM evaluation across Gemini API, Claude CLI, Codex CLI</li>
+            <li>Pareto convergence criterion for <code>ConvergenceDetection.tla</code></li>
+            <li>Causal diagnosis safety property for <code>EvolutionGating.tla</code></li>
+        </ul>
+
         <h2>Examples</h2>
         <ul>
             <li><a href="https://github.com/coredipper/operon/tree/main/examples">86&ndash;88</a>: Adapter demos (Swarms, AnimaWorks, DeerFlow)</li>
@@ -96,6 +106,7 @@
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/104_evaluation_harness.py">104</a>: Evaluation harness with MockEvaluator</li>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/105_prompt_optimization_interface.py">105</a>: Prompt optimization protocols</li>
             <li><a href="https://github.com/coredipper/operon/blob/main/examples/106_workflow_generation_interface.py">106</a>: Workflow generation and registration</li>
+            <li><a href="https://github.com/coredipper/operon/blob/main/examples/107_live_evaluation.py">107</a>: Live evaluation with real LLM providers</li>
         </ul>
 
         <div class="footer">
