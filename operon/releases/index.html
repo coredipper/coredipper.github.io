@@ -19,6 +19,29 @@
             <p class="subtitle">Recent direction and public writing around the project.</p>
         </header>
 
+        <h2>v0.26.0</h2>
+        <p>Focus:</p>
+        <ul>
+            <li><strong>C8 Phase A+B: Meta-evolution of organism configurations</strong></li>
+            <li>Tests whether biological abstractions generalize to evolving organisms</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+            <li><code>FilesystemOptimizer</code> protocol, <code>EvolutionLoop</code>, <code>CandidateConfig</code> with Genome round-trip</li>
+            <li><code>TournamentMutator</code> + <code>LLMProposer</code> hybrid proposer strategy</li>
+            <li><code>DistanceProvider</code> for scale-invariant EpiplexityMonitor</li>
+            <li>Topology mutations: edges, add/remove/rewire, DAG execution</li>
+            <li>57 C8-specific tests</li>
+        </ul>
+        <p>Findings:</p>
+        <ul>
+            <li>Gene abstraction covers full configuration space (lossless round-trip)</li>
+            <li>Rich context LLM proposer: 3x improvement over compressed (0.49 vs 0.15)</li>
+            <li>Phase B: tournament improved (0.60), LLM degraded (0.36)</li>
+            <li><strong>Conclusion:</strong> biological abstractions generalize as code structure, not as optimization algorithms</li>
+        </ul>
+        <p>Note: C8 search code moved to <code>eval/meta/</code>. Only <code>DistanceProvider</code> remains in the library.</p>
+
         <h2>v0.25.1</h2>
         <p>Focus:</p>
         <ul>
