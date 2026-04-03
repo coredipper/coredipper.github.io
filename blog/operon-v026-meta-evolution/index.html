@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operon v0.26: What Happens When You Try to Evolve Your Agent Architectures - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        .abstract {
+            background: #111;
+            border-left: 3px solid #333;
+            padding: 24px;
+            margin: 32px 0;
+            font-style: italic;
+            color: #b0b0b0;
+        }
+        .abstract-title {
+            font-style: normal;
+            font-weight: 600;
+            color: #999;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        pre {
+            background: #0f0f0f;
+            border: 1px solid #1a1a1a;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 24px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre code {
+            background: transparent;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        .insight {
+            background: #0a1a2a;
+            border: 1px solid #1a2a3a;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 24px 0;
+        }
+        .insight-title {
+            font-weight: 600;
+            color: #6af;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>What Happens When You Try to Evolve Your Agent Architectures</h1>
+                <div class="subtitle">We built biological evolution for AI organisms. Here&rsquo;s why random mutation won.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; April 3, 2026</div>
+                <div class="version-note">operon-ai v0.26.0</div>
+            </header>
+
+            <div class="abstract">
+                <div class="abstract-title">Summary</div>
+                Operon uses biological metaphors&mdash;genes, genomes, epiplexity, immune systems&mdash;to structure AI agent systems. Phases C1&ndash;C7 validated these at the organism level. Phase C8 asks: do they generalize to <em>evolving</em> organisms? The answer is nuanced. The abstractions generalize beautifully as code structure (lossless Genome round-trip, scale-invariant monitoring). But as optimization algorithms, evolution does not beat random tournament mutation. The structural guarantee features remain the right focus.
+            </div>
+
+            <h2>1. The Question</h2>
+
+            <p>If your agents have genomes, can you evolve them?</p>
+
+            <p>Operon&rsquo;s <code>Genome</code> class manages immutable configuration traits for individual agents. It tracks genes, mutations, expression levels, and lineage. The question C8 poses: can this same abstraction represent organism-level configurations&mdash;the modes, models, and thresholds of a multi-stage pipeline&mdash;and can we evolve those configurations to discover better architectures?</p>
+
+            <p>This is the natural extension of the biological metaphor. Biology doesn&rsquo;t just run organisms; it evolves them. If Operon&rsquo;s abstractions are genuinely biological, they should work at both levels.</p>
+
+            <h2>2. What We Built</h2>
+
+            <h3>Genome Mapping</h3>
+
+            <p>Each <code>CandidateConfig</code> (stage modes, models, visibility flags, intervention thresholds) maps to a <code>Genome</code> via ~5 lines of flattening logic. Mode and model become <code>STRUCTURAL</code> genes. Boolean flags become <code>REGULATORY</code> genes. The round-trip is lossless&mdash;no type coercion, no special cases.</p>
+
+<pre><code>genome = candidate_to_genome(config)
+restored = genome_to_candidate(genome, ...)
+assert restored.stage_configs == config.stage_configs  # always True</code></pre>
+
+            <p>This is the strongest evidence that the gene abstraction generalizes beyond its original per-agent use case.</p>
+
+            <h3>Scale-Invariant Health Monitoring</h3>
+
+            <p>The existing <code>EpiplexityMonitor</code> detects epistemic stagnation via Bayesian surprise on embedding similarity. We extended it with a <code>DistanceProvider</code> protocol that plugs in any novelty metric. For configuration space, <code>ConfigHammingDistance</code> counts field-level mismatches. The core formula is unchanged&mdash;the monitor triggers STAGNANT/EXPLORING transitions identically to the embedding path.</p>
+
+            <p>This confirms that epistemic health monitoring is scale-invariant: the same mechanism works for token-level stagnation (within an organism run) and configuration-level stagnation (across an evolution loop).</p>
+
+            <h3>Dual Stall Detection</h3>
+
+            <p>We discovered that config novelty alone doesn&rsquo;t trigger the LLM proposer: tournament mutations always produce <em>different</em> configs (high novelty) even when scores stagnate. We added a second signal&mdash;score plateau (best score not improved in N steps)&mdash;and either triggers the switch to LLM reasoning.</p>
+
+            <h3>The LLM Proposer</h3>
+
+            <p>When stagnation is detected, a Gemini-backed proposer reads evolution history from the filesystem store&mdash;full candidate configs plus execution trace metadata&mdash;and proposes a new configuration. This implements the <a href="https://arxiv.org/abs/2603.28052">Meta-Harness</a> insight: raw filesystem history outperforms compressed feedback.</p>
+
+            <h2>3. The Good News</h2>
+
+            <table>
+                <tr><th>Abstraction</th><th>Generalizes?</th><th>Evidence</th></tr>
+                <tr><td>Genome &rarr; CandidateConfig</td><td>Yes</td><td>Lossless round-trip, 5 lines</td></tr>
+                <tr><td>EpiplexityMonitor + DistanceProvider</td><td>Yes</td><td>Scale-invariant transitions</td></tr>
+                <tr><td>DesignProblem wrapping</td><td>Yes</td><td>Natural composition</td></tr>
+                <tr><td><code>feedback_fixed_point</code></td><td>No</td><td>Evolution &ne; convergent iteration</td></tr>
+                <tr><td>TrustRegistry</td><td>No</td><td>Overkill for 2 proposers</td></tr>
+            </table>
+
+            <p>The biological abstractions that describe <em>structure</em> (genes, health monitoring, composition) generalize cleanly. The ones that describe <em>specific dynamics</em> (fixed-point convergence, trust networks) do not&mdash;evolution has different dynamics than the processes they were designed for.</p>
+
+            <h2>4. The Surprise</h2>
+
+            <table>
+                <tr><th>Proposer</th><th>Context</th><th>Mean Score</th><th>N</th></tr>
+                <tr><td>Tournament</td><td>n/a</td><td>0.44</td><td>9</td></tr>
+                <tr><td>LLM (compressed history)</td><td>index entries only</td><td>0.15</td><td>2</td></tr>
+                <tr><td>LLM (rich filesystem context)</td><td>configs + traces</td><td>0.49</td><td>24</td></tr>
+            </table>
+
+            <p>Rich context improves the LLM proposer 3&times; over compressed history (0.49 vs 0.15). But it only marginally exceeds tournament mutation (0.49 vs 0.44). Random mutation&mdash;flip one field, keep the best&mdash;is nearly as good as an LLM reasoning about the full evolution trajectory.</p>
+
+            <div class="insight">
+                <div class="insight-title">The Ao et al. Connection</div>
+                <a href="https://arxiv.org/abs/2603.26993">Ao, Gao &amp; Simchi-Levi (2026)</a> prove that without genuinely new exogenous signals, delegated multi-agent networks cannot beat centralized baselines. Our LLM proposer is the delegated network; tournament mutation is the centralized baseline. Rich context provides an exogenous signal, but the config search space is too small for structural reasoning to provide genuine advantage over random exploration.
+            </div>
+
+            <h2>5. Phase B: Topology Mutations</h2>
+
+            <p>We extended the evolution to mutate topology itself&mdash;add stages, remove stages, rewire edges. Candidates carry explicit <code>edges</code> (directed wiring pairs). A <code>WiringDiagram</code> + <code>ResourceAwareExecutor</code> executes stages in parallel groups via DAG layering.</p>
+
+            <table>
+                <tr><th>Proposer</th><th>Phase A (config only)</th><th>Phase B (topology)</th></tr>
+                <tr><td>Tournament</td><td>0.44</td><td><strong>0.60</strong></td></tr>
+                <tr><td>LLM</td><td>0.49</td><td>0.36</td></tr>
+            </table>
+
+            <p>Tournament <em>improved</em> with topology mutations (0.44 &rarr; 0.60). The LLM proposer <em>degraded</em> (0.49 &rarr; 0.36). Blind mutation handles structural changes more productively than reasoned proposals.</p>
+
+            <p>Why? The LLM spends reasoning capacity on edges that the organism doesn&rsquo;t fully utilize (shared state still leaks across stages). Meanwhile, tournament mutations that happen to add a useful stage or remove a redundant one improve the pipeline directly.</p>
+
+            <h2>6. The Honest Conclusion</h2>
+
+            <blockquote>
+                Biological abstractions generalize to the meta-level as organizing principles, not as optimization advantages.
+            </blockquote>
+
+            <p>The Genome mapping, EpiplexityMonitor extension, and DesignProblem wrapping produce clean, composable code. The evolutionary search itself does not outperform random mutation. This is consistent with Ao et al.: without a search space that rewards structural reasoning, the multi-agent approach (LLM proposer) cannot dominate the single-agent baseline (tournament).</p>
+
+            <p>The structural guarantee features&mdash;immune systems, epiplexity monitoring, developmental gating&mdash;remain the core value proposition of biology-inspired agent engineering. C8 confirms they should be the focus of empirical validation, not meta-optimization.</p>
+
+            <p>The search code has been moved from the library (<code>operon_ai/convergence/</code>) to the evaluation harness (<code>eval/meta/</code>). The only C8 artifact that stays in the library is <code>DistanceProvider</code>&mdash;a genuinely useful extension to epistemic health monitoring.</p>
+
+            <h2>7. The Categorical Connection</h2>
+
+            <p><a href="https://arxiv.org/abs/2603.28906">de los Riscos, Corbacho &amp; Arbib (2026)</a> independently developed a category-theoretic framework (<strong>ArchAgents</strong>) that maps tightly to Operon&rsquo;s architecture. In their framework: objects are organism architectures, morphisms are structure-preserving translations (our compilers), and agents are monoidal functors (configured organisms). Phase A explores agents within a fixed architecture; Phase B explores architecture morphisms. The finding that blind morphisms outperform reasoned ones suggests that the categorical constraints on valid mutations are more productive than LLM-generated ones.</p>
+
+            <h2>8. What&rsquo;s Next</h2>
+
+            <p>The right question is no longer &ldquo;can we evolve better organisms?&rdquo; but &ldquo;do the structural safety features actually work?&rdquo;</p>
+
+            <ul>
+                <li>Does the immune system catch more errors than ad-hoc validation?</li>
+                <li>Does epiplexity monitoring prevent more runaway loops than simple timeouts?</li>
+                <li>Does developmental gating prevent premature deployments?</li>
+            </ul>
+
+            <p>These are the biological features that Operon implements well, and they&rsquo;re the ones the project claims provide structural guarantees. Testing those claims is the next productive direction.</p>
+
+            <h2>9. Try It</h2>
+
+<pre><code>pip install operon-ai==0.26.0
+
+# Run the meta-evolution experiment
+git clone https://github.com/coredipper/operon
+cd operon
+python run_meta_evolution.py --provider gemini --llm-proposer gemini \
+  --max-iterations 10 --tasks easy_seq_01,easy_seq_02</code></pre>
+
+            <p>The evolution loop, proposers, and evaluation harness live in <code>eval/meta/</code>. The 57 C8-specific tests are in <code>tests/eval/test_meta_harness.py</code>.</p>
+
+            <ul>
+                <li><a href="https://github.com/coredipper/operon">GitHub</a></li>
+                <li><a href="https://pypi.org/project/operon-ai/">PyPI</a></li>
+                <li><a href="https://banu.be/operon/convergence/">Convergence docs</a></li>
+            </ul>
+
+            <div class="footer">
+                <a href="/blog/">&larr; Back to blog</a>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
