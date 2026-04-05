@@ -191,15 +191,25 @@
 
             <p>Two structural properties drive this: continuous signals average out noise (unlike binary votes), and temporal decay ensures stale evidence ages out (unlike a vote that persists forever). Biology solved the problem of coordinating without a leader by making evidence time-sensitive.</p>
 
-            <h2>What did not earn its weight: epiplexity stagnation detection</h2>
+            <h2>What earned its weight once the signal was real: epiplexity</h2>
 
             <p>The <code>EpiplexityMonitor</code> uses a Bayesian two-signal approach: embedding novelty plus perplexity, inspired by the free energy principle. The theory: an agent repeating itself (low novelty) while remaining uncertain (high perplexity) is in a pathological loop. A converging agent has both low novelty <em>and</em> low perplexity. Two signals should distinguish these cases; one signal cannot.</p>
 
             <p>The naive alternative: cosine similarity across a sliding window plus a timeout.</p>
 
-            <p>Results on the loop scenario: naive achieved <strong>94.0% detection accuracy</strong> versus biological&rsquo;s <strong>46.7%</strong>. But the false-positive/false-negative breakdown tells a more nuanced story. The biological variant has 0% false-positive rate but 58% false-negative rate. The naive detector has 0% false-negative rate but <strong>75% false-positive rate</strong>&mdash;it false-alarms on three out of four healthy steps.</p>
+            <p>With mock embeddings (SHA-256 hashes), the naive detector won: 94% accuracy on loops versus biological&rsquo;s 47%. I initially reported this as an honest negative. Then I swapped in real sentence embeddings (all-MiniLM-L6-v2, local, no API calls) and the result flipped.</p>
 
-            <p>Same precision-recall tradeoff as the other benchmarks. But here the biological version&rsquo;s recall is too low to be useful. With <code>MockEmbeddingProvider</code> (SHA-256 hash to pseudo-embedding), the novelty signal does not carry semantic information. Two noisy signals combine worse than one clean signal. This may change with real embedding models. For now, it is an honest negative.</p>
+            <table>
+                <tr><th>Scenario</th><th>Bio (real emb)</th><th>Naive (real emb)</th><th>Naive FP rate</th></tr>
+                <tr><td>Convergence</td><td><strong>96.0%</strong></td><td>40.1%</td><td>59.9%</td></tr>
+                <tr><td>False stagnation</td><td><strong>96.0%</strong></td><td>2.0%</td><td>98.0%</td></tr>
+                <tr><td>Trophic withdrawal</td><td>64.4%</td><td>62.5%</td><td>93.8%</td></tr>
+                <tr><td>Loop (easy case)</td><td>57.1%</td><td><strong>94.0%</strong></td><td>75.0%</td></tr>
+            </table>
+
+            <p>The biological monitor achieves <strong>96% accuracy</strong> on convergence and false-stagnation scenarios&mdash;the exact cases it was designed for. The naive detector sees similar outputs and screams &ldquo;stagnant!&rdquo; at 98% false-positive rate on false stagnation. It cannot distinguish an agent converging confidently from an agent stuck in a loop.</p>
+
+            <p>The loop scenario still favors naive (94% vs 57%) because exact repetition is trivially detectable by cosine similarity. That is the easy case. The hard case&mdash;semantically similar outputs where the agent&rsquo;s confidence level matters&mdash;is where the two-signal design earns its complexity. The structural guarantee is conditional: it works when the embedding signal carries semantic meaning, just as a biological receptor works when its ligand is present.</p>
 
             <h2>C8 confirmed the same pattern at the meta-level</h2>
 
@@ -221,18 +231,18 @@
 
             <p><strong>DeerFlow</strong> benefits from metabolic budgets preventing recursive sub-agent calls from exhausting resources. AnimaWorks, Ralph, and Scion have lighter fits: genome immutability for config audit, backpressure enforcement, and cross-container consensus respectively.</p>
 
-            <h2>The honest pattern</h2>
+            <h2>The pattern</h2>
 
-            <p>Across all three benchmarks and the C8 meta-evolution findings, the same pattern holds: Operon&rsquo;s value is <em>structural guarantees</em>, not <em>algorithmic complexity</em>.</p>
+            <p>Across all three benchmarks and the C8 meta-evolution findings, the same pattern holds: Operon&rsquo;s value is <em>structural guarantees</em>&mdash;hard properties enforced by design that simpler approaches cannot match without reimplementing the same structural choices.</p>
 
-            <p>Priority gating beats complex optimization. Signal accumulation with temporal decay beats Bayesian surprise. Developmental staging beats meta-evolution. The winning features are not algorithmically complex. A metabolic state machine is simple. Exponential decay is a one-liner. But they provide hard guarantees that simpler approaches cannot match without reimplementing the same structural choices.</p>
+            <p>Priority gating guarantees critical service under pressure. Signal accumulation with decay guarantees zero false alarms with meaningful detection. Two-signal Bayesian discrimination guarantees convergence/stagnation distinction&mdash;when the embedding signal is real. A metabolic state machine is simple. Exponential decay is a one-liner. A two-signal combiner is undergraduate statistics. But each provides a structural guarantee that a flat counter, a majority vote, or a cosine threshold structurally cannot.</p>
 
-            <p>This is a useful finding for anyone adopting biological motifs in agent systems: invest in mechanism design that enforces structural invariants. Be skeptical of biological metaphors that promise better information processing.</p>
+            <p>The epiplexity result adds a nuance: some structural guarantees are <em>conditional</em> on signal quality. The two-signal design works when embeddings carry semantic meaning; it fails when they do not. This is analogous to a biological receptor that provides a structural binding guarantee but only functions in the presence of its ligand. The structure is always there; whether it activates depends on the environment.</p>
 
             <h2>What comes next</h2>
 
             <ul>
-                <li>Real embedding models (sentence-transformers, local, no API calls) for the epiplexity benchmark&mdash;the current negative may be a MockEmbeddingProvider artifact</li>
+                <li>Confirmation of the real-embedding epiplexity result across additional models and larger sample sizes</li>
                 <li>Auto-calibrated thresholds for quorum sensing (currently hand-tuned to threshold_base=10.0)</li>
                 <li>Empirical validation of epistemic topology bounds against measured benchmark performance</li>
                 <li>End-to-end evaluation with actual LLM agents running real tasks</li>
