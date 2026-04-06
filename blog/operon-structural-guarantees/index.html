@@ -151,7 +151,7 @@
                 <h1>What Biological Agent Design Actually Buys You</h1>
                 <div class="subtitle">After benchmarking three operon subsystems against naive alternatives, the honest answer is: structural guarantees, not algorithmic sophistication</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 4, 2026</div>
-                <div class="version-note">operon-ai v0.26.0</div>
+                <div class="version-note">operon-ai v0.27.1</div>
             </header>
 
             <h2>The biological stack</h2>
@@ -170,9 +170,9 @@
 
             <p>Under bursty load, the biological system served <strong>100% of critical operations</strong> (priority 5+) during resource pressure. The flat counter served <strong>39.8%</strong>. That is a delta of +0.602, statistically significant at p &lt; 0.001, across 24,139 pressure events.</p>
 
-            <p>The tradeoff: the biological system completed 71.9% of total operations versus the naive counter&rsquo;s 68.5%. A 3.4 percentage-point throughput penalty for guaranteed critical service. When resources run low, the state machine enters STARVING and rejects low-priority work while preserving critical ops. A flat counter just says &ldquo;no&rdquo; to everything once empty.</p>
+            <p>The tradeoff: the biological system completed 71.9% of total operations versus the naive counter&rsquo;s 68.5% under bursty load. The <code>MTORScaler</code> adds adaptive worker scaling&mdash;8 workers during GROWTH, scaling down to 1 in AUTOPHAGY. In a worker-scaling benchmark, the biological variant completed 300 operations in 57 steps versus 75 for a fixed-worker alternative&mdash;32% faster by front-loading work when resources are abundant. The value is latency (finish sooner), not per-slot efficiency.</p>
 
-            <p>This is mechanism design, not optimization. The priority gate is a simple structural rule. But it provides a hard guarantee: critical operations <em>will</em> be served under any load pattern. A flat counter cannot provide this guarantee without reimplementing the state machine.</p>
+            <p>This is mechanism design, not optimization. The priority gate is a simple structural rule. The adaptive scaler is a simple state machine. But together they provide hard guarantees: critical operations <em>will</em> be served, and work <em>will</em> be front-loaded when resources allow. A flat counter cannot provide either guarantee.</p>
 
             <h2>What earned its weight with a tradeoff: quorum sensing</h2>
 

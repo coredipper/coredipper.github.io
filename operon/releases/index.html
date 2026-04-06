@@ -19,6 +19,25 @@
             <p class="subtitle">Recent direction and public writing around the project.</p>
         </header>
 
+        <h2>v0.27.0</h2>
+        <p>Focus:</p>
+        <ul>
+            <li><strong>Structural guarantee benchmarks</strong>: three-variant comparison (biological, ablated, naive) with pathway-grounded scenarios from KEGG/Reactome</li>
+            <li>10M+ data points across 10 seeds, all three benchmarks show biological wins</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+            <li><code>QuorumSensingBio</code>: autoinducer signal accumulation with temporal decay, auto-calibrated thresholds via categorical certificate</li>
+            <li><code>MTORScaler</code>: AMPK ratio + rate-of-change sensing with hysteresis, adaptive worker scaling</li>
+            <li>Benchmark suite in <code>eval/benchmarks/</code> with naive alternatives and pathway parameter modules</li>
+            <li>Real embedding experiment: sentence-transformers confirms convergence discrimination across 3 models</li>
+        </ul>
+        <p>Papers:</p>
+        <ul>
+            <li>Paper 4: &ldquo;Do Biological Structural Guarantees Earn Their Complexity?&rdquo;</li>
+            <li>Paper 2 extension: Sections 8&ndash;9 (empirical validation + epistemic topology assessment)</li>
+        </ul>
+
         <h2>v0.26.0</h2>
         <p>Focus:</p>
         <ul>
