@@ -3,60 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Overview - Operon</title>
+    <title>API Reference - Operon</title>
     <link rel="stylesheet" href="/operon/styles.css">
 </head>
 <body>
     <div class="container">
         <nav>
             <a href="/operon/">&larr; Docs</a>
-            <a href="/operon/pattern-first-api/">Patterns</a>
-            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">Repo</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
         </nav>
 
-        <header>
-            <h1>API Overview</h1>
-            <p class="subtitle">A lightweight map of the current library surface.</p>
-        </header>
-
-        <h2>Recommended Public Layer</h2>
+        <h1 id="api-overview">API Overview</h1>
+        <p>This is a lightweight map of the current library surface.</p>
+        <h2 id="recommended-public-layer">Recommended Public Layer</h2>
+        <ul>
+        <li><code>operon_ai.patterns</code></li>
+        <li><code>advise_topology(...)</code></li>
+        <li><code>reviewer_gate(...)</code></li>
+        <li><code>specialist_swarm(...)</code></li>
+        <li><code>skill_organism(...)</code></li>
+        <li><code>PatternLibrary</code>, <code>TaskFingerprint</code>, <code>PatternTemplate</code>, <code>PatternRunRecord</code></li>
+        <li><code>WatcherComponent</code>, <code>WatcherConfig</code>, <code>WatcherSignal</code>, <code>SignalCategory</code></li>
+        <li><code>InterventionKind</code>, <code>WatcherIntervention</code></li>
+        <li><code>adaptive_skill_organism(...)</code>, <code>assemble_pattern(...)</code></li>
+        <li><code>AdaptiveSkillOrganism</code>, <code>AdaptiveRunResult</code>, <code>ExperienceRecord</code></li>
+        <li><code>CognitiveMode</code>, <code>resolve_cognitive_mode()</code></li>
+        <li><code>SleepConsolidation</code>, <code>ConsolidationResult</code>, <code>CounterfactualResult</code>, <code>counterfactual_replay()</code></li>
+        <li><code>SocialLearning</code>, <code>PeerExchange</code>, <code>TrustRegistry</code>, <code>AdoptionResult</code>, <code>AdoptionOutcome</code></li>
+        </ul>
+        <h2 id="core-runtime-and-analysis">Core Runtime and Analysis</h2>
+        <ul>
+        <li><code>operon_ai.core</code></li>
+        <li>typed wiring</li>
+        <li>epistemic analysis</li>
+        <li>coalgebraic utilities</li>
+        <li>denaturation and optics</li>
+        </ul>
+        <h2 id="organelles">Organelles</h2>
+        <ul>
+        <li><code>operon_ai.organelles</code></li>
+        <li><code>Nucleus</code></li>
+        <li><code>Membrane</code></li>
+        <li><code>Mitochondria</code></li>
+        <li><code>Chaperone</code></li>
+        <li><code>Ribosome</code></li>
+        <li><code>Lysosome</code></li>
+        </ul>
+        <h2 id="state-memory">State / Memory</h2>
+        <ul>
+        <li><code>operon_ai.state</code></li>
+        <li>ATP / metabolism</li>
+        <li>genome</li>
+        <li>histone memory</li>
+        <li>
+        <p>lifecycle-related state</p>
+        </li>
+        <li>
+        <p><code>operon_ai.memory</code></p>
+        </li>
+        <li>episodic memory</li>
+        <li>
+        <p>bi-temporal memory (<code>BiTemporalMemory</code>, <code>BiTemporalFact</code>, <code>BiTemporalQuery</code>)</p>
+        </li>
+        <li>
         <p><code>operon_ai.patterns</code></p>
+        </li>
+        <li><code>SubstrateView</code> — read-only view passed to stage handlers during substrate-backed runs</li>
+        </ul>
+        <h2 id="coordination-surveillance-healing">Coordination / Surveillance / Healing</h2>
         <ul>
-            <li><code>advise_topology(...)</code></li>
-            <li><code>reviewer_gate(...)</code></li>
-            <li><code>specialist_swarm(...)</code></li>
-            <li><code>skill_organism(...)</code></li>
-            <li><code>PatternLibrary</code>, <code>TaskFingerprint</code>, <code>PatternTemplate</code>, <code>PatternRunRecord</code></li>
-            <li><code>WatcherComponent</code>, <code>WatcherConfig</code>, <code>WatcherSignal</code>, <code>SignalCategory</code></li>
-            <li><code>InterventionKind</code>, <code>WatcherIntervention</code></li>
-            <li><code>adaptive_skill_organism(...)</code>, <code>assemble_pattern(...)</code></li>
-            <li><code>AdaptiveSkillOrganism</code>, <code>AdaptiveRunResult</code>, <code>ExperienceRecord</code></li>
-            <li><code>CognitiveMode</code>, <code>resolve_cognitive_mode()</code></li>
-            <li><code>SleepConsolidation</code>, <code>ConsolidationResult</code>, <code>CounterfactualResult</code>, <code>counterfactual_replay()</code></li>
-            <li><code>SocialLearning</code>, <code>PeerExchange</code>, <code>TrustRegistry</code>, <code>AdoptionResult</code>, <code>AdoptionOutcome</code></li>
-            <li><code>managed_organism(...)</code>, <code>consolidate(...)</code></li>
-            <li><code>ManagedOrganism</code>, <code>ManagedRunResult</code></li>
+        <li><code>operon_ai.coordination</code></li>
+        <li><code>operon_ai.surveillance</code></li>
+        <li><code>operon_ai.health</code></li>
+        <li><code>operon_ai.healing</code></li>
+        </ul>
+        <p>For concrete usage, start from the examples rather than reading the namespaces in isolation.</p>
+        <h2 id="convergence">Convergence</h2>
+        <ul>
+        <li><code>operon_ai.convergence</code></li>
+        <li>adapters: <code>parse_swarm_topology</code>, <code>parse_animaworks_org</code>, <code>parse_deerflow_session</code></li>
+        <li>analysis: <code>analyze_external_topology</code>, <code>topology_to_template</code></li>
+        <li>types: <code>ExternalTopology</code>, <code>AdapterResult</code>, <code>RuntimeConfig</code></li>
+        <li>catalog: <code>seed_library_from_swarms</code>, <code>seed_library_from_deerflow</code>, <code>seed_library_from_acg_survey</code></li>
+        <li>skill bridge: <code>skill_to_template</code>, <code>template_to_skill</code></li>
+        <li>hybrid: <code>hybrid_skill_organism</code>, <code>default_template_generator</code></li>
+        <li>async thinking: <code>AsyncOrganizer</code>, <code>AsyncThinkResult</code>, <code>async_stage_handler</code></li>
+        <li>memory bridge: <code>bridge_animaworks_memory</code>, <code>bridge_deerflow_memory</code></li>
+        <li>
+        <p>co-design: <code>DesignProblem</code>, <code>compose_series</code>, <code>compose_parallel</code>, <code>feedback_fixed_point</code></p>
+        </li>
+        <li>
+        <p><code>operon_ai.patterns.priming</code></p>
+        </li>
+        <li><code>PrimingView</code> — multi-channel SubstrateView subclass</li>
+        <li>
+        <p><code>build_priming_view</code> — promote SubstrateView to PrimingView</p>
+        </li>
+        <li>
+        <p><code>operon_ai.patterns.heartbeat</code></p>
+        </li>
+        <li><code>HeartbeatDaemon</code> — WatcherComponent with idle-time consolidation</li>
+        </ul>
+        <h2 id="ralph-adapter">Ralph Adapter</h2>
+        <ul>
+        <li><code>operon_ai.convergence.ralph_adapter</code></li>
+        <li><code>parse_ralph_config</code> — convert Ralph hat config to ExternalTopology</li>
+        <li>
+        <p><code>ralph_hats_to_stages</code> — map Ralph hats to SkillStages with CognitiveMode</p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.catalog</code></p>
+        </li>
+        <li><code>seed_library_from_ralph</code> — seed PatternLibrary from Ralph hat patterns</li>
+        </ul>
+        <h2 id="a-evolve-adapter">A-Evolve Adapter</h2>
+        <ul>
+        <li><code>operon_ai.convergence.aevolve_adapter</code></li>
+        <li><code>parse_aevolve_workspace</code> — convert A-Evolve workspace manifest to ExternalTopology</li>
+        <li>
+        <p><code>aevolve_skills_to_stages</code> — map evolved skills to SkillStages</p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.aevolve_skills</code></p>
+        </li>
+        <li><code>import_aevolve_skills</code> — import SKILL.md strings into PatternLibrary</li>
+        <li><code>seed_library_from_aevolve</code> — seed from workspace manifests</li>
+        </ul>
+        <p>All functions are also re-exported from <code>operon_ai.convergence</code> directly.</p>
+        <h2 id="compilers-c5">Compilers (C5)</h2>
+        <ul>
+        <li><code>operon_ai.convergence.swarms_compiler</code></li>
+        <li>
+        <p><code>organism_to_swarms</code>, <code>managed_to_swarms</code></p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.deerflow_compiler</code></p>
+        </li>
+        <li>
+        <p><code>organism_to_deerflow</code>, <code>managed_to_deerflow</code></p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.ralph_compiler</code></p>
+        </li>
+        <li>
+        <p><code>organism_to_ralph</code>, <code>managed_to_ralph</code></p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.scion_compiler</code></p>
+        </li>
+        <li><code>organism_to_scion</code>, <code>managed_to_scion</code></li>
+        </ul>
+        <h2 id="distributed-watcher">Distributed Watcher</h2>
+        <ul>
+        <li><code>operon_ai.convergence.distributed_watcher</code></li>
+        <li>
+        <p><code>DistributedWatcher</code>, <code>InMemoryTransport</code>, <code>HttpTransport</code></p>
+        </li>
+        <li>
+        <p><code>operon_ai.convergence.langgraph_watcher</code></p>
+        </li>
+        <li><code>operon_watcher_node</code>, <code>create_watcher_config</code></li>
+        </ul>
+        <h2 id="prompt-optimization-c7">Prompt Optimization (C7)</h2>
+        <ul>
+        <li><code>operon_ai.convergence.prompt_optimization</code></li>
+        <li><code>PromptOptimizer</code> — protocol for prompt-level optimization</li>
+        <li><code>EvolutionaryOptimizer</code> — evolutionary prompt mutation with fitness gating</li>
+        <li><code>NoOpOptimizer</code> — pass-through optimizer for baselines</li>
+        <li><code>attach_optimizer</code> — attach an optimizer instance to a SkillStage</li>
+        </ul>
+        <h2 id="workflow-generation-c7">Workflow Generation (C7)</h2>
+        <ul>
+        <li><code>operon_ai.convergence.workflow_generation</code></li>
+        <li><code>WorkflowGenerator</code> — protocol for workflow topology generation</li>
+        <li><code>ReasoningGenerator</code> — reasoning-based workflow construction</li>
+        <li><code>HeuristicGenerator</code> — heuristic-based workflow construction</li>
+        <li><code>generate_and_register</code> — generate a workflow and register it in PatternLibrary</li>
+        </ul>
+        <h2 id="live-evaluation-c6b">Live Evaluation (C6b)</h2>
+        <ul>
+        <li><code>eval.convergence.live_evaluator</code></li>
+        <li><code>LiveEvaluator</code> — runs real LLM calls through SkillOrganism pipelines</li>
+        <li><code>LiveRunResult</code> — per-task result with quality score, tokens, latency, risk</li>
+        <li>CLI provider support: <code>claude -p</code> and <code>codex exec</code> via <code>cli_handler()</code></li>
+        <li>LLM-as-judge quality scoring with cross-provider comparison</li>
+        <li>Guided configs use distinct fast/deep models; unguided use same model for both</li>
         </ul>
 
-        <h2>Core Runtime and Analysis</h2>
-        <p><code>operon_ai.core</code> includes typed wiring, epistemic analysis, coalgebraic utilities, denaturation, and optics.</p>
-
-        <h2>Organelles</h2>
-        <p><code>operon_ai.organelles</code> includes <code>Nucleus</code>, <code>Membrane</code>, <code>Mitochondria</code>, <code>Chaperone</code>, <code>Ribosome</code>, and <code>Lysosome</code>.</p>
-
-        <h2>State / Memory</h2>
-        <p><code>operon_ai.state</code> covers ATP / metabolism, genome, histone memory, and lifecycle-related state.</p>
-        <p><code>operon_ai.memory</code> covers episodic memory and bi-temporal memory (<code>BiTemporalMemory</code>, <code>BiTemporalFact</code>, <code>BiTemporalQuery</code>, <code>SubstrateView</code>).</p>
-
-        <h2>Coordination / Surveillance / Healing</h2>
-        <ul>
-            <li><code>operon_ai.coordination</code></li>
-            <li><code>operon_ai.surveillance</code></li>
-            <li><code>operon_ai.health</code></li>
-            <li><code>operon_ai.healing</code></li>
-        </ul>
-
-        <p>For concrete usage, start from the examples rather than reading namespaces in isolation.</p>
+        <footer>
+            <p><a href="/operon/">&larr; Back to docs</a></p>
+        </footer>
     </div>
 </body>
 </html>

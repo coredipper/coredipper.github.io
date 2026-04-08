@@ -11,316 +11,350 @@
         <nav>
             <a href="/operon/">&larr; Docs</a>
             <a href="/blog/">Blog</a>
-            <a href="https://github.com/coredipper/operon/releases" target="_blank" rel="noopener">GitHub Releases</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
         </nav>
 
-        <header>
-            <h1>Release Notes</h1>
-            <p class="subtitle">Recent direction and public writing around the project.</p>
-        </header>
-
-        <h2>v0.27.0</h2>
+        <h1 id="release-notes">Release Notes</h1>
+        <p>This page tracks the recent direction of the project.</p>
+        <h2 id="v0281">v0.28.1</h2>
+        <ul>
+        <li>Certificate preservation through convergence compilers (Swarms, DeerFlow, Ralph, Scion)</li>
+        <li><code>collect_certificates()</code> on SkillOrganism, <code>verify_compiled()</code> for post-compilation verification</li>
+        <li>Certificate serialization/deserialization with lazy theorem resolution</li>
+        <li>Concrete implementation of Prop 5.1: structural guarantees are functorially stable under compilation</li>
+        </ul>
+        <h2 id="v0280">v0.28.0</h2>
+        <p>New:</p>
+        <ul>
+        <li><code>Certificate</code> framework: self-verifiable structural guarantees with derivation-replay <code>verify()</code></li>
+        <li><code>certify()</code> on QuorumSensingBio (no-false-activation), MTORScaler (no-oscillation), ATP_Store (priority gating)</li>
+        <li>Sequential pipeline validation harness (<code>run_topology_validation.py</code>)</li>
+        <li>Paper 4 Section 4.4: error amplification bound validated (rho=+0.751, p&lt;0.001)</li>
+        <li>Role-to-capability mapping for ToolDensity theorem</li>
+        <li>Gemma 4 / Ollama support in live evaluator</li>
+        <li>Default provider timeout 30s → 120s</li>
+        </ul>
+        <h2 id="v0271">v0.27.1</h2>
+        <ul>
+        <li>Worker scaling benchmark: fixed denominator for consistent slot accounting</li>
+        <li>Multi-model embedding summary: regenerated from source data</li>
+        <li>Docs sync: version bumps, release notes, paper abstract/intro fixes</li>
+        </ul>
+        <h2 id="v0270">v0.27.0</h2>
         <p>Focus:</p>
         <ul>
-            <li><strong>Structural guarantee benchmarks</strong>: three-variant comparison (biological, ablated, naive) with pathway-grounded scenarios from KEGG/Reactome</li>
-            <li>10M+ data points across 10 seeds, all three benchmarks show biological wins</li>
+        <li><strong>Structural guarantee benchmarks</strong> — three-variant comparison (biological, ablated, naive) with pathway-grounded scenarios from KEGG/Reactome, 10M+ data points</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>QuorumSensingBio</code>: autoinducer signal accumulation with temporal decay, auto-calibrated thresholds via categorical certificate</li>
-            <li><code>MTORScaler</code>: AMPK ratio + rate-of-change sensing with hysteresis, adaptive worker scaling</li>
-            <li>Benchmark suite in <code>eval/benchmarks/</code> with naive alternatives and pathway parameter modules</li>
-            <li>Real embedding experiment: sentence-transformers confirms convergence discrimination across 3 models</li>
+        <li><code>QuorumSensingBio</code>: autoinducer signal accumulation with temporal decay (KEGG map02024), auto-calibrated thresholds via categorical certificate (de los Riscos et al. Prop 5.1)</li>
+        <li><code>MTORScaler</code>: AMPK ratio + rate-of-change sensing with hysteresis (KEGG hsa04152), adaptive worker scaling</li>
+        <li>Benchmark suite (<code>eval/benchmarks/</code>): metabolism, quorum sensing, epiplexity — all three biological wins</li>
+        <li>Real embedding confirmation: false-stagnation discrimination 96% bio vs 2% naive across 3 models; convergence accuracy 96% bio vs 40% naive (all-MiniLM-L6-v2)</li>
+        <li>Paper 4, Paper 2 extension (Sections 8-9), blog post</li>
         </ul>
-        <p>Papers:</p>
-        <ul>
-            <li>Paper 4: &ldquo;Do Biological Structural Guarantees Earn Their Complexity?&rdquo;</li>
-            <li>Paper 2 extension: Sections 8&ndash;9 (empirical validation + epistemic topology assessment)</li>
-        </ul>
-
-        <h2>v0.26.0</h2>
+        <h2 id="v0260">v0.26.0</h2>
         <p>Focus:</p>
         <ul>
-            <li><strong>C8 Phase A+B: Meta-evolution of organism configurations</strong></li>
-            <li>Tests whether biological abstractions generalize to evolving organisms</li>
+        <li><strong>C8 Phase A: Meta-evolution of organism configurations</strong> — the core experiment testing whether biological abstractions generalize to the meta-level</li>
+        <li>Rich LLM proposer with filesystem context (Meta-Harness insight)</li>
+        <li>Dual stall detection: config novelty + score plateau</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>FilesystemOptimizer</code> protocol, <code>EvolutionLoop</code>, <code>CandidateConfig</code> with Genome round-trip</li>
-            <li><code>TournamentMutator</code> + <code>LLMProposer</code> hybrid proposer strategy</li>
-            <li><code>DistanceProvider</code> for scale-invariant EpiplexityMonitor</li>
-            <li>Topology mutations: edges, add/remove/rewire, DAG execution</li>
-            <li>57 C8-specific tests</li>
+        <li><code>FilesystemOptimizer</code> protocol — distinct from C7's <code>EvolutionaryOptimizer</code></li>
+        <li><code>EvolutionLoop</code> — meta-harness glue (DesignProblem wrapping, EpiplexityMonitor stall detection)</li>
+        <li><code>CandidateConfig</code> / <code>StageConfig</code> with lossless Genome round-trip</li>
+        <li><code>TournamentMutator</code> + <code>LLMProposer</code> hybrid proposer strategy</li>
+        <li><code>EvolutionStore</code> — candidate-first filesystem persistence with <code>index.jsonl</code></li>
+        <li><code>DistanceProvider</code> protocol for EpiplexityMonitor (scale-invariant epistemic health)</li>
+        <li><code>ConfigHammingDistance</code> for config-space novelty measurement</li>
+        <li><code>run_meta_evolution.py</code> CLI runner with <code>--llm-proposer gemini</code> support</li>
+        <li>Example 108: meta-evolution usage</li>
+        <li>52 C8-specific tests, 20+ roborev review rounds</li>
         </ul>
         <p>Findings:</p>
         <ul>
-            <li>Gene abstraction covers full configuration space (lossless round-trip)</li>
-            <li>Rich context LLM proposer: 3x improvement over compressed (0.49 vs 0.15)</li>
-            <li>Phase B: tournament improved (0.60), LLM degraded (0.36)</li>
-            <li><strong>Conclusion:</strong> biological abstractions generalize as code structure, not as optimization algorithms</li>
+        <li>Gene abstraction covers full configuration space (lossless round-trip)</li>
+        <li>Epistemic health monitoring generalizes across scales (pluggable distance)</li>
+        <li>Rich context LLM proposer: 3x improvement over compressed (0.49 vs 0.15)</li>
+        <li>Config-space evolution: LLM proposer matches but doesn't dominate tournament mutations</li>
+        <li>Phase B topology mutations: tournament improved (0.60), LLM degraded (0.36)</li>
+        <li><strong>Conclusion</strong>: biological abstractions generalize as code structure, not as optimization algorithms</li>
         </ul>
-        <p>Note: C8 search code moved to <code>eval/meta/</code>. Only <code>DistanceProvider</code> remains in the library.</p>
-
-        <h2>v0.25.1</h2>
+        <p>Note: C8 meta-optimization code moved from <code>operon_ai/convergence/</code> to <code>eval/meta/</code> — experimental evaluation code, not part of the library. <code>DistanceProvider</code> remains in <code>operon_ai/health/</code>.</p>
+        <h2 id="v0251">v0.25.1</h2>
         <p>Focus:</p>
         <ul>
-            <li>live evaluation with real LLM providers: Gemini API, Claude CLI, Codex CLI (Phase C6b)</li>
-            <li>C8 roadmap: <a href="https://arxiv.org/abs/2603.28052">Meta-Harness</a> integration (FilesystemOptimizer, HarnessSearchDP, Pareto convergence)</li>
-            <li>live evaluation finding: +6.2% quality for guided multi-stage pipelines</li>
+        <li>live evaluation with real LLM providers (Gemini API, Claude CLI, Codex CLI)</li>
+        <li>C8 roadmap: Meta-Harness integration planning</li>
+        <li>documentation and version sync fixes</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>LiveEvaluator</code> &mdash; runs real LLM calls through SkillOrganism pipelines</li>
-            <li>CLI provider evaluation via <code>cli_handler()</code> (Claude Code, Codex)</li>
-            <li>LLM-as-judge quality scoring with cross-provider comparison</li>
-            <li>C8 roadmap: <code>FilesystemOptimizer</code>, <code>HarnessSearchDP</code>, Pareto convergence, causal diagnosis</li>
-            <li>Example 107: live evaluation harness</li>
+        <li><code>LiveEvaluator</code> — runs real LLM calls through SkillOrganism pipelines</li>
+        <li>CLI provider evaluation via <code>cli_handler()</code> (Claude Code, Codex)</li>
+        <li>LLM-as-judge quality scoring across providers</li>
+        <li>Live evaluation finding: +6.2% quality for guided multi-stage pipelines</li>
+        <li>C8 roadmap: <code>FilesystemOptimizer</code>, <code>HarnessSearchDP</code>, Pareto convergence, causal diagnosis</li>
+        <li>Example 107: live evaluation harness</li>
         </ul>
-
-        <h2>v0.25.0</h2>
+        <h2 id="v0250">v0.25.0</h2>
         <p>Focus:</p>
         <ul>
-            <li>evaluation harness: 20 benchmark tasks &times; 7 configurations with MockEvaluator (Phase C6)</li>
-            <li>PromptOptimizer and WorkflowGenerator protocol families (Phase C7)</li>
-            <li>production runtime compilers, distributed watcher, LangGraph integration (Phase C5)</li>
+        <li>evaluation harness, prompt optimization protocols, workflow generation (Phases C6+C7)</li>
+        <li>20 benchmark tasks x 7 configurations with MockEvaluator using real structural analysis</li>
+        <li>PromptOptimizer and WorkflowGenerator protocol families</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li>4 compilers (<code>organism_to_swarms</code>, <code>organism_to_deerflow</code>, <code>organism_to_ralph</code>, <code>organism_to_scion</code>) &mdash; compile organisms to deployment configs</li>
-            <li><code>DistributedWatcher</code> with <code>InMemoryTransport</code> and <code>HttpTransport</code> &mdash; transport-abstracted convergence detection</li>
-            <li><code>operon_watcher_node()</code> &mdash; LangGraph-compatible convergence detection node</li>
-            <li><code>MockEvaluator</code> &mdash; evaluation harness with structural variation and credit assignment</li>
-            <li><code>PromptOptimizer</code>, <code>EvolutionaryOptimizer</code>, <code>NoOpOptimizer</code> &mdash; prompt optimization protocols</li>
-            <li><code>WorkflowGenerator</code>, <code>ReasoningGenerator</code>, <code>HeuristicGenerator</code> &mdash; workflow generation protocols</li>
-            <li><code>attach_optimizer</code>, <code>generate_and_register</code> &mdash; integration helpers</li>
-            <li>Examples 99&ndash;106</li>
+        <li><code>MockEvaluator</code> — evaluation harness with structural variation and credit assignment</li>
+        <li><code>PromptOptimizer</code>, <code>EvolutionaryOptimizer</code>, <code>NoOpOptimizer</code> — prompt optimization protocols</li>
+        <li><code>attach_optimizer</code> — attach optimizer to SkillStage</li>
+        <li><code>WorkflowGenerator</code>, <code>ReasoningGenerator</code>, <code>HeuristicGenerator</code> — workflow generation protocols</li>
+        <li><code>generate_and_register</code> — generate workflow and register in PatternLibrary</li>
+        <li>20 benchmark tasks across 7 configurations (single, pipeline, fan-out, fan-in, diamond, full, stress)</li>
+        <li>Structural variation analysis and credit assignment in evaluation</li>
+        <li>Examples 104–106</li>
         </ul>
-
-        <h2>v0.24.0</h2>
+        <h2 id="v0241">v0.24.1</h2>
         <p>Focus:</p>
         <ul>
-            <li>convergence adapters for <a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, <a href="https://github.com/xuiltul/animaworks">AnimaWorks</a>, <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a>, and <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a></li>
-            <li>template exchange, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a> skill bridge, hybrid assembly</li>
-            <li>PrimingView multi-channel context, memory bridge, HeartbeatDaemon</li>
-            <li>AsyncThink Fork/Join execution, TLA+ formal verification, co-design theory</li>
+        <li>production runtime compilers, distributed watcher, LangGraph integration (Phase C5)</li>
+        <li>4 deployment compilers (Swarms, DeerFlow, Ralph, Scion) plus 6 external adapter integrations</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>operon_ai.convergence</code> package with 12 modules</li>
-            <li><code>ExternalTopology</code>, <code>AdapterResult</code> &mdash; shared adapter types</li>
-            <li><code>analyze_external_topology()</code> &mdash; epistemic theorems as structural linter</li>
-            <li><code>seed_library_from_swarms/deerflow/acg_survey</code> &mdash; catalog seeding</li>
-            <li><code>skill_to_template()</code>, <code>template_to_skill()</code> &mdash; bidirectional DeerFlow bridge</li>
-            <li><code>hybrid_skill_organism()</code> &mdash; library-first + LLM generator fallback</li>
-            <li><code>PrimingView</code> &mdash; multi-channel SubstrateView subclass</li>
-            <li><code>HeartbeatDaemon</code> &mdash; idle-time consolidation</li>
-            <li><code>AsyncOrganizer</code>, <code>async_stage_handler()</code> &mdash; Fork/Join within stages</li>
-            <li><code>DesignProblem</code>, <code>compose_series/parallel</code>, <code>feedback_fixed_point</code> &mdash; Zardini co-design</li>
-            <li>3 TLA+ specifications (TemplateExchange, DevelopmentalGating, ConvergenceDetection)</li>
-            <li><code>parse_ralph_config()</code>, <code>ralph_hats_to_stages()</code> &mdash; <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a> adapter</li>
-            <li><code>parse_aevolve_workspace()</code>, <code>aevolve_skills_to_stages()</code> &mdash; <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a> adapter</li>
-            <li><code>seed_library_from_ralph/aevolve</code> &mdash; catalog seeding</li>
-            <li><code>EvolutionGating.tla</code> &mdash; TLA+ spec for evolution loop</li>
-            <li><code>prompt_optimizer</code> hook on SkillStage</li>
-            <li>Examples 86&ndash;98</li>
+        <li><code>organism_to_swarms()</code>, <code>managed_to_swarms()</code> — compile organism to Swarms workflow config</li>
+        <li><code>organism_to_deerflow()</code>, <code>managed_to_deerflow()</code> — compile organism to DeerFlow session config</li>
+        <li><code>organism_to_ralph()</code>, <code>managed_to_ralph()</code> — compile organism to Ralph event-driven hat config</li>
+        <li><code>organism_to_scion()</code>, <code>managed_to_scion()</code> — compile organism to Scion containerized grove config</li>
+        <li><code>DistributedWatcher</code> with <code>InMemoryTransport</code> and <code>HttpTransport</code> (webhook payload stub) — transport-abstracted convergence detection</li>
+        <li><code>operon_watcher_node()</code> — LangGraph-compatible convergence detection node</li>
+        <li><code>create_watcher_config()</code> — helper for LangGraph watcher configuration</li>
+        <li>Examples 99–103</li>
         </ul>
-
-        <h2>v0.23.2</h2>
+        <h2 id="v0240">v0.24.0</h2>
         <p>Focus:</p>
         <ul>
-            <li>pattern-first ergonomics for the v0.19&ndash;0.23 subsystems</li>
-            <li>one-call <code>managed_organism()</code> factory</li>
-            <li>top-level <code>consolidate()</code> convenience</li>
+        <li>convergence adapters for <a href="https://github.com/kyegomez/swarms">Swarms</a>, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>, and <a href="https://github.com/xuiltul/animaworks">AnimaWorks</a></li>
+        <li>template exchange, <a href="https://github.com/bytedance/deer-flow">DeerFlow</a> skill bridge, hybrid assembly</li>
+        <li>PrimingView multi-channel context, memory bridge, HeartbeatDaemon</li>
+        <li>AsyncThink Fork/Join execution, TLA+ formal verification, co-design theory</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>managed_organism()</code> &mdash; full stack in one call</li>
-            <li><code>ManagedOrganism</code> with <code>.run()</code>, <code>.consolidate()</code>, <code>.export_templates()</code>, <code>.scaffold()</code>, <code>.status()</code></li>
-            <li><code>consolidate()</code> &mdash; one-call sleep consolidation</li>
-            <li><code>advise_topology()</code> now accepts optional <code>library</code> and <code>fingerprint</code></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/82_managed_organism.py" target="_blank" rel="noopener"><code>examples/82_managed_organism.py</code></a></li>
+        <li><code>operon_ai.convergence</code> package with 12 modules</li>
+        <li><code>ExternalTopology</code>, <code>AdapterResult</code> — shared adapter types</li>
+        <li><code>analyze_external_topology()</code> — epistemic theorems as structural linter</li>
+        <li><code>seed_library_from_swarms/deerflow/acg_survey</code> — catalog seeding</li>
+        <li><code>skill_to_template()</code>, <code>template_to_skill()</code> — bidirectional DeerFlow skill bridge</li>
+        <li><code>hybrid_skill_organism()</code> — library-first + LLM generator fallback</li>
+        <li><code>PrimingView</code> — multi-channel SubstrateView subclass (immutable via MappingProxyType)</li>
+        <li><code>HeartbeatDaemon</code> — idle-time consolidation via WatcherComponent extension</li>
+        <li><code>AsyncOrganizer</code>, <code>async_stage_handler()</code> — Fork/Join within stages</li>
+        <li><code>DesignProblem</code>, <code>compose_series/parallel</code>, <code>feedback_fixed_point</code> — Zardini co-design</li>
+        <li>3 TLA+ specifications (TemplateExchange, DevelopmentalGating, ConvergenceDetection)</li>
+        <li><code>prompt_optimizer</code> hook on SkillStage (interface for future DSPy integration)</li>
+        <li><code>parse_ralph_config()</code>, <code>ralph_hats_to_stages()</code> — Ralph adapter</li>
+        <li><code>parse_aevolve_workspace()</code>, <code>aevolve_skills_to_stages()</code> — A-Evolve adapter</li>
+        <li><code>seed_library_from_ralph/aevolve</code> — catalog seeding</li>
+        <li><code>EvolutionGating.tla</code> — TLA+ spec for evolution loop</li>
+        <li>Examples 86–98</li>
         </ul>
-
-        <h2>v0.23.1</h2>
+        <h2 id="v0233">v0.23.3</h2>
         <p>Focus:</p>
         <ul>
-            <li>release integration and publication polish</li>
-            <li>bi-temporal memory adapters (HistoneStore &rarr; BiTemporal, EpisodicMemory &rarr; BiTemporal)</li>
-            <li>cross-subsystem integration tests</li>
-            <li>article abstract and conclusion rewritten for full v0.19&ndash;v0.23 scope</li>
+        <li>CLI stage handler for external tool integration</li>
+        <li>Shell out to any CLI tool (Claude Code, Copilot, ruff, custom scripts) as organism stages</li>
         </ul>
         <p>New:</p>
         <ul>
-            <li><code>histone_to_bitemporal()</code>, <code>episodic_to_bitemporal()</code> &mdash; memory bridge adapters</li>
-            <li>5 end-to-end integration tests covering the full Phase 1&ndash;7 stack</li>
+        <li><code>cli_handler()</code> — factory that wraps any CLI command as a SkillStage handler</li>
+        <li><code>cli_organism()</code> — convenience for multi-CLI workflows via managed_organism</li>
+        <li><code>CLIResult</code> — structured output with stdout, stderr, returncode, latency, timed_out</li>
+        <li><code>_action_type</code> convention in handler output for signaling FAILURE to the watcher</li>
+        <li>Output parsers: <code>parse_json()</code>, <code>parse_lines()</code></li>
+        <li><code>examples/83_cli_stage_handler.py</code></li>
+        </ul>
+        <h2 id="v0232">v0.23.2</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>pattern-first ergonomics pass for the v0.19-0.23 subsystems</li>
+        <li>one-call <code>managed_organism()</code> factory wiring the full stack</li>
+        <li>top-level <code>consolidate()</code> convenience function</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>ManagedOrganism</code>, <code>ManagedRunResult</code> — full-stack organism with run/consolidate/export/scaffold</li>
+        <li><code>managed_organism()</code> — batteries-included factory with sensible defaults</li>
+        <li><code>consolidate()</code> — one-call sleep consolidation</li>
+        <li><code>advise_topology()</code> gains optional <code>library</code> and <code>fingerprint</code> params</li>
+        <li><code>examples/82_managed_organism.py</code></li>
+        </ul>
+        <h2 id="v0231">v0.23.1</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>release integration and publication polish</li>
+        <li>bi-temporal memory adapters (HistoneStore → BiTemporal, EpisodicMemory → BiTemporal)</li>
+        <li>cross-subsystem integration tests (5 end-to-end tests)</li>
+        <li>article rewrite (abstract, conclusion updated for full v0.19–v0.23 scope)</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>histone_to_bitemporal()</code>, <code>episodic_to_bitemporal()</code> — memory bridge adapters</li>
+        <li>Integration tests covering substrate+watcher, adaptive+consolidation, social+development, full lifecycle</li>
+        <li>Article abstract covering six-layer progression</li>
+        <li>Article conclusion with roadmap arc and updated future work</li>
+        </ul>
+        <h2 id="v0230">v0.23.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>developmental staging (EMBRYONIC → JUVENILE → ADOLESCENT → MATURE)</li>
+        <li>critical periods that close as organisms mature</li>
+        <li>capability gating on Plasmid acquisition</li>
+        <li>teacher-learner scaffolding</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>DevelopmentController</code>, <code>DevelopmentConfig</code>, <code>DevelopmentalStage</code>, <code>DevelopmentStatus</code></li>
+        <li><code>CriticalPeriod</code>, <code>StageTransition</code>, <code>stage_reached()</code></li>
+        <li><code>Plasmid.min_stage</code> — developmental gating on tool acquisition</li>
+        <li><code>SocialLearning.scaffold_learner()</code> + <code>ScaffoldingResult</code></li>
+        <li>Watcher developmental signals (SOMATIC/development)</li>
+        <li><code>examples/80_developmental_staging.py</code> — lifecycle progression and gating</li>
+        <li><code>examples/81_critical_periods.py</code> — teacher-learner scaffolding</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-development">Developmental Staging Space</a></li>
+        <li>Article updates: critical periods (§6), developmental staging impl (§8)</li>
+        </ul>
+        <h2 id="v0221">v0.22.1</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>social learning with trust-weighted template exchange across organisms</li>
+        <li>epistemic vigilance (TrustRegistry) for peer output trust scoring</li>
+        <li>curiosity signals in WatcherComponent for novelty-seeking escalation</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>SocialLearning</code>, <code>PeerExchange</code>, <code>TrustRegistry</code>, <code>AdoptionResult</code>, <code>AdoptionOutcome</code></li>
+        <li>Watcher curiosity signals (EPISTEMIC/curiosity) + <code>curiosity_escalation_threshold</code></li>
+        <li><code>examples/78_social_learning.py</code> — template sharing with trust</li>
+        <li><code>examples/79_curiosity_driven_exploration.py</code> — curiosity-driven escalation</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-social">Social Learning Space</a></li>
+        <li>Article updates: social learning + curiosity (§6, §8)</li>
+        </ul>
+        <h2 id="v0220">v0.22.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>cognitive mode annotations (System A/B on SkillStage)</li>
+        <li>sleep consolidation cycle (replay, compress, counterfactual, histone promotion)</li>
+        <li>counterfactual replay over bi-temporal corrections</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>CognitiveMode</code> enum, <code>resolve_cognitive_mode()</code> helper</li>
+        <li><code>SleepConsolidation</code>, <code>ConsolidationResult</code>, <code>CounterfactualResult</code></li>
+        <li><code>counterfactual_replay()</code> — static analysis of corrected facts</li>
+        <li>Watcher <code>mode_balance()</code> for System A/B distribution</li>
+        <li><code>examples/76_cognitive_modes.py</code> — mode annotations and watcher balance</li>
+        <li><code>examples/77_sleep_consolidation.py</code> — full consolidation cycle</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-consolidation">Consolidation Space</a></li>
+        <li>Article updates: cognitive modes (§6, §8), sleep consolidation (§8)</li>
+        </ul>
+        <h2 id="v0211">v0.21.1</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>adaptive assembly loop (fingerprint → template → assemble → run → record)</li>
+        <li>experience pool on WatcherComponent for cross-run intervention learning</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>AdaptiveSkillOrganism</code>, <code>AdaptiveRunResult</code> — compose-run-record lifecycle wrapper</li>
+        <li><code>adaptive_skill_organism()</code> — public factory for adaptive assembly</li>
+        <li><code>assemble_pattern()</code> — convert PatternTemplate into runnable topology</li>
+        <li><code>ExperienceRecord</code> — cross-run intervention memory on WatcherComponent</li>
+        <li><code>record_experience()</code>, <code>retrieve_similar_experiences()</code>, <code>recommend_intervention()</code></li>
+        <li><code>examples/74_adaptive_assembly.py</code> — full adaptive loop</li>
+        <li><code>examples/75_experience_driven_watcher.py</code> — experience-driven recommendations</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-adaptive">Adaptive Assembly Space</a></li>
+        <li>Article updates: evo-devo inner loop (§6), adaptive assembly impl (§8)</li>
+        </ul>
+        <h2 id="v0210">v0.21.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>pattern repository for reusable collaboration templates</li>
+        <li>watcher component with three-category signal taxonomy</li>
+        <li>run-loop intervention mechanism (retry, escalate, halt)</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>PatternLibrary</code>, <code>TaskFingerprint</code>, <code>PatternTemplate</code>, <code>PatternRunRecord</code></li>
+        <li><code>WatcherComponent</code>, <code>WatcherConfig</code>, <code>WatcherSignal</code>, <code>SignalCategory</code></li>
+        <li><code>InterventionKind</code>, <code>WatcherIntervention</code> — run-loop intervention types</li>
+        <li><code>examples/72_pattern_repository.py</code> — register, score, and retrieve templates</li>
+        <li><code>examples/73_watcher_component.py</code> — signal classification and interventions</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-watcher">Watcher Dashboard Space</a></li>
+        <li>Article updates: adaptive assembly (§2, §6), watcher + pattern library (§8)</li>
+        </ul>
+        <h2 id="v0200">v0.20.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>bi-temporal memory integration with SkillOrganism</li>
+        <li>three-layer context model (topology, ephemeral, bi-temporal)</li>
+        <li>HuggingFace Space for bi-temporal memory explorer</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>SubstrateView</code> — frozen read-only envelope for substrate queries</li>
+        <li><code>SkillStage</code> fields: <code>read_query</code>, <code>fact_extractor</code>, <code>emit_output_fact</code>, <code>fact_tags</code></li>
+        <li><code>SkillOrganism.substrate</code> — optional <code>BiTemporalMemory</code> for auditable shared facts</li>
+        <li><code>examples/71_bitemporal_skill_organism.py</code> — enterprise workflow with substrate</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-bitemporal">Bi-Temporal Memory Space</a></li>
+        <li>Article updates: three-layer context model (§6), substrate integration (§8)</li>
+        </ul>
+        <h2 id="v0190">v0.19.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>bi-temporal memory (valid time vs record time)</li>
+        <li>append-only correction semantics</li>
+        <li>belief-state reconstruction for compliance auditing</li>
+        <li>article updates: temporal databases, temporal coalgebra, temporal epistemics</li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>BiTemporalMemory</code>, <code>BiTemporalFact</code>, <code>BiTemporalQuery</code>, <code>FactSnapshot</code>, <code>CorrectionResult</code></li>
+        <li><code>examples/69_bitemporal_memory.py</code> — core API demo</li>
+        <li><code>examples/70_bitemporal_compliance_audit.py</code> — enterprise audit scenario</li>
+        <li><a href="bitemporal-memory.md">Bi-Temporal Memory docs</a></li>
+        </ul>
+        <h2 id="v018">v0.18</h2>
+        <p>Focus:</p>
+        <ul>
+        <li>thinner front door</li>
+        <li>pattern-first API</li>
+        <li>provider-bound skill organisms</li>
+        <li>attachable telemetry</li>
         </ul>
         <p>Related writing:</p>
         <ul>
-            <li><a href="/blog/operon-v023-roadmap-complete/">Blog: Roadmap Complete</a></li>
+        <li><a href="https://medium.com/@coredipper/operon-v0-18-the-point-where-it-started-feeling-usable-b284d7b7317f">Medium: Operon v0.18</a></li>
+        <li><a href="https://banu.be/blog/operon-v018-pattern-first-skills/">Blog: Operon v0.18</a></li>
         </ul>
-
-        <h2>v0.23</h2>
+        <h2 id="v017">v0.17</h2>
         <p>Focus:</p>
         <ul>
-            <li>developmental staging (EMBRYONIC &rarr; JUVENILE &rarr; ADOLESCENT &rarr; MATURE)</li>
-            <li>critical periods that close as organisms mature</li>
-            <li>capability gating on tool acquisition</li>
-            <li>teacher-learner scaffolding</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>DevelopmentController</code>, <code>DevelopmentalStage</code>, <code>CriticalPeriod</code></li>
-            <li><code>Plasmid.min_stage</code> &mdash; developmental gating on tool acquisition</li>
-            <li><code>SocialLearning.scaffold_learner()</code> + <code>ScaffoldingResult</code></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/80_developmental_staging.py" target="_blank" rel="noopener"><code>examples/80_developmental_staging.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/81_critical_periods.py" target="_blank" rel="noopener"><code>examples/81_critical_periods.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-development" target="_blank" rel="noopener">Developmental Staging Space</a></li>
+        <li>epistemic topology</li>
+        <li>architecture-level analysis</li>
+        <li>practical comparison to Kim et al.</li>
         </ul>
         <p>Related writing:</p>
         <ul>
-            <li><a href="/blog/operon-v023-developmental-staging/">Blog: Operon v0.23</a></li>
+        <li><a href="https://banu.be/blog/operon-v017-epistemic-topology/">Blog: Operon v0.17</a></li>
         </ul>
 
-        <h2>v0.22.1</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>social learning with trust-weighted template exchange</li>
-            <li>epistemic vigilance (TrustRegistry) with EMA scoring</li>
-            <li>curiosity signals for novelty-seeking escalation</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>SocialLearning</code>, <code>PeerExchange</code>, <code>TrustRegistry</code>, <code>AdoptionResult</code>, <code>AdoptionOutcome</code></li>
-            <li>Watcher curiosity signals + <code>curiosity_escalation_threshold</code></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/78_social_learning.py" target="_blank" rel="noopener"><code>examples/78_social_learning.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/79_curiosity_driven_exploration.py" target="_blank" rel="noopener"><code>examples/79_curiosity_driven_exploration.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-social" target="_blank" rel="noopener">Social Learning Space</a></li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="/blog/operon-v022-cognitive-social/">Blog: Operon v0.22</a></li>
-        </ul>
-
-        <h2>v0.22</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>cognitive mode annotations (System A/B on SkillStage)</li>
-            <li>sleep consolidation cycle (replay, compress, counterfactual, histone promotion)</li>
-            <li>counterfactual replay over bi-temporal corrections</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>CognitiveMode</code> enum, <code>resolve_cognitive_mode()</code></li>
-            <li><code>SleepConsolidation</code>, <code>ConsolidationResult</code>, <code>CounterfactualResult</code></li>
-            <li><code>counterfactual_replay()</code> &mdash; static analysis of corrected facts</li>
-            <li>Watcher <code>mode_balance()</code> for System A/B distribution</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/76_cognitive_modes.py" target="_blank" rel="noopener"><code>examples/76_cognitive_modes.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/77_sleep_consolidation.py" target="_blank" rel="noopener"><code>examples/77_sleep_consolidation.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-consolidation" target="_blank" rel="noopener">Consolidation Space</a></li>
-        </ul>
-
-        <h2>v0.21.1</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>adaptive assembly loop (fingerprint &rarr; template &rarr; assemble &rarr; run &rarr; record)</li>
-            <li>experience pool on WatcherComponent for cross-run intervention learning</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>AdaptiveSkillOrganism</code>, <code>AdaptiveRunResult</code> &mdash; compose-run-record lifecycle</li>
-            <li><code>adaptive_skill_organism()</code>, <code>assemble_pattern()</code></li>
-            <li><code>ExperienceRecord</code> &mdash; cross-run intervention memory</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/74_adaptive_assembly.py" target="_blank" rel="noopener"><code>examples/74_adaptive_assembly.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/75_experience_driven_watcher.py" target="_blank" rel="noopener"><code>examples/75_experience_driven_watcher.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-adaptive" target="_blank" rel="noopener">Adaptive Assembly Space</a></li>
-        </ul>
-
-        <h2>v0.21.0</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>pattern repository for reusable collaboration templates</li>
-            <li>watcher component with three-category signal taxonomy (Dupoux/LeCun/Malik)</li>
-            <li>run-loop intervention mechanism (retry, escalate, halt)</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>PatternLibrary</code>, <code>TaskFingerprint</code>, <code>PatternTemplate</code>, <code>PatternRunRecord</code></li>
-            <li><code>WatcherComponent</code>, <code>WatcherConfig</code>, <code>WatcherSignal</code>, <code>SignalCategory</code></li>
-            <li><code>InterventionKind</code>, <code>WatcherIntervention</code> &mdash; run-loop intervention types</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/72_pattern_repository.py" target="_blank" rel="noopener"><code>examples/72_pattern_repository.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/73_watcher_component.py" target="_blank" rel="noopener"><code>examples/73_watcher_component.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-watcher" target="_blank" rel="noopener">Watcher Dashboard Space</a></li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="/blog/operon-v021-adaptive-foundations/">Blog: Operon v0.21</a></li>
-        </ul>
-
-        <h2>v0.20</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>bi-temporal memory integration with SkillOrganism</li>
-            <li>three-layer context model (topology, ephemeral, bi-temporal)</li>
-            <li>HuggingFace Space for bi-temporal memory explorer</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>SubstrateView</code> &mdash; frozen read-only envelope for substrate queries</li>
-            <li><code>SkillStage</code> fields: <code>read_query</code>, <code>fact_extractor</code>, <code>emit_output_fact</code>, <code>fact_tags</code></li>
-            <li><code>SkillOrganism.substrate</code> &mdash; optional <code>BiTemporalMemory</code> for auditable shared facts</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py" target="_blank" rel="noopener"><code>examples/71_bitemporal_skill_organism.py</code></a></li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-bitemporal" target="_blank" rel="noopener">Bi-Temporal Memory Explorer Space</a></li>
-            <li>Article updates: three-layer context model (&sect;6), substrate integration (&sect;8)</li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="/blog/operon-v020-substrate-integration/">Blog: Operon v0.20</a></li>
-        </ul>
-
-        <h2>v0.19</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>bi-temporal memory (valid time vs record time)</li>
-            <li>append-only correction semantics</li>
-            <li>belief-state reconstruction for compliance auditing</li>
-            <li>article updates: temporal databases, temporal coalgebra, temporal epistemics</li>
-        </ul>
-        <p>New:</p>
-        <ul>
-            <li><code>BiTemporalMemory</code>, <code>BiTemporalFact</code>, <code>BiTemporalQuery</code>, <code>FactSnapshot</code>, <code>CorrectionResult</code></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/69_bitemporal_memory.py" target="_blank" rel="noopener"><code>examples/69_bitemporal_memory.py</code></a></li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/70_bitemporal_compliance_audit.py" target="_blank" rel="noopener"><code>examples/70_bitemporal_compliance_audit.py</code></a></li>
-            <li><a href="/operon/bitemporal-memory/">Bi-Temporal Memory docs</a></li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="/blog/operon-v019-bitemporal-memory/">Blog: Operon v0.19</a></li>
-        </ul>
-
-        <h2>v0.18</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>thinner front door</li>
-            <li>pattern-first API</li>
-            <li>provider-bound skill organisms</li>
-            <li>attachable telemetry</li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="https://coredipper.github.io/blog/operon-v018-pattern-first-skills/">Blog: Operon v0.18</a></li>
-        </ul>
-
-        <h2>v0.17</h2>
-        <p>Focus:</p>
-        <ul>
-            <li>epistemic topology</li>
-            <li>architecture-level analysis</li>
-            <li>practical comparison to Kim et al.</li>
-        </ul>
-        <p>Related writing:</p>
-        <ul>
-            <li><a href="https://coredipper.github.io/blog/operon-v017-epistemic-topology/">Blog: Operon v0.17</a></li>
-        </ul>
+        <footer>
+            <p><a href="/operon/">&larr; Back to docs</a></p>
+        </footer>
     </div>
 </body>
 </html>

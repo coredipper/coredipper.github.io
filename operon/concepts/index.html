@@ -3,62 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concepts and Architecture - Operon</title>
+    <title>Core Concepts - Operon</title>
     <link rel="stylesheet" href="/operon/styles.css">
 </head>
 <body>
     <div class="container">
         <nav>
             <a href="/operon/">&larr; Docs</a>
-            <a href="/operon/theory/">Theory</a>
-            <a href="/operon/api/">API</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
         </nav>
 
-        <header>
-            <h1>Concepts and Architecture</h1>
-            <p class="subtitle">How the current layers of the library fit together.</p>
-        </header>
-
+        <h1 id="concepts-and-architecture">Concepts and Architecture</h1>
         <p>Operon is built around the idea that agent reliability depends heavily on structure.</p>
-
-        <h2>Core View</h2>
-        <p>The library borrows from biology not as decoration, but as a source of reusable control motifs: review bottlenecks, consensus gates, bounded resource use, self-repair and surveillance, and explicit interfaces between stages.</p>
-
-        <h2>Current Practical Layers</h2>
-
-        <h3>Pattern-first API</h3>
+        <h2 id="core-view">Core View</h2>
+        <p>The library borrows from biology not as decoration, but as a source of reusable control motifs:</p>
+        <ul>
+        <li>review bottlenecks</li>
+        <li>consensus gates</li>
+        <li>bounded resource use</li>
+        <li>self-repair and surveillance</li>
+        <li>explicit interfaces between stages</li>
+        </ul>
+        <h2 id="current-practical-layers">Current Practical Layers</h2>
+        <h3 id="pattern-first-api">Pattern-first API</h3>
         <p>The recommended front door for engineers:</p>
         <ul>
-            <li>topology advice</li>
-            <li>reviewer gates</li>
-            <li>specialist swarms</li>
-            <li>skill organisms</li>
+        <li>topology advice</li>
+        <li>reviewer gates</li>
+        <li>specialist swarms</li>
+        <li>skill organisms</li>
         </ul>
-
-        <h3>Organelles</h3>
-        <p>Shared infrastructural components such as <code>Nucleus</code>, <code>Membrane</code>, <code>Mitochondria</code>, <code>Chaperone</code>, and <code>Lysosome</code>.</p>
-
-        <h3>State and Coordination</h3>
-        <p>ATP budgeting, histone memory, surveillance and healing, and morphogen-style coordination.</p>
-
-        <h3>Typed Wiring and Analysis</h3>
-        <p>The lower-level layer models modules, ports, wires, and topology explicitly so the library can reason about architecture instead of treating everything as an opaque chain.</p>
-
-        <h2>What Changed Recently</h2>
+        <h3 id="organelles">Organelles</h3>
+        <p>Shared infrastructural components such as:</p>
         <ul>
-            <li><code>v0.17</code> made the epistemic topology story explicit</li>
-            <li><code>v0.18</code> made the practical front door thinner</li>
-            <li><code>v0.19</code> added bi-temporal memory with dual time axes</li>
-            <li><code>v0.20</code> integrated bi-temporal memory into the SkillOrganism runtime as an auditable substrate, formalizing the three-layer context model</li>
-            <li><code>v0.21</code> added pattern repository, watcher component, adaptive assembly, and experience pool &mdash; the adaptive structure layer</li>
-            <li><code>v0.22</code> added cognitive mode annotations (System A/B) and sleep consolidation &mdash; the cognitive architecture layer</li>
-            <li><code>v0.23</code> added developmental staging with critical periods and capability gating</li>
-            <li><code>v0.24</code> added convergence adapters (Swarms, DeerFlow, AnimaWorks, Ralph, A-Evolve), TLA+ formal verification, co-design composition &mdash; C1&ndash;C4</li>
-            <li><code>v0.24.1</code> added Scion adapter, production compilers, distributed watcher, LangGraph node &mdash; C5</li>
-            <li><code>v0.25</code> added evaluation harness (20 tasks, 7 configs), prompt optimization, workflow generation &mdash; C6&ndash;C7</li>
-            <li><code>v0.25.1</code> added live LLM evaluation with cross-judging across Gemini API, Claude CLI, and Codex CLI</li>
-            <li><code>v0.26</code> added meta-evolution (C8): biological abstractions generalize as code structure but not as optimization algorithms</li>
+        <li><code>Nucleus</code></li>
+        <li><code>Membrane</code></li>
+        <li><code>Mitochondria</code></li>
+        <li><code>Chaperone</code></li>
+        <li><code>Lysosome</code></li>
         </ul>
+        <h3 id="state-and-coordination">State and Coordination</h3>
+        <p>Includes:</p>
+        <ul>
+        <li>ATP / metabolic budgeting</li>
+        <li>histone-based memory</li>
+        <li>surveillance and healing</li>
+        <li>morphogen coordination</li>
+        </ul>
+        <h3 id="typed-wiring-and-analysis">Typed Wiring and Analysis</h3>
+        <p>The lower-level layer models modules, ports, wires, and topology explicitly so the library can reason about architecture instead of treating everything as an opaque chain.</p>
+        <h2 id="what-changed-recently">What Changed Recently</h2>
+        <ul>
+        <li><code>v0.17</code> made the epistemic topology story explicit</li>
+        <li><code>v0.18</code> made the practical front door thinner</li>
+        <li><code>v0.19</code> added bi-temporal memory with dual time axes</li>
+        <li><code>v0.20</code> integrated bi-temporal memory into the SkillOrganism runtime as an auditable substrate, formalizing the three-layer context model (topology, ephemeral, bi-temporal)</li>
+        <li><code>v0.21</code> added pattern repository, watcher component, adaptive assembly, and experience pool — the adaptive structure layer</li>
+        <li><code>v0.22</code> added cognitive mode annotations (System A/B), sleep consolidation, social learning, and curiosity — the cognitive architecture layer</li>
+        <li><code>v0.23</code> added developmental staging with critical periods and capability gating — the developmental layer; release integration with memory adapters and cross-subsystem tests completed the roadmap</li>
+        <li><code>v0.24</code> added convergence adapters (Swarms, DeerFlow, AnimaWorks, Ralph, A-Evolve), TLA+ formal verification, co-design composition — the convergence layer (C1–C4)</li>
+        <li><code>v0.24.1</code> added Scion adapter, production compilers (organism_to_swarms/deerflow/ralph/scion), distributed watcher, LangGraph node — phase C5</li>
+        <li><code>v0.25</code> added evaluation harness (20 tasks, 7 configs), prompt optimization protocols, workflow generation — phases C6–C7</li>
+        <li><code>v0.25.1</code> added live LLM evaluation with cross-judging across Gemini API, Claude CLI, and Codex CLI; C8 roadmap</li>
+        <li><code>v0.26</code> added meta-evolution (C8 Phase A): evolves organism configurations using biological primitives at the meta-level, with dual stall detection and LLM proposer</li>
+        <li><code>v0.27</code> added structural guarantee benchmarks (metabolism, quorum sensing, epiplexity) with 10M+ data points, QuorumSensingBio auto-calibration, MTORScaler, real-embedding confirmation</li>
+        <li><code>v0.28</code> added categorical certificate framework (<code>Certificate</code>, <code>certify()</code>, <code>verify()</code>), sequential pipeline validation harness with Gemma 4 local eval, Paper 4 empirical results (error bound validated, rho=+0.751)</li>
+        </ul>
+        <p>The current center of gravity is pattern-first workflows with auditable state.</p>
+
+        <footer>
+            <p><a href="/operon/">&larr; Back to docs</a></p>
+        </footer>
     </div>
 </body>
 </html>

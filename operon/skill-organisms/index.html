@@ -9,81 +9,79 @@
 <body>
     <div class="container">
         <nav>
-            <a href=”/operon/”>&larr; Docs</a>
-            <a href=”/operon/pattern-first-api/”>Pattern-First API</a>
-            <a href=”/operon/bitemporal-memory/”>Bi-Temporal Memory</a>
-            <a href=”/operon/examples/”>Examples</a>
+            <a href="/operon/">&larr; Docs</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
         </nav>
 
-        <header>
-            <h1>Skill Organisms</h1>
-            <p class=”subtitle”>Structured workflows made of multiple stages, not one giant prompt.</p>
-        </header>
-
-        <p><code>skill_organism(...)</code> is the current practical runtime for building one coherent workflow out of multiple stages.</p>
-
-        <h2>Why It Exists</h2>
-        <p>A lot of real multi-agent workflows are not &ldquo;many agents everywhere.&rdquo; They look more like normalize input, route cheaply, do ambiguous work with a stronger model, and attach telemetry or review without rewriting the workflow.</p>
-
-        <h2>Core Pieces</h2>
+        <h1 id="skill-organisms">Skill Organisms</h1>
+        <p><code>skill_organism(...)</code> is the current practical runtime for building one structured workflow out of multiple stages.</p>
+        <h2 id="why-it-exists">Why It Exists</h2>
+        <p>A lot of real multi-agent workflows are not “many agents everywhere.”</p>
+        <p>They look more like:</p>
         <ul>
-            <li><code>SkillStage</code></li>
-            <li><code>SkillOrganism</code></li>
-            <li><code>TelemetryProbe</code></li>
-            <li><code>SubstrateView</code></li>
+        <li>normalize input</li>
+        <li>classify or route cheaply</li>
+        <li>do the ambiguous work with a stronger model</li>
+        <li>attach telemetry, review, or other runtime concerns without rewriting the whole workflow</li>
         </ul>
-
-        <p>Stages can be deterministic handlers or provider-bound agents using a fast nucleus or a deep nucleus.</p>
-
-        <h2>Practical Pattern</h2>
+        <p>That is the use case <code>skill_organism(...)</code> is meant to serve.</p>
+        <h2 id="core-pieces">Core Pieces</h2>
+        <ul>
+        <li><code>SkillStage</code></li>
+        <li><code>SkillOrganism</code></li>
+        <li><code>TelemetryProbe</code></li>
+        </ul>
+        <p>Stages can be:</p>
+        <ul>
+        <li>deterministic handlers</li>
+        <li>provider-bound agents using a fast nucleus</li>
+        <li>provider-bound agents using a deep nucleus</li>
+        </ul>
+        <h2 id="practical-pattern">Practical Pattern</h2>
+        <p>Typical workflow:</p>
         <ol>
-            <li>intake or normalization stage</li>
-            <li>cheap routing or classification stage</li>
-            <li>deeper planning or synthesis stage</li>
-            <li>optional attached telemetry or review</li>
+        <li>intake or normalization stage</li>
+        <li>cheap routing/classification stage</li>
+        <li>deeper planning or synthesis stage</li>
+        <li>optional attached telemetry or review</li>
         </ol>
-
-        <h2>Three-Layer Context Model</h2>
+        <p>This lets one workflow behave more like a composed organism than a single prompt or an unstructured chain of scripts.</p>
+        <h2 id="three-layer-context-model">Three-Layer Context Model</h2>
         <p>Stages within an organism have access to three layers of context, each with different lifetime and mutability:</p>
         <ol>
-            <li><strong>Topology</strong> &mdash; the wiring diagram and observation structure. Structural and static within a single run.</li>
-            <li><strong>Ephemeral</strong> &mdash; the <code>shared_state</code> dictionary. Carries routing hints, counters, and stage outputs. Mutable, not historically reconstructible.</li>
-            <li><strong>Bi-temporal</strong> &mdash; an optional <code>BiTemporalMemory</code> substrate. Carries durable factual knowledge with dual time axes. Append-only and fully auditable.</li>
+        <li><strong>Topology</strong> — the wiring diagram and observation structure. Structural and static within a single run.</li>
+        <li><strong>Ephemeral</strong> — the <code>shared_state</code> dictionary. Carries routing hints, counters, and stage outputs. Mutable, not historically reconstructible.</li>
+        <li><strong>Bi-temporal</strong> — an optional <code>BiTemporalMemory</code> substrate. Carries durable factual knowledge with dual time axes. Append-only and fully auditable.</li>
         </ol>
-
-        <h3>Ephemeral: shared_state</h3>
-        <p><code>shared_state</code> is still useful for lightweight orchestration data &mdash; routing labels, counters, temporary outputs.</p>
-
-        <h3>Bi-temporal: substrate</h3>
-        <p>When you pass <code>substrate=BiTemporalMemory()</code> to <code>skill_organism(...)</code>, stages can read facts via <code>read_query</code> and write facts via <code>fact_extractor</code> or <code>emit_output_fact</code>. Handlers receive a frozen <code>SubstrateView(facts, query, record_time)</code> rather than the raw memory instance, keeping them decoupled from memory internals.</p>
-
-        <table>
-            <thead>
-                <tr><th><code>SkillStage</code> field</th><th>Purpose</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><code>read_query</code></td><td>Subject string or callable &rarr; <code>SubstrateView</code> injected before stage runs</td></tr>
-                <tr><td><code>fact_extractor</code></td><td>Callable &rarr; emits assert/correct/invalidate events after stage runs</td></tr>
-                <tr><td><code>emit_output_fact</code></td><td>Convenience flag: auto-records <code>(task, stage.name, output)</code></td></tr>
-                <tr><td><code>fact_tags</code></td><td>Default tags applied to all facts emitted by this stage</td></tr>
-            </tbody>
-        </table>
-
-        <p>This enables the audit question: &ldquo;what did the organism know when stage X made its decision?&rdquo; &mdash; answered via <code>retrieve_belief_state()</code> on the append-only history.</p>
-
-        <h3>Cognitive mode annotations</h3>
-        <p>Since v0.22, stages can declare a <code>CognitiveMode</code>: <code>OBSERVATIONAL</code> (System A &mdash; passive sensing) or <code>ACTION_ORIENTED</code> (System B &mdash; active decision-making). When not set, the mode is inferred from the existing <code>mode</code> field. The watcher detects mismatches and reports A/B balance via <code>mode_balance()</code>.</p>
-
-        <h3>Attachable components</h3>
-        <p>For cross-cutting concerns you do not want to hardcode: telemetry (<code>TelemetryProbe</code>), runtime monitoring (<code>WatcherComponent</code> &mdash; classifies signals as epistemic/somatic/species-specific, can retry/escalate/halt), review and safety policies, and custom lifecycle hooks via <code>SkillRuntimeComponent</code>.</p>
-
-        <h2>Recommended Examples</h2>
+        <h3 id="ephemeral-shared_state">Ephemeral: shared_state</h3>
+        <p><code>shared_state</code> is still useful for lightweight orchestration data — routing labels, counters, temporary outputs.</p>
+        <h3 id="bi-temporal-substrate">Bi-temporal: substrate</h3>
+        <p>When you pass <code>substrate=BiTemporalMemory()</code> to <code>skill_organism(...)</code>, stages can:</p>
         <ul>
-            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/68_skill_organism_runtime.py” target=”_blank” rel=”noopener”><code>68_skill_organism_runtime.py</code></a> &mdash; deterministic intake, fast routing, deep planning, attached telemetry</li>
-            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py” target=”_blank” rel=”noopener”><code>71_bitemporal_skill_organism.py</code></a> &mdash; multi-stage workflow with bi-temporal substrate, belief-state reconstruction, and temporal diffs</li>
-            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/73_watcher_component.py” target=”_blank” rel=”noopener”><code>73_watcher_component.py</code></a> &mdash; runtime monitoring with signal classification and retry/escalate/halt interventions</li>
-            <li><a href=”https://github.com/coredipper/operon/blob/main/examples/76_cognitive_modes.py” target=”_blank” rel=”noopener”><code>76_cognitive_modes.py</code></a> &mdash; System A/B cognitive mode annotations with watcher mode balance</li>
+        <li><strong>Read</strong> facts via <code>read_query</code> — a subject string or callable returning a <code>BiTemporalQuery</code></li>
+        <li><strong>Write</strong> facts via <code>emit_output_fact=True</code> (auto-records output) or <code>fact_extractor</code> (custom event logic)</li>
         </ul>
+        <p>Stages receive a frozen <code>SubstrateView(facts, query, record_time)</code> rather than the raw memory instance, keeping them decoupled from memory internals.</p>
+        <p>This enables the audit question: "what did the organism know when stage X made its decision?" — answered via <code>retrieve_belief_state()</code> on the append-only history.</p>
+        <h3 id="attachable-components">Attachable components</h3>
+        <p>For cross-cutting concerns you do not want to hardcode:</p>
+        <ul>
+        <li>telemetry (<code>TelemetryProbe</code>)</li>
+        <li>runtime monitoring (<code>WatcherComponent</code>) — classifies signals as epistemic/somatic/species-specific, can retry/escalate/halt</li>
+        <li>review and safety policies</li>
+        <li>custom lifecycle hooks via <code>SkillRuntimeComponent</code></li>
+        </ul>
+        <h2 id="recommended-examples">Recommended Examples</h2>
+        <ul>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/68_skill_organism_runtime.py"><code>examples/68_skill_organism_runtime.py</code></a> — deterministic intake, fast routing, deep planning, attached telemetry</li>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py"><code>examples/71_bitemporal_skill_organism.py</code></a> — multi-stage workflow with bi-temporal substrate, belief-state reconstruction, and temporal diffs</li>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/73_watcher_component.py"><code>examples/73_watcher_component.py</code></a> — runtime monitoring with signal classification and retry/escalate/halt interventions</li>
+        </ul>
+
+        <footer>
+            <p><a href="/operon/">&larr; Back to docs</a></p>
+        </footer>
     </div>
 </body>
 </html>

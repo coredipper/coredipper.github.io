@@ -10,128 +10,185 @@
     <div class="container">
         <nav>
             <a href="/operon/">&larr; Docs</a>
-            <a href="/operon/skill-organisms/">Skill Organisms</a>
-            <a href="/operon/examples/">Examples</a>
+            <a href="/blog/">Blog</a>
+            <a href="https://github.com/coredipper/operon" target="_blank" rel="noopener">GitHub</a>
         </nav>
 
-        <header>
-            <h1>Bi-Temporal Memory</h1>
-            <p class="subtitle">Append-only factual memory with dual time axes for auditable decision-making.</p>
-        </header>
-
-        <p><code>BiTemporalMemory</code> tracks facts along two independent time axes:</p>
+        <h1 id="bi-temporal-memory">Bi-Temporal Memory</h1>
+        <p>Operon's <code>BiTemporalMemory</code> tracks facts along two independent time axes:</p>
         <ul>
-            <li><strong>Valid time</strong> &mdash; when a fact is true in the world.</li>
-            <li><strong>Record time</strong> &mdash; when the system learned about it.</li>
+        <li><strong>Valid time</strong> — when a fact is true in the world.</li>
+        <li><strong>Record time</strong> — when the system learned about it.</li>
         </ul>
-
-        <p>Unlike <code>HistoneStore</code> (epigenetic marks) or <code>EpisodicMemory</code> (tiered decay), bi-temporal memory is append-only &mdash; corrections close old records and create new ones, so the full history is always reconstructible.</p>
-
-        <h2>Why Two Time Axes?</h2>
+        <p>Unlike <code>HistoneStore</code> (epigenetic marks on memories) or <code>EpisodicMemory</code> (tiered decay), bi-temporal memory is append-only — corrections close old records and create new ones, so the full history is always reconstructible.</p>
+        <h2 id="why-two-time-axes">Why two time axes?</h2>
         <p>A single timestamp conflates two different questions:</p>
         <ol>
-            <li>&ldquo;What is true now?&rdquo; (valid-time query)</li>
-            <li>&ldquo;What did the system believe at decision time?&rdquo; (record-time query)</li>
+        <li>"What is true now?" (valid-time query)</li>
+        <li>"What did the system believe at decision time?" (record-time query)</li>
         </ol>
-        <p>These diverge whenever facts are ingested with delay or corrected retroactively &mdash; the norm in compliance, healthcare, and finance workflows.</p>
-
-        <h2>Quick Start</h2>
-<pre><code>from operon_ai import BiTemporalMemory
-
-mem = BiTemporalMemory()
-
-# Record: risk tier is "medium" (valid day 1, ingested day 3)
-fact = mem.record_fact("client:42", "risk_tier", "medium",
-                       valid_from=day1, recorded_from=day3, source="crm")
-
-# Correct: actually "high", retroactive to day 1 (recorded day 5)
-mem.correct_fact(fact.fact_id, "high",
-                 valid_from=day1, recorded_from=day5, source="manual_review")</code></pre>
-
-        <h2>Querying</h2>
+        <p>These diverge whenever facts are ingested with delay or corrected retroactively — which is the norm in compliance, healthcare, and finance workflows. Bi-temporal memory makes the divergence explicit and queryable.</p>
+        <h2 id="quick-start">Quick start</h2>
+        <pre><code class="language-python">from datetime import datetime, timedelta
+        from operon_ai import BiTemporalMemory
+        
+        mem = BiTemporalMemory()
+        
+        day1 = datetime(2025, 1, 1)
+        day3 = day1 + timedelta(days=2)
+        day5 = day1 + timedelta(days=4)
+        
+        # Record a fact: client risk tier is &quot;medium&quot; (valid day 1, ingested day 3)
+        fact = mem.record_fact(&quot;client:42&quot;, &quot;risk_tier&quot;, &quot;medium&quot;,
+                               valid_from=day1, recorded_from=day3, source=&quot;crm&quot;)
+        
+        # Correct it: actually &quot;high&quot;, retroactive to day 1 (recorded day 5)
+        mem.correct_fact(fact.fact_id, &quot;high&quot;,
+                         valid_from=day1, recorded_from=day5, source=&quot;manual_review&quot;)
+        </code></pre>
+        <h2 id="querying">Querying</h2>
         <p>Three retrieval methods correspond to three questions:</p>
-<pre><code># What is true at day 2? (active records only)
-mem.retrieve_valid_at(at=day2, subject="client:42")        # &rarr; "high"
-
-# What had the system recorded by day 2?
-mem.retrieve_known_at(at=day2, subject="client:42")         # &rarr; [] (not yet ingested)
-
-# What did the system believe on day 2, given what it knew by day 4?
-mem.retrieve_belief_state(at_valid=day2, at_record=day4)    # &rarr; "medium"
-
-# Same question, given what it knows by day 6 (after correction)?
-mem.retrieve_belief_state(at_valid=day2, at_record=day6)    # &rarr; "high"</code></pre>
-
-        <h2>History and Audit</h2>
-<pre><code># Full correction history, sorted by record time
-mem.history("client:42")
-
-# What changed between two points on either axis?
-mem.diff_between(day4, day6, axis="record")
-
-# World-time timeline, sorted by valid_from
-mem.timeline_for("client:42")</code></pre>
-
-        <h2>Append-Only Semantics</h2>
+        <pre><code class="language-python">day2 = day1 + timedelta(days=1)
+        day4 = day1 + timedelta(days=3)
+        day6 = day1 + timedelta(days=5)
+        
+        # What is true at day 2? (current active records only)
+        mem.retrieve_valid_at(at=day2, subject=&quot;client:42&quot;)       # → &quot;high&quot;
+        
+        # What had the system recorded by day 2?
+        mem.retrieve_known_at(at=day2, subject=&quot;client:42&quot;)        # → [] (not yet ingested)
+        
+        # What did the system believe was true on day 2, given what it knew by day 4?
+        mem.retrieve_belief_state(at_valid=day2, at_record=day4)   # → &quot;medium&quot;
+        
+        # Same question, but given what it knows by day 6 (after correction)?
+        mem.retrieve_belief_state(at_valid=day2, at_record=day6)   # → &quot;high&quot;
+        </code></pre>
+        <h2 id="history-and-audit">History and audit</h2>
+        <pre><code class="language-python"># Full correction history for a subject, sorted by record time
+        mem.history(&quot;client:42&quot;)
+        
+        # What changed between two points on either axis?
+        mem.diff_between(day4, day6, axis=&quot;record&quot;)
+        
+        # World-time timeline, sorted by valid_from
+        mem.timeline_for(&quot;client:42&quot;)
+        </code></pre>
+        <h2 id="append-only-semantics">Append-only semantics</h2>
         <p>Corrections never mutate existing records. Instead:</p>
         <ol>
-            <li>The old record&rsquo;s <code>recorded_to</code> is set (closing it on the record-time axis).</li>
-            <li>A new record is appended with <code>supersedes</code> pointing to the old <code>fact_id</code>.</li>
+        <li>The old record's <code>recorded_to</code> is set (closing it on the record-time axis).</li>
+        <li>A new record is appended with <code>supersedes</code> pointing to the old <code>fact_id</code>.</li>
         </ol>
-        <p>This means any past belief state is always reconstructible &mdash; the foundation for compliance auditing.</p>
-
-        <h2>Data Model</h2>
+        <p>This means any past belief state is always reconstructible — the foundation for compliance auditing.</p>
+        <h2 id="data-model">Data model</h2>
         <table>
-            <thead>
-                <tr><th>Type</th><th>Purpose</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><code>BiTemporalFact</code></td><td>Immutable fact with dual time intervals (frozen dataclass)</td></tr>
-                <tr><td><code>BiTemporalQuery</code></td><td>Filter spec for point-in-time queries</td></tr>
-                <tr><td><code>BiTemporalMemory</code></td><td>Mutable store with append-only write semantics</td></tr>
-                <tr><td><code>FactSnapshot</code></td><td>Query result container</td></tr>
-                <tr><td><code>CorrectionResult</code></td><td>Result of <code>correct_fact()</code></td></tr>
-                <tr><td><code>SubstrateView</code></td><td>Frozen read-only envelope of facts for stage handlers (v0.20.0)</td></tr>
-            </tbody>
+        <thead>
+        <tr>
+        <th>Type</th>
+        <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><code>BiTemporalFact</code></td>
+        <td>Immutable fact with dual time intervals (frozen dataclass)</td>
+        </tr>
+        <tr>
+        <td><code>BiTemporalQuery</code></td>
+        <td>Filter spec for point-in-time queries</td>
+        </tr>
+        <tr>
+        <td><code>BiTemporalMemory</code></td>
+        <td>Mutable store with append-only write semantics</td>
+        </tr>
+        <tr>
+        <td><code>FactSnapshot</code></td>
+        <td>Query result container</td>
+        </tr>
+        <tr>
+        <td><code>CorrectionResult</code></td>
+        <td>Result of <code>correct_fact()</code> — old fact, new fact, correction time</td>
+        </tr>
+        <tr>
+        <td><code>SubstrateView</code></td>
+        <td>Frozen read-only envelope of facts for stage handlers (v0.20.0)</td>
+        </tr>
+        </tbody>
         </table>
         <p>All types are exported from the top level: <code>from operon_ai import BiTemporalMemory, BiTemporalFact, SubstrateView, ...</code></p>
-
-        <h2>Relationship to Other Memory Systems</h2>
-        <table>
-            <thead>
-                <tr><th>System</th><th>Time Model</th><th>Mutation</th><th>Use Case</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><code>HistoneStore</code></td><td>Single timestamp</td><td>Mutable marks</td><td>Epigenetic metadata on retrieval</td></tr>
-                <tr><td><code>EpisodicMemory</code></td><td>Single timestamp</td><td>Mutable (decay, promote)</td><td>Tiered memory with relevance scoring</td></tr>
-                <tr><td><code>BiTemporalMemory</code></td><td>Dual timestamps</td><td>Append-only</td><td>Auditable fact tracking with corrections</td></tr>
-            </tbody>
-        </table>
-
-        <h2>SkillOrganism Integration</h2>
+        <h2 id="skillorganism-integration">SkillOrganism Integration</h2>
         <p>Since v0.20.0, <code>BiTemporalMemory</code> can serve as a shared substrate for <code>SkillOrganism</code> workflows. Pass <code>substrate=BiTemporalMemory()</code> to <code>skill_organism(...)</code>, then use per-stage hooks to read and write facts:</p>
-
         <table>
-            <thead>
-                <tr><th><code>SkillStage</code> field</th><th>Purpose</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><code>read_query</code></td><td>Subject string or callable &rarr; <code>SubstrateView</code> injected before stage runs</td></tr>
-                <tr><td><code>fact_extractor</code></td><td>Callable &rarr; emits assert/correct/invalidate events after stage runs</td></tr>
-                <tr><td><code>emit_output_fact</code></td><td>Convenience flag: auto-records <code>(task, stage.name, output)</code></td></tr>
-                <tr><td><code>fact_tags</code></td><td>Default tags applied to all facts emitted by this stage</td></tr>
-            </tbody>
+        <thead>
+        <tr>
+        <th><code>SkillStage</code> field</th>
+        <th>Purpose</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><code>read_query</code></td>
+        <td>Subject string or callable → <code>SubstrateView</code> injected before stage runs</td>
+        </tr>
+        <tr>
+        <td><code>fact_extractor</code></td>
+        <td>Callable → emits assert/correct/invalidate events after stage runs</td>
+        </tr>
+        <tr>
+        <td><code>emit_output_fact</code></td>
+        <td>Convenience flag: auto-records <code>(task, stage.name, output)</code></td>
+        </tr>
+        <tr>
+        <td><code>fact_tags</code></td>
+        <td>Default tags applied to all facts emitted by this stage</td>
+        </tr>
+        </tbody>
         </table>
-
-        <p>Handlers receive the <code>SubstrateView</code> as an additional argument (via arity-aware dispatch &mdash; existing handlers are unaffected). See <a href="/operon/skill-organisms/">Skill Organisms</a> for the full three-layer context model.</p>
-
-        <h2>Examples</h2>
+        <p>Handlers receive the <code>SubstrateView</code> as an additional argument (via arity-aware dispatch — existing handlers are unaffected). See <a href="skill-organisms.md">Skill Organisms</a> for the full three-layer context model.</p>
+        <h2 id="examples">Examples</h2>
         <ul>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/69_bitemporal_memory.py" target="_blank" rel="noopener"><code>69_bitemporal_memory.py</code></a> &mdash; core valid-time vs record-time divergence</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/70_bitemporal_compliance_audit.py" target="_blank" rel="noopener"><code>70_bitemporal_compliance_audit.py</code></a> &mdash; multi-fact compliance audit</li>
-            <li><a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py" target="_blank" rel="noopener"><code>71_bitemporal_skill_organism.py</code></a> &mdash; multi-stage organism with substrate</li>
-            <li><a href="https://huggingface.co/spaces/coredipper/operon-bitemporal" target="_blank" rel="noopener">Bi-Temporal Memory Explorer</a> &mdash; interactive HuggingFace Space</li>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/69_bitemporal_memory.py"><code>examples/69_bitemporal_memory.py</code></a> — core valid-time vs record-time divergence with corrections</li>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/70_bitemporal_compliance_audit.py"><code>examples/70_bitemporal_compliance_audit.py</code></a> — multi-fact compliance audit with belief-state reconstruction</li>
+        <li><a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py"><code>examples/71_bitemporal_skill_organism.py</code></a> — multi-stage organism with substrate, belief-state reconstruction, and temporal diffs</li>
+        <li><a href="https://huggingface.co/spaces/coredipper/operon-bitemporal">Bi-Temporal Memory Explorer</a> — interactive HuggingFace Space</li>
         </ul>
+        <h2 id="relationship-to-other-memory-systems">Relationship to other memory systems</h2>
+        <table>
+        <thead>
+        <tr>
+        <th>System</th>
+        <th>Time model</th>
+        <th>Mutation</th>
+        <th>Use case</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><code>HistoneStore</code></td>
+        <td>Single timestamp</td>
+        <td>Mutable marks</td>
+        <td>Epigenetic metadata on retrieval</td>
+        </tr>
+        <tr>
+        <td><code>EpisodicMemory</code></td>
+        <td>Single timestamp</td>
+        <td>Mutable (decay, promote)</td>
+        <td>Tiered memory with relevance scoring</td>
+        </tr>
+        <tr>
+        <td><code>BiTemporalMemory</code></td>
+        <td>Dual timestamps</td>
+        <td>Append-only</td>
+        <td>Auditable fact tracking with corrections</td>
+        </tr>
+        </tbody>
+        </table>
+        <p>The three systems are intentionally decoupled. Integration bridges (converting histone marks or episodic memories into bi-temporal facts) are planned for future work.</p>
+
+        <footer>
+            <p><a href="/operon/">&larr; Back to docs</a></p>
+        </footer>
     </div>
 </body>
 </html>
