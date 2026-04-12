@@ -16,6 +16,25 @@
 
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
+        <h2 id="v0310">v0.31.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Adaptive immune quality evaluation + pre-execution integrity checking</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>VerifierComponent</code>: rubric-based quality evaluation for stage outputs (adaptive immune / B-cell analogy). Emits <code>WatcherSignal(source="verifier")</code> that triggers ESCALATE on low quality</li>
+        <li><code>CertificateGateComponent</code>: pre-execution <code>DNARepair.scan()</code> in <code>on_stage_start()</code> &mdash; halts before LLM call if genome corruption detected (G1/S DNA damage checkpoint)</li>
+        <li>Pre-stage intervention check in <code>SkillOrganism.run()</code> (enables CertificateGate)</li>
+        <li>Non-watcher components run before watcher in <code>on_stage_result()</code> for correct signal ordering</li>
+        <li>Cross-model judging: <code>--judge-url</code> and <code>--judge-model</code> flags for e2e eval</li>
+        </ul>
+        <p>Findings:</p>
+        <ul>
+        <li>Quality-based escalation requires cross-model judging &mdash; self-judging with weak models inflates scores</li>
+        <li>Phi-3 Mini produces quality = 0.95&ndash;1.0 code reviews even with Gemma 4 cross-judge &mdash; task needs harder bugs to differentiate</li>
+        <li>Each structural guarantee layer has a stricter precondition: DNARepair (none) &lt; ImmuneSystem (sustained obs) &lt; EpiplexityMonitor (real embeddings) &lt; VerifierComponent (capable judge)</li>
+        </ul>
         <h2 id="v0301">v0.30.1</h2>
         <p>Focus:</p>
         <ul>
