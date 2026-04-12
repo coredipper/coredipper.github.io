@@ -189,7 +189,7 @@
                 <h1>Where Structural Guarantees Actually Help (and Where They Don&rsquo;t)</h1>
                 <div class="subtitle">End-to-end evaluation with real LLM agents reveals that Operon&rsquo;s value depends on which layer you&rsquo;re protecting&mdash;and the answer is more nuanced than we expected</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 10, 2026</div>
-                <div class="version-note">operon-ai v0.30.1</div>
+                <div class="version-note">operon-ai v0.30.1 &middot; updated v0.31.1</div>
             </header>
 
             <h2>The question we had been avoiding</h2>
@@ -340,6 +340,58 @@
             <p>One clear structural win (state integrity), one precise but limited detection capability (behavioral immune), and one correctly-scoped non-result (stagnation escalation). The biomimetic approach earns its complexity at the state layer&mdash;where guarantees are deterministic and model-independent&mdash;and provides diminishing returns at the output layer, where the signals don&rsquo;t match the problems.</p>
 
             <p>This is not the blog post where we claim everything works. It is the post where we show exactly what works, what doesn&rsquo;t, and why. The evaluation harness, results, and paper updates are all in <a href="https://github.com/coredipper/operon/pull/35">PR #35</a>, published as <a href="https://pypi.org/project/operon-ai/0.30.1/">operon-ai v0.30.1</a>.</p>
+
+            <h2>Update: v0.31.1 &mdash; closing the gaps</h2>
+
+            <p>The stagnation escalation non-result above led directly to the v0.31.0 work (VerifierComponent for quality-based escalation, CertificateGate for pre-execution integrity) and now v0.31.1, which addresses several follow-ups:</p>
+
+            <h3>Harder eval task validates discrimination</h3>
+
+            <p>We added <code>hard_par_08</code>: subtle bug detection with non-obvious bugs (off-by-one pagination, TOCTOU cache race, float precision in financial math, <code>except Exception</code> swallowing <code>KeyboardInterrupt</code>). The code looks production-quality. Results:</p>
+
+            <table>
+                <tr><th>Model</th><th>Quality</th><th>Delta from weak</th></tr>
+                <tr><td>phi3:mini (3.8B)</td><td>0.72</td><td>&mdash;</td></tr>
+                <tr><td>gemma4 (27B MoE)</td><td>1.00</td><td>+0.28</td></tr>
+            </table>
+
+            <p>The 0.28 quality delta exceeds our 0.2 threshold. phi3:mini identifies the bug <em>classes</em> but explains them generically; gemma4 explains the concrete failure scenarios. The task includes expected-bug hints for the judge rubric&mdash;this is deliberate: the hints make judging reliable, and the discrimination comes from depth of reasoning, not surface pattern matching.</p>
+
+            <h3>Compile&rarr;decompile round-trip</h3>
+
+            <p>New decompilers (<code>deerflow_to_topology()</code>, <code>swarms_to_topology()</code>) enable verifying Prop 5.1 empirically: compile an organism, decompile back to <code>ExternalTopology</code>, verify all certificates survive. Result: 100% certificate identity preservation across all 4 compilers. The Swarms compiler preserves exact graph topology (1:1 mapping); DeerFlow reshapes to hub-and-spoke but preserves all stage names and certificates.</p>
+
+            <h3>Structural guarantees by layer (updated)</h3>
+
+            <table>
+                <tr><th>Layer</th><th>Nature</th><th>Result</th><th>What&rsquo;s new in v0.31.x</th></tr>
+                <tr>
+                    <td><strong>State</strong></td>
+                    <td>Deterministic</td>
+                    <td>100% detection, 100% repair</td>
+                    <td>CertificateGate: preventive (block before execute), not just reactive</td>
+                </tr>
+                <tr>
+                    <td><strong>Behavioral</strong></td>
+                    <td>Statistical</td>
+                    <td>TP = 20%, FP = 0%</td>
+                    <td>VerifierComponent: quality-based escalation (adaptive immune)</td>
+                </tr>
+                <tr>
+                    <td><strong>Output</strong></td>
+                    <td>Stochastic</td>
+                    <td>No effect (novelty &ne; quality)</td>
+                    <td>hard_par_08 confirms discrimination at delta = 0.28</td>
+                </tr>
+                <tr>
+                    <td><strong>Developmental</strong></td>
+                    <td>Preventive</td>
+                    <td><em>New layer</em></td>
+                    <td>CertificateGate halts before corrupted state reaches LLM</td>
+                </tr>
+            </table>
+
+            <p>Published as <a href="https://pypi.org/project/operon-ai/0.31.1/">operon-ai v0.31.1</a>. All papers updated. <a href="https://github.com/coredipper/operon/pull/37">PR #37</a>.</p>
 
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>

@@ -69,9 +69,17 @@
             <li><code>DesignProblem</code> + <code>compose_series/parallel</code> + <code>feedback_fixed_point</code> &mdash; Zardini co-design</li>
         </ul>
 
+        <h2>Phase C5+ &mdash; Decompilers + Capability Annotations</h2>
+        <ul>
+            <li><code>deerflow_to_topology()</code> / <code>swarms_to_topology()</code> &mdash; compile&rarr;decompile round-trip with certificate preservation (Prop 5.1 verified)</li>
+            <li><code>ExternalTopology.capabilities</code> &mdash; structured per-agent capability annotations consumed by <code>tool_density()</code></li>
+            <li><code>EXTERNAL_CAPABILITY_MAP</code> &mdash; 27 mappings from framework tool names (<code>web_search</code>, <code>python</code>, <code>file_io</code>) to Operon <code>Capability</code> enum values</li>
+            <li><code>RunContext</code> &mdash; typed <code>dict</code> subclass wrapping <code>shared_state</code> with property accessors; supports custom <code>WatcherConfig.state_key</code></li>
+        </ul>
+
         <h2>Phase C6 &mdash; Evaluation Harness</h2>
         <ul>
-            <li>20 benchmark tasks across 7 configurations (single, pipeline, fan-out, fan-in, diamond, full, stress)</li>
+            <li>21 benchmark tasks across 7 configurations (single, pipeline, fan-out, fan-in, diamond, full, stress)</li>
             <li><code>MockEvaluator</code> using real structural analysis (topology advice, epistemic bounds, pattern scoring)</li>
             <li>Structural variation analysis: measures how topology metrics change across task configurations</li>
             <li>Credit assignment: attributes evaluation outcomes to individual stage contributions</li>

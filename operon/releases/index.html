@@ -16,6 +16,28 @@
 
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
+        <h2 id="v0311">v0.31.1</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Compile/decompile round-trip, capability annotations, RunContext, harder eval</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>RunContext</code>: typed <code>dict</code> subclass wrapping <code>shared_state</code> with property accessors for watcher interventions, verifier signals, and telemetry events. Supports custom <code>WatcherConfig.state_key</code>.</li>
+        <li><code>deerflow_to_topology()</code> / <code>swarms_to_topology()</code>: decompilers enabling compile&rarr;decompile round-trips with certificate preservation</li>
+        <li><code>ExternalTopology.capabilities</code>: structured per-agent capability annotations with <code>EXTERNAL_CAPABILITY_MAP</code> (27 tool&rarr;Capability mappings) for ToolDensity theorem</li>
+        <li><code>TelemetryProbe</code> enrichment: <code>run_start</code> event includes organism config (stage_count, stage_names, mode_assignments, certificate_theorems)</li>
+        <li><code>hard_par_08</code>: subtle bug detection eval task (off-by-one, TOCTOU, float precision, exception handling). 21 benchmark tasks total.</li>
+        <li>Sustained immune monitoring: 6 tests at production thresholds (min_observations=10)</li>
+        <li>Certificate identity tests: full (theorem, parameters, source) preservation verified across all 4 compilers</li>
+        <li>Papers updated: VerifierComponent + CertificateGate documented across all 4 papers + overview article</li>
+        </ul>
+        <p>Findings:</p>
+        <ul>
+        <li><code>hard_par_08</code> discriminates: phi3:mini scores 0.72, gemma4 scores 1.00 (delta = 0.28). Hints in the prompt are for the judge, not the examinee.</li>
+        <li>Prop 5.1 round-trip verified: certificates survive DeerFlow and Swarms compile&rarr;decompile. Swarms preserves exact graph topology (1:1 compiler).</li>
+        <li>All 4 compilers achieve 100% certificate identity preservation.</li>
+        </ul>
         <h2 id="v0310">v0.31.0</h2>
         <p>Focus:</p>
         <ul>
