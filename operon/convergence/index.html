@@ -77,6 +77,14 @@
             <li><code>RunContext</code> &mdash; typed <code>dict</code> subclass wrapping <code>shared_state</code> with property accessors; supports custom <code>WatcherConfig.state_key</code></li>
         </ul>
 
+        <h2>Phase C9 &mdash; LangGraph Compiler + DeerFlow Executor</h2>
+        <ul>
+            <li><code>organism_to_langgraph()</code> &mdash; compile SkillOrganism to a LangGraph <code>StateGraph</code>. Wraps <code>organism.run()</code> as a single node; all structural guarantees enforced by the organism&rsquo;s own run loop.</li>
+            <li><code>run_organism_langgraph()</code> &mdash; compile + execute in one call with certificate verification</li>
+            <li><code>execute_deerflow()</code> &mdash; single-agent execution via DeerFlow&rsquo;s <code>create_deerflow_agent</code></li>
+            <li>Optional dependency: <code>pip install operon-ai[deerflow]</code> (Python &ge;3.12)</li>
+        </ul>
+
         <h2>Phase C6 &mdash; Evaluation Harness</h2>
         <ul>
             <li>21 benchmark tasks across 7 configurations (single, pipeline, fan-out, fan-in, diamond, full, stress)</li>

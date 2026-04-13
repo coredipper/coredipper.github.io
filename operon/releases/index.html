@@ -16,6 +16,25 @@
 
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
+        <h2 id="v0320">v0.32.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>LangGraph compiler + DeerFlow executor</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>organism_to_langgraph()</code>: compile SkillOrganism to a LangGraph StateGraph. Wraps <code>organism.run()</code> as a single node &mdash; all structural guarantees (CertificateGate, WatcherComponent, VerifierComponent, halt_on_block) enforced by the organism&rsquo;s own run loop.</li>
+        <li><code>run_organism_langgraph()</code>: compile + execute in one call with certificate verification</li>
+        <li><code>execute_deerflow()</code>: single-agent execution via DeerFlow&rsquo;s <code>create_deerflow_agent</code> (LangGraph runtime)</li>
+        <li><code>guarded_graph.py</code>: earlier per-stage approach (superseded by langgraph_compiler but kept for reference)</li>
+        <li>Optional dependency: <code>pip install operon-ai[deerflow]</code></li>
+        </ul>
+        <p>Findings:</p>
+        <ul>
+        <li>Reimplementing <code>SkillOrganism.run()</code> logic as LangGraph nodes caused 8 rounds of review fixes. Wrapping <code>organism.run()</code> directly eliminated all divergence bugs: 215 lines instead of 520.</li>
+        <li>LangGraph&rsquo;s <code>StateGraph</code> is structurally isomorphic to Operon&rsquo;s wiring diagram model (nodes = stages, conditional edges = interventions).</li>
+        <li>DeerFlow requires Python &ge;3.12 and uses LangGraph under the hood &mdash; LangGraph is the right compile target.</li>
+        </ul>
         <h2 id="v0311">v0.31.1</h2>
         <p>Focus:</p>
         <ul>
