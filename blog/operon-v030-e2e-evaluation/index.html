@@ -189,7 +189,7 @@
                 <h1>Where Structural Guarantees Actually Help (and Where They Don&rsquo;t)</h1>
                 <div class="subtitle">End-to-end evaluation with real LLM agents reveals that Operon&rsquo;s value depends on which layer you&rsquo;re protecting&mdash;and the answer is more nuanced than we expected</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 10, 2026</div>
-                <div class="version-note">operon-ai v0.30.1 &middot; updated v0.31.1</div>
+                <div class="version-note">operon-ai v0.30.1 &middot; updated v0.33.0</div>
             </header>
 
             <h2>The question we had been avoiding</h2>
@@ -392,6 +392,24 @@
             </table>
 
             <p>Published as <a href="https://pypi.org/project/operon-ai/0.31.1/">operon-ai v0.31.1</a>. All papers updated. <a href="https://github.com/coredipper/operon/pull/37">PR #37</a>.</p>
+
+            <h2>Update: v0.33.0 &mdash; harness engineering as architecture</h2>
+
+            <p>The harness concept&mdash;&ldquo;everything except the model&rdquo;&mdash;has become the central abstraction in the LangChain ecosystem. <a href="https://arxiv.org/abs/2604.08224">Zhou et al.</a> formalize this as four pillars of agent externalization: Memory, Skills, Protocols, and Harness Engineering. Each maps directly to an Operon component:</p>
+
+            <table>
+                <tr><th>Externalization Pillar</th><th>Operon Component</th><th>Categorical Role</th></tr>
+                <tr><td>Memory</td><td>BiTemporalMemory, RunContext</td><td>State in the coalgebra</td></tr>
+                <tr><td>Skills</td><td>SkillStage, PatternTemplate</td><td>Objects composed via operad</td></tr>
+                <tr><td>Protocols</td><td>WiringDiagram, typed ports</td><td>Syntactic wiring G</td></tr>
+                <tr><td>Harness</td><td>SkillOrganism + components</td><td>Full Architecture (G, Know, &Phi;)</td></tr>
+            </table>
+
+            <p>The key insight: structural guarantees are harness-level properties, not model-level ones. The LangGraph functor (v0.32.0) proved this operationally&mdash;wrapping <code>organism.run()</code> as a single LangGraph node transfers all guarantees because they live in the harness.</p>
+
+            <p><a href="https://arxiv.org/abs/2604.05013">Ma et al.</a> provide empirical validation from a different angle: five atomic coding skills (localize, edit, test, reproduce, review) compose without negative interference under joint RL training. v0.33.0 adds these as a built-in catalog (<code>seed_library_from_atomic_skills()</code>), connecting their empirical result to Operon&rsquo;s operad composition model.</p>
+
+            <p>Published as <a href="https://pypi.org/project/operon-ai/0.33.0/">operon-ai v0.33.0</a>. <a href="https://github.com/coredipper/operon/pull/40">PR #40</a>.</p>
 
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>

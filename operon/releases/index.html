@@ -16,6 +16,24 @@
 
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
+        <h2 id="v0330">v0.33.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Atomic skills catalog + harness-architecture paper updates</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>seed_library_from_atomic_skills()</code>: 5 composable coding skill patterns (localize, edit, test, reproduce, review) from Ma et al. (arXiv:2604.05013). Topology derived via shared <code>_shape_to_topology()</code> &mdash; parallel review maps to <code>specialist_swarm</code>, sequential skills to <code>skill_organism</code>.</li>
+        <li><code>get_atomic_skill_patterns()</code>: returns deep copies of the built-in catalog</li>
+        <li>Paper: new subsection &ldquo;Harness Engineering as Architecture&rdquo; mapping Zhou et al.&rsquo;s four-pillar externalization framework (Memory, Skills, Protocols, Harness) to Operon&rsquo;s categorical Architecture triple $(G, \mathrm{Know}, \Phi)$</li>
+        <li>Paper: cite Zhou et al. (2604.08224) and Ma et al. (2604.05013) in related work with Operon mapping</li>
+        <li>All 5 paper PDFs rebuilt</li>
+        </ul>
+        <p>Key insight:</p>
+        <ul>
+        <li>Structural guarantees are <em>harness-level</em> properties, not model-level ones. The LangGraph functor proves this: wrapping <code>organism.run()</code> transfers all guarantees because they reside in the harness.</li>
+        <li>Atomic skills compose without negative interference (Ma et al.) &mdash; validates Operon&rsquo;s operad composition model.</li>
+        </ul>
         <h2 id="v0320">v0.32.0</h2>
         <p>Focus:</p>
         <ul>
