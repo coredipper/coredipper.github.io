@@ -189,7 +189,7 @@
                 <h1>Where Structural Guarantees Actually Help (and Where They Don&rsquo;t)</h1>
                 <div class="subtitle">End-to-end evaluation with real LLM agents reveals that Operon&rsquo;s value depends on which layer you&rsquo;re protecting&mdash;and the answer is more nuanced than we expected</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 10, 2026</div>
-                <div class="version-note">operon-ai v0.30.1 &middot; updated v0.33.0</div>
+                <div class="version-note">operon-ai v0.30.1 &middot; updated v0.33.1</div>
             </header>
 
             <h2>The question we had been avoiding</h2>
@@ -410,6 +410,40 @@
             <p><a href="https://arxiv.org/abs/2604.05013">Ma et al.</a> provide empirical validation from a different angle: five atomic coding skills (localize, edit, test, reproduce, review) compose without negative interference under joint RL training. v0.33.0 adds these as a built-in catalog (<code>seed_library_from_atomic_skills()</code>), connecting their empirical result to Operon&rsquo;s operad composition model.</p>
 
             <p>Published as <a href="https://pypi.org/project/operon-ai/0.33.0/">operon-ai v0.33.0</a>. <a href="https://github.com/coredipper/operon/pull/40">PR #40</a>.</p>
+
+            <h2>Update: v0.33.1 &mdash; interactive demos and per-stage LangGraph</h2>
+
+            <p>Seven new examples (114&ndash;120) and three interactive HuggingFace Spaces make the v0.33.x features explorable without writing code:</p>
+
+            <h3>Interactive demos</h3>
+
+            <ul>
+                <li><a href="https://huggingface.co/spaces/coredipper/operon-harness-inspector">Harness Inspector</a> &mdash; build an organism, extract the Architecture triple (G, Know, &Phi;), see the four-pillar mapping, compile to any target, verify certificate preservation.</li>
+                <li><a href="https://huggingface.co/spaces/coredipper/operon-escalation-lab">Escalation Lab</a> &mdash; run quality-based escalation scenarios. The fast model scores low on a rubric, the VerifierComponent emits an EPISTEMIC signal, the WatcherComponent escalates to the deep model. Three scenarios: shallow bug fix (escalates), vague summary (escalates), adequate response (no escalation).</li>
+                <li><a href="https://huggingface.co/spaces/coredipper/operon-langgraph-visualizer">LangGraph Visualizer</a> &mdash; compile organisms to per-stage LangGraph graphs and visualize the topology. Each stage is a node with conditional continue/halt edges. Execute and see which stages ran.</li>
+            </ul>
+
+            <h3>Per-stage LangGraph compiler</h3>
+
+            <p>The LangGraph compiler now creates one node per stage (v0.32.0 used a single wrapper node). Each node calls <code>organism.run_single_stage()</code>&mdash;the same per-stage method that <code>organism.run()</code> uses internally. This means:</p>
+
+            <ul>
+                <li><strong>All structural guarantees transfer</strong> because they live in the organism, not the graph topology</li>
+                <li><strong>Per-stage observability</strong> in LangGraph Studio&mdash;each stage appears as a visible node</li>
+                <li><strong>Checkpointing between stages</strong> via LangGraph&rsquo;s MemorySaver (with an honest limitation: component instance state like watcher counters is not checkpointed)</li>
+            </ul>
+
+            <h3>Paper 5: &ldquo;Harness Engineering as Categorical Architecture&rdquo;</h3>
+
+            <p>The formal paper connecting Zhou et al.&rsquo;s four-pillar externalization framework with de los Riscos et al.&rsquo;s ArchAgents category. The background section now cites three additional formalizations:</p>
+
+            <ul>
+                <li><a href="https://arxiv.org/abs/2604.11767">Liu (2604.11767)</a> &mdash; typed lambda calculus for agent composition. 94.1% of GitHub agent configs are structurally incomplete under this formalization.</li>
+                <li><a href="https://arxiv.org/abs/2603.25723">Willstr&ouml;m et al. (2603.25723)</a> &mdash; natural-language agent harnesses as portable artifacts. Validates the harness-as-object assumption.</li>
+                <li><a href="https://arxiv.org/abs/2603.28815">Chen et al. (2603.28815)</a> &mdash; SkillTester quality assurance for agent skills. Parallels our VerifierComponent.</li>
+            </ul>
+
+            <p>Examples and spaces: <a href="https://github.com/coredipper/operon/pull/44">PR #44</a>.</p>
 
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>
