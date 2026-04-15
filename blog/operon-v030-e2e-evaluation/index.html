@@ -506,6 +506,50 @@
 
             <p>The pattern continues from the earlier e2e results: structural guarantees that enforce deterministic invariants (state integrity, priority gating) deliver unconditionally. Guarantees that depend on signal quality (quality evaluation, novelty detection) deliver conditionally on whether the signal triggers. <a href="https://github.com/coredipper/operon/pull/45">PR #45</a>.</p>
 
+            <h2>Update: SWE-bench-lite &mdash; baseline wins</h2>
+
+            <p>We ran 10 SWE-bench-lite instances (real Python bug-fix tasks from astropy and django) comparing a raw Gemma&nbsp;4 call against a 3-stage Operon organism (localize&rarr;edit&rarr;verify):</p>
+
+            <table>
+                <tr><th>Condition</th><th>Mean Quality</th><th>Mean Latency</th><th>n</th></tr>
+                <tr><td>Baseline (raw LLM)</td><td><strong>0.878</strong></td><td>47s</td><td>10</td></tr>
+                <tr><td>Organism (3-stage)</td><td>0.658</td><td>86s</td><td>10</td></tr>
+            </table>
+
+            <div class="finding negative">
+                <strong>The organism pipeline degrades quality by &minus;0.220 on SWE-bench-lite.</strong> Baseline wins on 6/10 instances, ties on 3/10, and loses on 1/10. Three organism runs scored 0.10 (catastrophic &mdash; the pipeline confused itself across stages). The single win was a feature request (astropy-14182) where structured decomposition genuinely helped (+0.35).
+            </div>
+
+            <p>This is the clearest test yet of Ao et al.&rsquo;s delegation theorem: <em>without exogenous signals, a capable single model beats a decomposed pipeline on tasks it can already solve in one shot.</em> Gemma&nbsp;4 scores 0.88 mean quality on these tasks with zero overhead. Adding localize&rarr;edit&rarr;verify stages costs 2x latency and degrades quality because intermediate outputs mislead later stages.</p>
+
+            <h3>Where Operon earns its complexity (updated)</h3>
+
+            <table>
+                <tr><th>Layer</th><th>Evidence</th><th>Verdict</th></tr>
+                <tr>
+                    <td><strong>State integrity</strong></td>
+                    <td>CertificateGate: 3/3 detection, 0/3 naive</td>
+                    <td>EARNS COMPLEXITY</td>
+                </tr>
+                <tr>
+                    <td><strong>Budget gating</strong></td>
+                    <td>ATP priority: perfect discrimination</td>
+                    <td>EARNS COMPLEXITY</td>
+                </tr>
+                <tr>
+                    <td><strong>Composition</strong></td>
+                    <td>Ma et al.: +0.029 overall, &minus;0.167 on hard tasks</td>
+                    <td>NEUTRAL</td>
+                </tr>
+                <tr>
+                    <td><strong>Task decomposition</strong></td>
+                    <td>SWE-bench: &minus;0.220 vs baseline</td>
+                    <td>DOES NOT EARN</td>
+                </tr>
+            </table>
+
+            <p>The value of Operon is not in decomposing tasks that a capable model can already solve. It is in the structural guarantees &mdash; state integrity, priority gating, certificate preservation &mdash; that no amount of prompting can provide. Use organisms for multi-stage workflows where you need structural coordination, not as a wrapper around single-shot tasks.</p>
+
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>
             </div>
