@@ -445,6 +445,67 @@
 
             <p>Examples and spaces: <a href="https://github.com/coredipper/operon/pull/44">PR #44</a>.</p>
 
+            <h2>Update: composition non-interference experiment</h2>
+
+            <p>Ma et al. claim that five atomic coding skills compose without negative interference. We tested this with Gemma 4 on three bug-fix tasks (SQL injection, off-by-one pagination, TOCTOU race condition), comparing individual skills against the composed localize&rarr;edit&rarr;test pipeline:</p>
+
+            <table>
+                <tr><th>Task</th><th>mean(individual)</th><th>composed</th><th>&Delta;</th><th>Verdict</th></tr>
+                <tr><td>sql_injection</td><td>0.806</td><td>0.967</td><td>+0.161</td><td>Positive</td></tr>
+                <tr><td>off_by_one</td><td>0.900</td><td>0.993</td><td>+0.093</td><td>None</td></tr>
+                <tr><td>race_condition</td><td>0.517</td><td>0.350</td><td>&minus;0.167</td><td><strong>Negative</strong></td></tr>
+                <tr><td><strong>Overall</strong></td><td><strong>0.741</strong></td><td><strong>0.770</strong></td><td><strong>+0.029</strong></td><td><strong>None</strong></td></tr>
+            </table>
+
+            <div class="finding">
+                <strong>Ma et al.&rsquo;s claim holds overall (&Delta; = +0.029).</strong> Composition does not degrade quality. On easier tasks (SQL injection, off-by-one), composition slightly helps because later stages build on earlier context.
+            </div>
+
+            <div class="finding negative">
+                <strong>Race condition shows negative interference (&Delta; = &minus;0.167).</strong> On genuinely hard problems, intermediate stage outputs can mislead later stages. The baseline raw LLM call (0.883) outperforms both individual (0.517) and composed (0.350) approaches&mdash;consistent with Ao et al.&rsquo;s finding that delegation can&rsquo;t beat a centralized baseline without exogenous signals.
+            </div>
+
+            <p>The individual &ldquo;test&rdquo; skill scored lower (0.42&ndash;0.70) than localize or edit because test-writing in isolation lacks the context of what was found and fixed. This is expected: some skills are context-dependent and perform better when composed.</p>
+
+            <h2>Update: safety benchmarks &mdash; do guarantees earn their complexity?</h2>
+
+            <p>Three scenarios testing whether structural guarantees catch errors that naive pipelines miss:</p>
+
+            <table>
+                <tr><th>Guarantee</th><th>Scenario</th><th>Naive</th><th>Guarded</th><th>Verdict</th></tr>
+                <tr>
+                    <td><strong>CertificateGate</strong></td>
+                    <td>Genome corruption between stages</td>
+                    <td>0/3 halted</td>
+                    <td>3/3 halted (3 damages detected)</td>
+                    <td>EARNS COMPLEXITY</td>
+                </tr>
+                <tr>
+                    <td><strong>VerifierComponent</strong></td>
+                    <td>Weak model on SQL injection fix</td>
+                    <td>0/3 escalated</td>
+                    <td>0/3 escalated (q=0.75, above threshold)</td>
+                    <td>NO MEASURED BENEFIT</td>
+                </tr>
+                <tr>
+                    <td><strong>ATP priority gating</strong></td>
+                    <td>STARVING state, low vs high priority</td>
+                    <td>0/3 rejected</td>
+                    <td>3/3 low rejected, 3/3 high accepted</td>
+                    <td>EARNS COMPLEXITY</td>
+                </tr>
+            </table>
+
+            <div class="finding">
+                <strong>Integrity and budget gating earn their complexity unconditionally.</strong> CertificateGate detects 100% of genome corruption (deterministic, model-independent). ATP priority gating discriminates perfectly between low and high priority under resource starvation.
+            </div>
+
+            <div class="finding neutral">
+                <strong>Escalation didn&rsquo;t fire because phi3:mini is too capable for this task.</strong> It scores 0.75 on the SQL injection rubric (above the 0.50 threshold), so quality-based escalation correctly does not trigger. This is the right behavior&mdash;not a failure&mdash;but it means we need a harder task or weaker model to validate the escalation path in this benchmark.
+            </div>
+
+            <p>The pattern continues from the earlier e2e results: structural guarantees that enforce deterministic invariants (state integrity, priority gating) deliver unconditionally. Guarantees that depend on signal quality (quality evaluation, novelty detection) deliver conditionally on whether the signal triggers. <a href="https://github.com/coredipper/operon/pull/45">PR #45</a>.</p>
+
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>
             </div>
