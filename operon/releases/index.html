@@ -16,6 +16,44 @@
 
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
+
+        <h2 id="v0344">v0.34.4</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>SWE-bench Phase 2 &mdash; pass/fail evaluation in Docker, honest null result</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>eval/swebench_phase2.py</code>: official <code>swebench.harness.run_evaluation</code> wrapper. Produces <code>eval/results/swebench_phase2.json</code> with per-instance <code>eval_status</code> (<code>resolved</code>, <code>unresolved</code>, <code>error</code>, <code>empty_patch</code>, <code>not_evaluated</code>).</li>
+        <li><code>eval/_patch_extraction.py</code>: unified-diff extractor. Accepts bare diffs, fenced <code>```diff</code> / <code>```patch</code> blocks, and git metadata (rename, new file, deleted file, <code>/dev/null</code> add/delete). Rejects hunk-only snippets without file headers.</li>
+        <li>Phase 2 separates harness failures from test failures: <code>resolved_rate=None</code> and <code>harness_ran=False</code> are reported explicitly instead of being silently counted as 0%.</li>
+        </ul>
+        <p>Findings:</p>
+        <ul>
+        <li><strong>Zero resolved across all three conditions on SWE-bench-lite with Gemma&nbsp;4 27B</strong>: baseline 0/10, organism 0/10, LangGraph 0/10. An honest ceiling imposed by model capability, not by the harness.</li>
+        <li>Organism and LangGraph pipelines <em>degrade</em> patch extraction (6/10 vs baseline&rsquo;s 10/10) and cost 2&times; latency. Three-stage localize&rarr;edit&rarr;verify loses clean-diff fidelity that direct prompting preserves.</li>
+        <li>Extends the Paper&nbsp;4 finding (&ldquo;decomposition does not earn complexity for capable models&rdquo;) to: decomposition does not help small models either.</li>
+        <li>Phase 1&rsquo;s judge-based plausibility scores (baseline=0.808, organism=0.776) do not predict correctness: plausible-looking patches still fail to apply or fail tests.</li>
+        </ul>
+        <p>Paper updates:</p>
+        <ul>
+        <li>Paper 5 adds Section 6.3 &ldquo;SWE-bench-lite: Decomposition Does Not Help on Real Bug-Fix Tasks.&rdquo;</li>
+        <li>Paper 5 Limitations extended with Phase 2 null-result framing.</li>
+        </ul>
+
+        <h2 id="v0342">v0.34.0 &ndash; 0.34.2</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Parallel stage execution + speedup theorem validation</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li>Parallel stage groups: <code>stages=[[s1, s2], [s3]]</code> runs <code>s1</code> and <code>s2</code> concurrently, then <code>s3</code>.</li>
+        <li>LangGraph fan-out/fan-in via Send API: <code>organism_to_langgraph()</code> compiles parallel groups to fork&rarr;stages&rarr;join topology.</li>
+        <li>Speedup theorem predictor validated against measured wall-clock: <code>rho=1.000</code> across 6 configs.</li>
+        <li>Categorical verification extended to parallel groups (non-interference preserved under compilation).</li>
+        </ul>
+
         <h2 id="v0330">v0.33.0</h2>
         <p>Focus:</p>
         <ul>

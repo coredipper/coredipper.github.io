@@ -522,6 +522,27 @@
 
             <p>This is the clearest test yet of Ao et al.&rsquo;s delegation theorem: <em>without exogenous signals, a capable single model beats a decomposed pipeline on tasks it can already solve in one shot.</em> Gemma&nbsp;4 scores 0.88 mean quality on these tasks with zero overhead. Adding localize&rarr;edit&rarr;verify stages costs 2x latency and degrades quality because intermediate outputs mislead later stages.</p>
 
+            <h3>Update: Phase 2 &mdash; pass/fail tells the truth</h3>
+
+            <p>Phase 1 used an LLM judge scoring diff <em>plausibility</em>. Phase 2 replaces the judge with the ground truth: apply the patch inside the official SWE-bench Docker harness and run <code>FAIL_TO_PASS</code> + <code>PASS_TO_PASS</code> pytest suites. Same 10 instances, same model (Gemma&nbsp;4 27B via Ollama), now with a LangGraph condition added.</p>
+
+            <table>
+                <tr><th>Condition</th><th>Resolved</th><th>Patch extracted</th><th>Mean latency</th></tr>
+                <tr><td>baseline</td><td><strong>0/10</strong></td><td><strong>10/10</strong></td><td>44s</td></tr>
+                <tr><td>organism (3-stage)</td><td>0/10</td><td>6/10</td><td>88s</td></tr>
+                <tr><td>langgraph (organism compiled)</td><td>0/10</td><td>6/10</td><td>90s</td></tr>
+            </table>
+
+            <div class="finding negative">
+                <strong>All three conditions resolve zero instances.</strong> This is an honest ceiling imposed by Gemma&nbsp;4 27B (4B active) &mdash; the model is too weak for SWE-bench-lite unaided on either prompt style. The judge&rsquo;s Phase 1 plausibility scores (0.878 / 0.658) do not predict correctness: patches that look plausible fail to apply or fail tests.
+            </div>
+
+            <div class="finding negative">
+                <strong>Organism and LangGraph <em>degrade</em> patch extraction.</strong> Direct prompting produces clean unified diffs 10/10 times; the 3-stage pipeline loses format fidelity and extracts only 6/10. The pipeline costs 2&times; latency and loses work that a single prompt was doing cleanly.
+            </div>
+
+            <p>The Phase 2 null extends the Paper&nbsp;4 finding &mdash; decomposition does not earn complexity for capable models on hard tasks &mdash; to: <em>decomposition does not help small models either</em>. Structural guarantees still transfer under compilation (certificate preservation holds across all compilers), but <em>guarantees about structure do not imply gains in task resolution</em>. The honest transfer value of the categorical harness is in <strong>reliability primitives</strong> (gates, certificates, monitors) dropped into an existing graph &mdash; not in wholesale organism adoption as a wrapper around single-shot tasks.</p>
+
             <h3>Where Operon earns its complexity (updated)</h3>
 
             <table>
@@ -543,7 +564,7 @@
                 </tr>
                 <tr>
                     <td><strong>Task decomposition</strong></td>
-                    <td>SWE-bench: &minus;0.220 vs baseline</td>
+                    <td>SWE-bench Phase 1 (judge): &minus;0.220 vs baseline. Phase 2 (pass/fail): 0/10 for all three conditions; organism/langgraph degrade extraction 10/10 &rarr; 6/10.</td>
                     <td>DOES NOT EARN</td>
                 </tr>
             </table>
