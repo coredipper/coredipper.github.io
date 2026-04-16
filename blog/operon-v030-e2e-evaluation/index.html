@@ -550,6 +550,31 @@
 
             <p>The value of Operon is not in decomposing tasks that a capable model can already solve. It is in the structural guarantees &mdash; state integrity, priority gating, certificate preservation &mdash; that no amount of prompting can provide. Use organisms for multi-stage workflows where you need structural coordination, not as a wrapper around single-shot tasks.</p>
 
+            <h2>Update: v0.34.x &mdash; parallel stage execution</h2>
+
+            <p>Stages can now be grouped for parallel execution:</p>
+
+<pre><code>organism = skill_organism(
+    stages=[
+        [stage_a, stage_b],  # run concurrently
+        stage_c,             # then sequential
+    ], ...
+)</code></pre>
+
+            <p>Groups execute sequentially; stages within a group run concurrently via <code>ThreadPoolExecutor</code>. State isolation via <code>copy.deepcopy</code>, conflict detection via <code>StateConflictError</code>, results in declared order.</p>
+
+            <h3>LangGraph fan-out/fan-in</h3>
+
+            <p>The LangGraph compiler now creates individual nodes for each parallel stage with proper fork/join topology:</p>
+
+<pre><code>Before: START &rarr; __parallel_0 (opaque) &rarr; stage_c &rarr; END
+After:  START &rarr; __fork_0 &rarr; stage_a &rarr; __join_0 &rarr; stage_c &rarr; END
+                             &rarr; stage_b &uarr;</code></pre>
+
+            <p>Uses LangGraph&rsquo;s native <code>Send</code> API for fan-out and <code>Annotated[list, operator.add]</code> for fan-in. Each parallel stage is individually visible in LangGraph Studio. The speedup theorem (Theorem 3) is now testable &mdash; verified via <code>threading.Barrier</code> proof of concurrent execution.</p>
+
+            <p>Published as <code>operon-ai v0.34.x</code>. <a href="https://github.com/coredipper/operon/pull/49">PR #49</a>.</p>
+
             <div class="footer">
                 <p><a href="/blog/">&larr; Back to blog</a></p>
             </div>
