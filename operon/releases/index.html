@@ -17,10 +17,35 @@
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
 
+        <h2 id="v0345">v0.34.5</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Patch-apply pipeline + grounded SWE-bench Phase 2 v2 rerun &mdash; the un-grounded v1 ceiling claim, properly tested</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li><code>eval/_patch_sanitizer.py</code>: pre-rejects model output that <code>git apply</code> would refuse &mdash; placeholder hunks (<code>@@ -XXX,N +XXX,N @@</code>), path doubling (<code>a/django/django/foo.py</code>), truncated/overlong hunks, malformed rename/copy metadata, bare empty context lines. Count-driven hunk consumption so adversarial body content can&rsquo;t false-match file headers. 47 unit tests lock the contract.</li>
+        <li><code>eval/_repo_cache.py</code> + <code>eval/_repo_grounding.py</code>: opt-in via <code>--grounding</code>. Shallow-fetches <code>{repo}@{base_commit}</code> into a local cache; ranks candidate files by issue-text heuristics; injects up to 5 file snippets into the task prompt. The sanitizer also gets a tree oracle and fuzzy-corrects near-miss paths to unique basename matches.</li>
+        <li>Honest reporting: new <code>EVAL_RUNTIME_ERROR</code> status distinct from sanitizer-rejected <code>empty_patch</code>; <code>mean_latency_ms</code> divides by completed predictions (was deflated when zero-latency timeout rows were included). Schema test pins specific runtime-error rows so silent regressions can&rsquo;t ship.</li>
+        </ul>
+        <p>Findings (Phase 2 v2 grounded rerun, 10 instances per condition):</p>
+        <ul>
+        <li>baseline: 0 resolved, 1 unresolved (<code>django-11001</code>), 7 sanitizer-rejected, 2 runtime errors (Ollama API timeouts) &mdash; 1/10 evaluated.</li>
+        <li>organism: 0 resolved, 0 unresolved, 10 sanitizer-rejected &mdash; 0/10 evaluated.</li>
+        <li>langgraph: 0 resolved, 0 unresolved, 10 sanitizer-rejected &mdash; 0/10 evaluated.</li>
+        <li>The original v1 run had 20 <code>error</code> outcomes (patches that failed at <code>git apply</code>); the rerun has zero. Sanitizer pre-rejection ensures no malformed patch reaches the harness, so the failures are now correctly attributed to the model rather than to infrastructure.</li>
+        </ul>
+        <p>Conclusion (Paper 5 §6.3):</p>
+        <ul>
+        <li>The original Phase 2 result confounded two failure modes: model selecting wrong file paths, and model writing malformed unified diffs. Grounding solves the first &mdash; every prompt now contains the actual files at <code>base_commit</code>. The fact that 27 of 28 model-returning submissions are still sanitizer-dropped localizes the bottleneck to the second: <strong>at 8B / Q4_K_M, diff-format discipline is the binding constraint, not file selection.</strong></li>
+        <li>Section 6.3 retitled &ldquo;8B Format Discipline Is the Ceiling.&rdquo;</li>
+        <li>Latency cost of grounding: ~doubles per-call wall-clock (baseline 44s &rarr; 131s) for zero evaluated-rate gain at this model scale. Cost-benefit changes with stronger models, but at 8B it is overhead.</li>
+        </ul>
+
         <h2 id="v0344">v0.34.4</h2>
         <p>Focus:</p>
         <ul>
-        <li><strong>SWE-bench Phase 2 &mdash; pass/fail evaluation in Docker, honest null result</strong></li>
+        <li><strong>SWE-bench Phase 2 &mdash; pass/fail evaluation in Docker, initial null result (later reframed in v0.34.5)</strong></li>
         </ul>
         <p>New:</p>
         <ul>
@@ -28,16 +53,16 @@
         <li><code>eval/_patch_extraction.py</code>: unified-diff extractor. Accepts bare diffs, fenced <code>```diff</code> / <code>```patch</code> blocks, and git metadata (rename, new file, deleted file, <code>/dev/null</code> add/delete). Rejects hunk-only snippets without file headers.</li>
         <li>Phase 2 separates harness failures from test failures: <code>resolved_rate=None</code> and <code>harness_ran=False</code> are reported explicitly instead of being silently counted as 0%.</li>
         </ul>
-        <p>Findings:</p>
+        <p>Findings (later superseded by v0.34.5 grounded rerun):</p>
         <ul>
-        <li><strong>Zero resolved across all three conditions on SWE-bench-lite with Gemma&nbsp;4 27B</strong>: baseline 0/10, organism 0/10, LangGraph 0/10. An honest ceiling imposed by model capability, not by the harness.</li>
-        <li>Organism and LangGraph pipelines <em>degrade</em> patch extraction (6/10 vs baseline&rsquo;s 10/10) and cost 2&times; latency. Three-stage localize&rarr;edit&rarr;verify loses clean-diff fidelity that direct prompting preserves.</li>
-        <li>Extends the Paper&nbsp;4 finding (&ldquo;decomposition does not earn complexity for capable models&rdquo;) to: decomposition does not help small models either.</li>
+        <li><strong>Zero resolved across all three conditions on SWE-bench-lite</strong>: baseline 0/10, organism 0/10, LangGraph 0/10. The original write-up framed this as a model-capability ceiling on Gemma&nbsp;4; the v0.34.5 rerun showed the result was confounded by patch-application failures (most submissions never reached the harness because <code>git apply</code> rejected them), and the actual ceiling is diff-format discipline at the 8B / Q4_K_M scale.</li>
+        <li>Organism and LangGraph pipelines <em>degrade</em> patch extraction (6/10 vs baseline&rsquo;s 10/10) and cost 2&times; latency &mdash; this gap closed in v0.34.5 once the <code>[edit]</code>-stage prompt was tightened to emit a single fenced diff and nothing else.</li>
         <li>Phase 1&rsquo;s judge-based plausibility scores (baseline=0.808, organism=0.776) do not predict correctness: plausible-looking patches still fail to apply or fail tests.</li>
+        <li>Model identifier in this release&rsquo;s artifact: <code>gemma4:latest</code> (8B Q4_K_M, digest <code>c6eb396dbd59</code>). The original write-up incorrectly described this as &ldquo;Gemma 4 27B MoE / 4B active&rdquo;; the model-identity record was added in v0.34.5 to prevent this kind of mis-attribution going forward.</li>
         </ul>
         <p>Paper updates:</p>
         <ul>
-        <li>Paper 5 adds Section 6.3 &ldquo;SWE-bench-lite: Decomposition Does Not Help on Real Bug-Fix Tasks.&rdquo;</li>
+        <li>Paper 5 adds Section 6.3 (originally titled &ldquo;Decomposition Does Not Help on Real Bug-Fix Tasks&rdquo;; retitled in v0.34.5 to &ldquo;8B Format Discipline Is the Ceiling&rdquo; once the grounded rerun localized the bottleneck).</li>
         <li>Paper 5 Limitations extended with Phase 2 null-result framing.</li>
         </ul>
 

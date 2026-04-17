@@ -179,7 +179,8 @@
 
             <h2>Running the theorems against reality</h2>
 
-            <p>The first thing we built was a validation harness that compares epistemic analysis predictions against measured behavior from real LLM execution. The harness constructs the same <code>ExternalTopology</code> the live evaluator would build, runs full epistemic analysis to capture all theorem predictions, then executes the task through a <code>SkillOrganism</code> pipeline with Gemma 4 27B (a mixture-of-experts model, 4B active parameters) served locally via Ollama.</p>
+            <p>The first thing we built was a validation harness that compares epistemic analysis predictions against measured behavior from real LLM execution. The harness constructs the same <code>ExternalTopology</code> the live evaluator would build, runs full epistemic analysis to capture all theorem predictions, then executes the task through a <code>SkillOrganism</code> pipeline with Gemma 4 27B (a mixture-of-experts model, 4B active parameters) served locally via Ollama.<sup><a href="#correction-model" style="text-decoration: none;">[*]</a></sup></p>
+            <p id="correction-model" style="font-size: 0.9em; color: #666; border-left: 3px solid #888; padding-left: 0.8em;"><sup>[*]</sup> Correction (v0.34.5): the actual model is <code>gemma4:latest</code> (8B Q4_K_M, digest <code>c6eb396dbd59</code>), not 27B with 4B-active. Immutable model-identity recording was added in v0.34.4 and clarified the spec.</p>
 
             <p>20 benchmark tasks spanning easy (2&ndash;3 stages), medium (4&ndash;5 stages), and hard (5&ndash;7 stages) difficulty. Each run in both guided and unguided configurations with 3 repetitions: 120 total runs.</p>
 

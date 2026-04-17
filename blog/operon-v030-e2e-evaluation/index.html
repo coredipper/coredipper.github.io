@@ -524,6 +524,15 @@
 
             <h3>Update: Phase 2 &mdash; pass/fail tells the truth</h3>
 
+            <div class="finding" style="border-left: 4px solid #888; padding-left: 1em;">
+                <strong>Correction (v0.34.5, 2026-04-17):</strong> Two claims in this section turned out to be wrong, and a follow-up grounded rerun (v0.34.5, see <a href="/operon/releases/#v0345">release notes</a>) reframed the conclusion:
+                <ul>
+                    <li>The model is <code>gemma4:latest</code> (8B Q4_K_M, digest <code>c6eb396dbd59</code>), not 27B / 4B-active. The ollama tag&rsquo;s metadata clarified this once we recorded immutable model identity in v0.34.4.</li>
+                    <li>The 0/10 result was <em>not</em> a clean &ldquo;model-capability ceiling&rdquo; &mdash; 28 of 30 submissions failed at <code>git apply</code> rather than at the test suite, mixing model output quality with prompt-format/pathing failures we couldn&rsquo;t separate. The v0.34.5 grounded rerun (with the new <code>eval/_patch_sanitizer.py</code> + <code>--grounding</code>) gets <em>1 of 30</em> to a real harness verdict (django-11001 baseline, unresolved); the other 27 are sanitizer-rejected for placeholder hunks, malformed counts, or invented paths even when shown the actual files. The bottleneck at this model scale is diff-format discipline, not file selection.</li>
+                </ul>
+                The original-run text below is preserved for reference; the v0.34.5 numbers are in the updated <a href="/operon/releases/#v0345">release notes</a> and Paper 5 §6.3.
+            </div>
+
             <p>Phase 1 used an LLM judge scoring diff <em>plausibility</em>. Phase 2 replaces the judge with the ground truth: apply the patch inside the official SWE-bench Docker harness and run <code>FAIL_TO_PASS</code> + <code>PASS_TO_PASS</code> pytest suites. Same 10 instances, same model (Gemma&nbsp;4 27B via Ollama), now with a LangGraph condition added.</p>
 
             <table>
