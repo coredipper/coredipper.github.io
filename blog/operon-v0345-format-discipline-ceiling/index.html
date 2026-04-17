@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>When Your Diagnostic Beats Your Result - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre {
+            margin: 24px 0;
+            padding: 16px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .finding {
+            margin: 24px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #4a4;
+            background: #0a110a;
+        }
+        .finding.negative {
+            border-left-color: #a84;
+            background: #110e0a;
+        }
+        .finding.neutral {
+            border-left-color: #88a;
+            background: #0a0a11;
+        }
+        .finding strong {
+            color: #fff;
+        }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>When Your Diagnostic Beats Your Result</h1>
+                <div class="subtitle">We built a patch-apply pipeline to disambiguate Phase 2&rsquo;s &ldquo;model or harness?&rdquo; failure mode. The score didn&rsquo;t move &mdash; but the failure became attributable.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; April 17, 2026</div>
+                <div class="version-note">operon-ai v0.34.5</div>
+            </header>
+
+            <h2>The question the previous run couldn&rsquo;t answer</h2>
+
+            <p>Two weeks ago we shipped <a href="/blog/operon-v030-e2e-evaluation/">SWE-bench Phase 2</a> and got a clean 0/30 across baseline, organism, and LangGraph on SWE-bench-lite. We framed it as a model-capability ceiling. The trouble: 28 of those 30 submissions never reached a test verdict at all. They were rejected at <code>git apply</code>. The model produced text that <em>looked</em> like diffs and the harness refused them.</p>
+
+            <p>That mixes two failure modes:</p>
+
+            <ol>
+                <li>The model selecting the wrong file path (or inventing one that doesn&rsquo;t exist in the target repo).</li>
+                <li>The model writing hunk headers and bodies that <code>git apply</code> can&rsquo;t consume &mdash; placeholder line numbers, mismatched counts, paths doubled with the repo name.</li>
+            </ol>
+
+            <p>If most of the failures are (1), the fix is grounding the prompt in the actual repository. If they&rsquo;re (2), grounding doesn&rsquo;t help &mdash; you&rsquo;re looking at a diff-format-discipline ceiling. The original write-up couldn&rsquo;t tell the difference, so we couldn&rsquo;t tell which fix to invest in.</p>
+
+            <p>v0.34.5 is the diagnostic. It separates the failure modes. The headline number is still bad &mdash; in fact slightly worse on raw count &mdash; but the failure is now <em>attributable</em>. That turns out to be the result.</p>
+
+            <h2>The diagnostic, in three pieces</h2>
+
+            <h3>1. A patch sanitizer that refuses known-bad output</h3>
+
+            <p><code>eval/_patch_sanitizer.py</code> sits between <code>extract_patch()</code> and the harness. It runs four passes over each candidate diff:</p>
+
+            <ul>
+                <li><strong>Path normalization.</strong> The model often emits <code>--- a/django/django/forms/foo.py</code> for repo <code>django/django</code> &mdash; doubling the repo name onto the real path. The sanitizer strips one <code>django/</code> when the repo name and owner segment match, or strips the full <code>{owner}/{repo}/</code> prefix when they don&rsquo;t. Same logic applies to <code>diff --git</code>, <code>rename from/to</code>, and <code>copy from/to</code> lines &mdash; partial normalization would leave inconsistent old/new paths and still fail to apply.</li>
+                <li><strong>Placeholder hunk rejection.</strong> Hunk headers like <code>@@ -XXX,10 +XXX,10 @@</code> get rejected. <code>git apply</code> would refuse with a cryptic &ldquo;missing line number&rdquo; message; the sanitizer catches it earlier and returns <code>""</code>.</li>
+                <li><strong>Hunk body validation.</strong> For each <code>@@ -a,b +c,d @@</code>, the sanitizer walks the body and checks that additions plus context equal <code>d</code>, deletions plus context equal <code>b</code>. Truncated or overlong hunks &mdash; declared 10 lines, body has 7 &mdash; get rejected. After a long review chain on this code (more on that below), the validator is count-driven: it consumes exactly the declared body length, so adversarial body content shaped like file headers (<code>--- a/foo.py</code> as the deletion of a line whose content starts with <code>-- a/foo.py</code>) can&rsquo;t fool it.</li>
+                <li><strong>Bare-empty context repair.</strong> Whitespace-stripping editors sometimes turn a single-space context line into an empty line. <code>git apply</code> rejects bare empty lines in hunk bodies; the sanitizer rewrites them back to <code>" "</code> before validation.</li>
+            </ul>
+
+            <p>The contract: if <code>sanitize()</code> returns a non-empty string, <code>git apply</code> will at least make a sincere attempt at it. If it returns <code>""</code>, the harness records <code>empty_patch</code> &mdash; and that&rsquo;s honest categorization, because the alternative would have been silent <code>error</code> conflated with infrastructure failures.</p>
+
+            <h3>2. Repo grounding that puts real files in the prompt</h3>
+
+            <p><code>--grounding</code> turns on a second pipeline. For each instance, the script shallow-clones <code>{repo}@{base_commit}</code> via <code>git fetch --depth 1 origin {sha}</code> into <code>.cache/swebench/{owner}__{repo}-{commit12}/</code>. Then a heuristic ranker mines the <code>problem_statement</code> + <code>hints_text</code> for plausible identifiers (<code>.py</code> paths, CamelCase class names, <code>snake_case</code> functions), walks the repo, and ranks Python files by stem-match (+3) and path-match (+1). Top 5 candidate files get their first 200 lines injected into the prompt as a <em>Repository context</em> block.</p>
+
+            <p>For organism and LangGraph, the same context flows through every stage &mdash; <code>SkillOrganism.run(task)</code> passes <code>task</code> unchanged to each stage&rsquo;s prompt, so injecting context once reaches localize, edit, and verify.</p>
+
+            <p>The sanitizer also gets a tree oracle: when it sees a path that doesn&rsquo;t exist in the cloned tree, it tries to fuzzy-correct to a unique basename match (e.g.&nbsp;the model wrote <code>django/settings.py</code> but the real file is <code>django/conf/global_settings.py</code> &mdash; if exactly one <code>settings.py</code> exists in the tree, rewrite). If the basename has zero or multiple matches, reject. Per-file-diff state means create / rename / copy targets pass through unchanged: a file that doesn&rsquo;t exist at <code>base_commit</code> is the entire point of a creation patch.</p>
+
+            <h3>3. Honest reporting that distinguishes failure modes</h3>
+
+            <p>Two small but consequential additions to the results artifact:</p>
+
+            <ul>
+                <li><code>EVAL_RUNTIME_ERROR</code> as a status distinct from sanitizer-rejected <code>empty_patch</code>. When a model call raises (Ollama API timeout, network glitch, OOM), the prediction carries an <code>error_reason</code> field. <code>classify_prediction(error_reason, harness_status)</code> overrides any harness verdict to <code>runtime_error</code> when an <code>error_reason</code> is set &mdash; including <code>not_evaluated</code> under <code>--skip-harness</code> and even harness-reported <code>error</code>. The override is unconditional because the harness can&rsquo;t see exceptions; only we can.</li>
+                <li><code>mean_latency_ms</code> divides by completed predictions, not by <code>n</code>. Two timeouts on a 10-instance run was deflating the baseline mean by 25% before this fix.</li>
+            </ul>
+
+            <p>And a CLI mode for keeping the artifact honest after the fact: <code>python -m eval.swebench_phase2 --rewrite-envelope eval/results/swebench_phase2.json</code> re-resolves the model identity against live Ollama, recomputes the post-run digest check, and rewrites the envelope through the same writer the live run uses. The verification tag is taken from the artifact (not from <code>--model</code>), so a stale CLI default can&rsquo;t silently verify the wrong model.</p>
+
+            <div class="finding neutral">
+                <strong>Sidebar: nine roborev iterations on the diff parser.</strong> The patch sanitizer&rsquo;s diff parser went through nine code-review rounds (#724 through #748) before converging. Each round narrowed the same axis: shape-based heuristics for distinguishing file headers from hunk-body content kept being defeated by adversarial content. The structural fix was count-driven hunk consumption &mdash; inside a hunk body, a <code>-</code>-prefixed line is always a delete, regardless of what comes after it. Only at <em>boundaries</em> between hunks do shape checks come back, and only as a full <code>---</code>/<code>+++</code>/<code>@@</code> triplet for bare multi-file diffs. The lesson: when parsing untrusted content, length-prefixed formats are robust; delimiter-terminated ones are fragile. Unified diffs are sort-of-both, and the correct parser uses each where it&rsquo;s available.
+            </div>
+
+            <h2>The grounded rerun</h2>
+
+            <p>Same model (<code>gemma4:latest</code>, digest <code>c6eb396dbd59</code>, 8B Q4_K_M), same 10 SWE-bench-lite instances, <code>--grounding</code> active across all three conditions:</p>
+
+            <table>
+                <tr><th>Condition</th><th>Resolved</th><th>Unresolved</th><th>Sanitizer-rejected</th><th>Runtime error</th><th>Evaluated</th><th>Mean latency</th></tr>
+                <tr><td>baseline</td><td>0</td><td>1</td><td>7</td><td>2</td><td>1/10</td><td>131s</td></tr>
+                <tr><td>organism</td><td>0</td><td>0</td><td>10</td><td>0</td><td>0/10</td><td>170s</td></tr>
+                <tr><td>langgraph</td><td>0</td><td>0</td><td>10</td><td>0</td><td>0/10</td><td>172s</td></tr>
+            </table>
+
+            <p>Comparison with the original (un-grounded, un-sanitized) run:</p>
+
+            <table>
+                <tr><th></th><th>Original (v0.34.4)</th><th>Grounded (v0.34.5)</th></tr>
+                <tr><td>Total evaluated (resolved + unresolved)</td><td>2/30</td><td>1/30</td></tr>
+                <tr><td>Harness <code>error</code> (apply-fail)</td><td>20</td><td>0</td></tr>
+                <tr><td>Sanitizer-rejected / <code>empty_patch</code></td><td>8</td><td>27</td></tr>
+                <tr><td>Runtime errors (model never returned)</td><td>0 (counted as <code>empty_patch</code>)</td><td>2 (separate status)</td></tr>
+                <tr><td>Resolved</td><td>0</td><td>0</td></tr>
+            </table>
+
+            <p>Every <code>error</code> from the original run collapsed to either sanitizer-rejected or runtime-error. The sanitizer&rsquo;s pre-rejection means no malformed patch reaches the harness anymore, so what previously appeared as 20 application failures is now correctly attributed to the model.</p>
+
+            <div class="finding negative">
+                <strong>The single survivor:</strong> <code>django/django-11001</code> baseline reached the harness as <code>unresolved</code> &mdash; patch applied cleanly, tests still failed. That&rsquo;s also the same instance that survived in the original run. Something about the issue&rsquo;s structure (likely a small, localized hunk) makes it more amenable to small-model output. It&rsquo;s the only positive control we have.
+            </div>
+
+            <h2>The reframe</h2>
+
+            <p>Grounding solves failure mode (1). Every prompt now contains the actual files at <code>base_commit</code>, the sanitizer&rsquo;s tree oracle catches near-miss paths, and the heuristic ranker reliably surfaces the right files (smoke-tested on a real astropy issue: all 5 candidate files came from <code>astropy/modeling/</code> for a modeling problem).</p>
+
+            <p>The fact that 27 of the 28 model-returning submissions <em>still</em> drop to sanitizer-rejection &mdash; with the dominant reasons being placeholder hunk headers, mismatched header counts, and paths that don&rsquo;t exist in the cloned tree even when the right files are right there in the prompt &mdash; localizes the bottleneck to (2). At 8B / Q4_K_M, the binding constraint isn&rsquo;t file selection. It&rsquo;s the model&rsquo;s ability to emit format-correct unified diffs.</p>
+
+            <p>That&rsquo;s a real capability statement, not &ldquo;inconclusive.&rdquo; Paper 5 §6.3 was retitled accordingly: <em>8B Format Discipline Is the Ceiling</em>.</p>
+
+            <h2>Side observations</h2>
+
+            <h3>The organism format leak closed silently</h3>
+
+            <p>The original run had a 4-vs-0 <code>empty_patch</code> gap between organism and baseline &mdash; the three-stage pipeline was leaking critique into where a diff should have been. Phase A&rsquo;s tightened <code>[edit]</code>-stage instruction (&ldquo;your entire response for this stage must be a single fenced diff block and nothing else&rdquo;) eliminated it. In the grounded rerun, both baseline and organism produce 0 extracted patches across the 8 non-timeout cases &mdash; the gap is closed in the wrong direction (baseline gained one, organism didn&rsquo;t), which is consistent with the localize/edit/verify decomposition asking the model to maintain diff format while juggling stage outputs. A discipline tax the single-shot baseline avoids.</p>
+
+            <h3>Grounding is overhead at 8B</h3>
+
+            <p>Baseline mean latency went from 44s in the original run to 131s with grounding. Organism from 88s to 170s, langgraph from 90s to 172s. The 30 KB of repository context per prompt roughly doubles to triples per-call wall-clock, with zero compensating gain in evaluated instances. Grounding&rsquo;s cost-benefit changes with stronger models &mdash; if format discipline weren&rsquo;t the binding constraint, the file context would actually translate to better patches. At 8B, it&rsquo;s overhead.</p>
+
+            <h3>Two API timeouts and what they teach</h3>
+
+            <p>Two of the 30 model calls (both baseline, on <code>astropy-12907</code> and <code>astropy-14995</code>) timed out at the OpenAI-compatible client&rsquo;s default. The exception-handler path constructed empty-patch predictions with <code>latency_ms=0.0</code>. In an earlier draft, those got serialized as <code>empty_patch</code> indistinguishable from sanitizer-rejections, and the mean latency divided by 10 instead of 8. Code review caught it (Roborev #747). The fix was the <code>EVAL_RUNTIME_ERROR</code> status with explicit <code>error_reason</code>; the test suite now pins the exact two known-failed rows so a regeneration can&rsquo;t silently lose them.</p>
+
+            <p>Importantly, those two instances <em>also</em> failed under organism and langgraph (which completed normally). So the runtime errors don&rsquo;t refute the format-discipline claim &mdash; the model never produced a usable diff for those instances regardless of which condition.</p>
+
+            <h2>What this run does and does not say</h2>
+
+            <p>It does say: at 8B / Q4_K_M, the model&rsquo;s ability to emit <code>git apply</code>-clean unified diffs is the binding constraint on SWE-bench-lite resolution. Three-stage decomposition does not relax it; if anything, it adds a discipline tax. File context in the prompt does not relax it either &mdash; the model&rsquo;s problem isn&rsquo;t finding the right file.</p>
+
+            <p>It does not say: the organism architecture is intrinsically worse than direct prompting. The sample is too small (1 evaluated baseline vs 0 organism) to discriminate. Nor does it say grounding is universally overhead &mdash; at this model scale it is, but the same infrastructure should add real value once format discipline isn&rsquo;t the bottleneck.</p>
+
+            <p>It also doesn&rsquo;t say the structural guarantees of the categorical harness are weakened. Certificate preservation across compilers (Paper 5 §5), priority gating, stagnation detection &mdash; these are <code>Know</code>-level properties verified independently of SWE-bench task resolution. The grounded null doesn&rsquo;t touch them.</p>
+
+            <h2>The meta-insight</h2>
+
+            <div class="finding">
+                <strong>Building a diagnostic localizes the problem before any fix is possible.</strong> Phase A and Phase B were infrastructure investments that did not improve the headline number on SWE-bench-lite. They <em>did</em> convert an unattributable failure mode (<code>error</code> &mdash; could be model, could be infrastructure) into an attributable one (<code>empty_patch</code> with sanitizer-reject reasons, distinct from <code>runtime_error</code>). That&rsquo;s the value pattern: when the failure mode isn&rsquo;t identifiable, building the diagnostic is upstream of any fix. Future runs &mdash; stronger models, format-correction retry loops, RL on diff format &mdash; now have a clean attribution surface to test against.
+            </div>
+
+            <p>The unstated subtext of a lot of agent-evaluation work is &ldquo;the resolved-rate is the result.&rdquo; Sometimes it isn&rsquo;t. Sometimes the result is &ldquo;we built the thing that lets us tell <em>why</em> the rate is what it is, and now there&rsquo;s a clean next experiment.&rdquo;</p>
+
+            <h2>What&rsquo;s next</h2>
+
+            <p>Three named wedges, in decreasing likelihood-of-moving-the-result:</p>
+
+            <ol>
+                <li><strong>Stronger model.</strong> Same code, swap <code>--model qwen3:latest</code> or escape the 8B class via Modal/RunPod for a 70B+. Format discipline is a capability that scales; the bottleneck this run identified is exactly the one that bigger / better-trained models tend to clear first.</li>
+                <li><strong>Format-correction retry.</strong> Re-prompt the model on sanitizer rejection with the specific failure reason (&ldquo;your hunk header had <code>XXX</code> placeholders &mdash; please use real line numbers from the file shown above&rdquo;). Doubles cost per failure but might recover 20-40% of sanitizer drops. Code change in the runners; not yet shipped.</li>
+                <li><strong>LLM-localized candidate ranking.</strong> Use the organism&rsquo;s <code>localize</code> stage as the file ranker for baseline too. Smoke-tested with the heuristic ranker already finds plausible files; this is marginal.</li>
+            </ol>
+
+            <p>None of these need more harness work. The patch-apply pipeline shipped in v0.34.5 is the substrate they all run on top of.</p>
+
+            <h2>Honest summary</h2>
+
+            <p>The shipped artifact is a patch-apply pipeline (sanitizer + grounding + classification) you can drop into any future SWE-bench experiment, plus a clean v0.34.5 baseline showing the format-discipline ceiling for our local 8B model. The headline number is bad and we&rsquo;re reporting it as bad. The infrastructure paid off as a <em>diagnostic</em>, not as a performance booster &mdash; and that&rsquo;s the result we&rsquo;re shipping. The next data point is a model swap, not more infrastructure.</p>
+
+            <p>Code: <a href="https://github.com/coredipper/operon/pull/53">PR #53</a> (sanitizer + prompts), <a href="https://github.com/coredipper/operon/pull/55">PR #55</a> (grounding + fuzzy correction + hardened parser), <a href="https://github.com/coredipper/operon/pull/56">PR #56</a> (grounded rerun + paper §6.3 + runtime_error classification). Released as <code>operon-ai v0.34.5</code> on PyPI. <a href="/operon/releases/#v0345">Release notes.</a></p>
+
+            <div class="footer">
+                <p><a href="/blog/">&larr; Back to blog</a></p>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
