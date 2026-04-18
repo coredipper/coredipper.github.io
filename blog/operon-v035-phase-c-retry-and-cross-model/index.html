@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase C: The 8B Ceiling Holds Cross-Model — Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre {
+            margin: 24px 0;
+            padding: 16px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .finding {
+            margin: 24px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #4a4;
+            background: #0a110a;
+        }
+        .finding.negative {
+            border-left-color: #a84;
+            background: #110e0a;
+        }
+        .finding.neutral {
+            border-left-color: #88a;
+            background: #0a0a11;
+        }
+        .finding strong {
+            color: #fff;
+        }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+
+        <article>
+            <header>
+                <h1>Phase C: The 8B Ceiling Holds Cross-Model, and Retry Is the Wrong Lever</h1>
+                <div class="subtitle">22 hours of Ollama, 30 submissions across a second 8B model with format-correction retry active, zero recoveries. A sharper negative than the v0.34.5 post predicted.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; April 18, 2026</div>
+                <div class="version-note">operon-ai v0.35.0</div>
+            </header>
+
+            <h2>Recap: the wedge list</h2>
+
+            <p>The <a href="/blog/operon-v0345-format-discipline-ceiling/">v0.34.5 post</a> localized SWE-bench Phase 2's failure mode to 8B diff-format discipline (not file selection) and named three wedges for moving the number:</p>
+
+            <ol>
+                <li><strong>Stronger model.</strong> Most likely to move the result.</li>
+                <li><strong>Format-correction retry.</strong> Re-prompt on sanitizer rejection with the specific failure reason.</li>
+                <li><strong>LLM-localized candidate ranking.</strong> Marginal.</li>
+            </ol>
+
+            <p>v0.35.0 runs the intersection of the first two on a second locally-available 8B model: <code>deepseek-r1:8b</code> (DeepSeek-R1 reasoning training distilled onto a Qwen3-8B base, Q4_K_M, 8.2B parameters), with <code>--retry-on-reject</code> active. Not a score-chasing run &mdash; 8B was already called out as below the SWE-bench-lite threshold. A test of whether the v0.34.5 ceiling claim generalizes across training regimes, and whether reason-coded retry prompts can recover any of the sanitizer-rejected submissions.</p>
+
+            <h2>The run</h2>
+
+            <p>Same 10 SWE-bench-lite instances as v0.34.5, same grounded prompt pipeline, three conditions (baseline, organism, langgraph). New in v0.35.0: on every sanitizer rejection the runner re-prompts the model once with the specific reason code (one of <code>placeholder_hunk</code>, <code>truncated_hunk</code>, <code>overlong_hunk</code>, <code>path_not_found</code>, <code>ambiguous_path</code>, <code>empty_extraction</code>, <code>malformed_metadata</code>), the failed output embedded verbatim, and reason-specific guidance. At <code>_FORMAT_RETRY_MAX = 1</code>, the retry fires exactly once per instance per condition.</p>
+
+            <p>PR #57 raised the per-call LLM timeout from 120s to 900s so reasoning models' long <code>&lt;think&gt;</code> blocks don't trip the OpenAI-compatible client's default. PR #58 shipped the sanitizer's tuple-return <code>sanitize_with_reason(patch, slug, tree_paths)</code>, the <code>_build_retry_prompt</code> helper, the runner-level retry callbacks for all three conditions, and the <code>--output</code> CLI flag so Phase C artifacts don't overwrite v0.34.5's. All of that landed on main before this run started.</p>
+
+            <p>Total wall-clock: <strong>~22 hours.</strong> Reasoning models are slow &mdash; the mean per-call latency was 18&ndash;19 minutes across all conditions, vs gemma4's 2&ndash;3 minutes in v0.34.5. The 900s timeout absorbed every call: zero runtime errors in the artifact. (v0.34.5 had two, both astropy instances that hit the old 120s ceiling; those completed cleanly in this run.)</p>
+
+            <h2>Results</h2>
+
+            <div class="finding negative">
+                <strong>0/30 evaluated, 0 retry-recovered patches.</strong> Every submission across every condition was sanitizer-rejected. The retry fired on every rejection and every retry was also rejected. No instance crossed the sanitizer under any condition.
+            </div>
+
+            <table>
+                <tr><th>Condition</th><th>Resolved</th><th>Unresolved</th><th>Sanitizer-rejected</th><th>Runtime error</th><th>Evaluated</th><th>Mean latency</th></tr>
+                <tr><td>baseline</td><td>0</td><td>0</td><td>10</td><td>0</td><td>0/10</td><td>1084 s (18 min)</td></tr>
+                <tr><td>organism</td><td>0</td><td>0</td><td>10</td><td>0</td><td>0/10</td><td>1073 s (18 min)</td></tr>
+                <tr><td>langgraph</td><td>0</td><td>0</td><td>10</td><td>0</td><td>0/10</td><td>1130 s (19 min)</td></tr>
+            </table>
+
+            <h2>Comparison with v0.34.5 gemma4</h2>
+
+            <table>
+                <tr><th></th><th>gemma4:latest (v0.34.5)</th><th>deepseek-r1:8b (v0.35.0)</th></tr>
+                <tr><td>Total evaluated</td><td>1/30</td><td><strong>0/30</strong></td></tr>
+                <tr><td>Sanitizer-rejected</td><td>27</td><td><strong>30</strong></td></tr>
+                <tr><td>Runtime errors</td><td>2</td><td><strong>0</strong></td></tr>
+                <tr><td>Resolved</td><td>0</td><td>0</td></tr>
+                <tr><td>Retry active</td><td>no</td><td><strong>yes</strong></td></tr>
+                <tr><td>Retry-recovered patches</td><td>&mdash;</td><td><strong>0</strong></td></tr>
+                <tr><td>Mean latency (baseline, completed)</td><td>131 s</td><td>1084 s</td></tr>
+            </table>
+
+            <h2>Two load-bearing findings</h2>
+
+            <h3>1. The cross-model ceiling is sharp</h3>
+
+            <p>Both 8B models produce zero resolved instances. Gemma4 crossed the sanitizer once; deepseek-r1 crossed it zero times. The single v0.34.5 "survivor" &mdash; <code>django/django-11001</code> baseline, <code>unresolved</code> &mdash; was <strong>gemma4-specific</strong>. Deepseek-r1 could not produce a <code>git apply</code>-clean diff for that instance under any of the three conditions (baseline, organism, or langgraph).</p>
+
+            <p>This matters because the v0.34.5 post flagged the single survivor as "a structural property of that issue (likely a small, localized hunk)." Under that theory, any 8B model should be able to handle django-11001 in baseline. The cross-model data disproves it: the issue isn't structurally easy in a model-independent sense; the single survivor was an idiosyncrasy of gemma4's output distribution on that specific prompt. The 8B-class format-discipline ceiling in v0.34.5 isn't a single-model artifact &mdash; it generalizes to at least one other 8B model, a reasoning-distilled one at that.</p>
+
+            <h3>2. Retry-with-reason-code did not break the ceiling</h3>
+
+            <p>The retry mechanism isn't broken &mdash; live logs showed the reason-code vocabulary firing in the wild (<code>overlong_hunk</code> on django-10914 baseline, <code>truncated_hunk</code> on astropy-14365 baseline), the retry callback was invoked exactly when expected, and the retry prompts embedded both the reason string and the failed output verbatim with reason-specific guidance ("use real integer line numbers" for <code>placeholder_hunk</code>, "use exact paths from the repository context" for <code>path_not_found</code>, etc.).</p>
+
+            <p>What the retry cannot do is move the model across a capability boundary. At 8B, diff-format failure appears not to be <em>mistake-that-can-be-corrected</em> but <em>cannot-produce-format-at-all</em>. Each retry produces a different shape of malformed output &mdash; not a correction of the first. Retry-with-guidance is a competence-with-lapses lever; it helps models that know what correct looks like and occasionally miss. It does nothing for models that are systematically below the threshold.</p>
+
+            <div class="finding negative">
+                <strong>This is a sharper negative than the v0.34.5 post predicted.</strong> That post said retry "might recover 20&ndash;40% of sanitizer drops." At 8B, it recovered 0 of 30. The 20&ndash;40% band was an intuition about ``what retry does to models that are close.'' Neither gemma4 8B nor deepseek-r1 8B is close. For the retry wedge to earn its 2&times; cost, we'd need a model that's already occasionally producing valid patches &mdash; likely 70B+, or a stronger 30B class.
+            </div>
+
+            <h2>What this does and does not say</h2>
+
+            <p>It says: (i)&nbsp;the 8B format-discipline ceiling holds across training regimes, with reasoning-distilled models showing no advantage over instruction-tuned ones for diff format; (ii)&nbsp;targeted retry prompts don't help when the failure is capability-bound, not competence-bound; (iii)&nbsp;the single v0.34.5 "survivor" was model-specific, not issue-structural. The cross-model confirmation is worth more than an additional gemma4 rerun would have been for the generality of the claim.</p>
+
+            <p>It does not say retry is universally useless. For models that are close to producing correct output &mdash; likely 70B+ via Modal / Groq / Together &mdash; the retry pipeline shipped in v0.35 is the instrument to test exactly that. The infrastructure is now there; what's missing is the compute.</p>
+
+            <p>It also doesn't say the structural guarantees of the categorical harness are weakened. Certificate preservation across compilers, priority gating, stagnation detection &mdash; these are <code>Know</code>-level properties verified independently of SWE-bench task resolution. The grounded null doesn't touch them.</p>
+
+            <h2>Side observations</h2>
+
+            <h3>Repo-dependent latency is a hidden confounder</h3>
+
+            <p>Astropy instances ran 25&ndash;30 min per call. Django instances ran 6&ndash;15 min. Same model, same grounded context injection, same sanitizer, same retry. The difference is issue complexity: astropy's stack traces reference more import paths and class hierarchies, producing longer <code>&lt;think&gt;</code> blocks. Benchmark latency numbers pooled across repos mask this. Worth flagging for future cross-repo cost-benefit claims: "reasoning-model latency is ~18 min per call" pools over a 2&times; spread that tracks with repo structure, not with reasoning effort.</p>
+
+            <h3>The timeout fix pays off</h3>
+
+            <p>v0.34.5's gemma4 run had two baseline timeouts on astropy instances (120s ceiling). Both completed cleanly in this run at 900s. The mean per-call latency in v0.35 is 18 minutes &mdash; well past the old ceiling but well under the new one. Raising a default that was set for interactive callers when the use case is an extended-reasoning benchmark isn't a tuning knob, it's a correctness fix.</p>
+
+            <h3>The reason vocabulary has head room</h3>
+
+            <p>Eight reason codes in <code>SANITIZE_REASONS</code>; this run exercised at least two in logs (<code>overlong_hunk</code>, <code>truncated_hunk</code>). The remaining codes are unit-tested but haven't fired in live data yet because the specific failure modes (placeholder line numbers, basename-collision paths, etc.) are less common than truncation/overrun at 8B. At larger models the distribution may shift &mdash; <code>placeholder_hunk</code> in particular is a common failure mode of models that reason about diff structure abstractly instead of grounding in real file content.</p>
+
+            <h2>What's next</h2>
+
+            <ol>
+                <li><strong>70B+ cloud rerun.</strong> The natural follow-up. Modal charges for GPU after their free tier; Groq's free-tier Llama-3.3-70B is a cheaper first pass. Same code, different <code>--model</code>, same artifact writer. If retry recovers anything at 70B, that's the first positive signal for the retry wedge.</li>
+                <li><strong>Per-stage retry for organism.</strong> Currently a retry re-runs the whole organism. A per-stage retry (only re-run the <code>edit</code> stage) would halve retry cost and sharpen "does decomposition help retry." Not yet shipped.</li>
+                <li><strong>Paper 4 / Paper 5 arXiv push.</strong> The §6.3 Phase C subsection means the Paper 5 claim is now cross-model verified. arXiv-ready.</li>
+            </ol>
+
+            <h2>Honest summary</h2>
+
+            <p>v0.35.0 ships Phase C: the patch-apply pipeline v0.34.5 described but didn't run, plus a cross-model artifact that confirms the ceiling and a retry null result that tightens the <em>why</em>. The headline number is the same (0 resolved on SWE-bench-lite). The claim is stronger (cross-model, with retry active, zero recoveries). And the instrument to test a bigger model is now on PyPI and ready to point at 70B compute whenever that's available.</p>
+
+            <p>Code: <a href="https://github.com/coredipper/operon/pull/57">PR #57</a> (timeout fix), <a href="https://github.com/coredipper/operon/pull/58">PR #58</a> (retry infrastructure), <a href="https://github.com/coredipper/operon/pull/59">PR #59</a> (Phase C artifact + paper §6.3 + release). Released as <code>operon-ai v0.35.0</code> on PyPI. <a href="/operon/releases/#v0350">Release notes.</a></p>
+
+            <div class="footer">
+                <p><a href="/blog/">&larr; Back to blog</a></p>
+            </div>
+        </article>
+    </div>
+</body>
+</html>

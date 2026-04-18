@@ -17,6 +17,30 @@
         <h1 id="release-notes">Release Notes</h1>
         <p>This page tracks the recent direction of the project.</p>
 
+        <h2 id="v0350">v0.35.0</h2>
+        <p>Focus:</p>
+        <ul>
+        <li><strong>Phase C: cross-model 8B ceiling confirmation + format-correction retry null result</strong></li>
+        </ul>
+        <p>New:</p>
+        <ul>
+        <li>Per-call LLM timeout raised to 900s (<code>_LLM_TIMEOUT_SECONDS</code>) to absorb reasoning-model <code>&lt;think&gt;</code> blocks; separate 60s <code>_LLM_PROBE_TIMEOUT_SECONDS</code> for the startup reachability check so misconfigurations still surface fast (PR #57).</li>
+        <li><code>sanitize_with_reason(patch, slug, *, tree_paths)</code> returning a <code>(cleaned_patch, reason)</code> tuple with 8 machine-readable reason codes in <code>SANITIZE_REASONS</code>: <code>placeholder_hunk</code>, <code>truncated_hunk</code>, <code>overlong_hunk</code>, <code>malformed_metadata</code>, <code>path_not_found</code>, <code>ambiguous_path</code>, <code>empty_extraction</code> (+ empty-string success). The legacy <code>sanitize()</code> is kept as a backward-compat wrapper (PR #58).</li>
+        <li>Format-correction retry: <code>_sanitize_for_submission(..., retry_callback=cb)</code> invokes <code>cb(reason, failed_output) -&gt; str</code> on rejection. <code>_build_retry_prompt</code> embeds the reason + failed output + reason-specific guidance. All three runners (<code>run_baseline</code>, <code>run_organism</code>, <code>run_langgraph</code>) accept <code>retry_on_reject: bool = False</code>. <code>_FORMAT_RETRY_MAX = 1</code> (PR #58).</li>
+        <li>New CLI flags: <code>--retry-on-reject</code> (enables retry), <code>--output PATH</code> (preserves artifacts per-model without overwriting; also honored under <code>--rewrite-envelope</code>). Existing callers see zero behavior change (PR #58, review #755 follow-up).</li>
+        </ul>
+        <p>Findings (deepseek-r1:8b with retry, 10 SWE-bench-lite instances per condition):</p>
+        <ul>
+        <li>baseline / organism / langgraph: <strong>0/10 evaluated each, 0 retry-recovered patches each, 0 runtime errors</strong>. Mean latency 18&ndash;19 min/call (reasoning models are slow).</li>
+        <li>The v0.34.5 gemma4 &quot;single survivor&quot; (<code>django/django-11001</code> baseline, <code>unresolved</code>) is <strong>gemma4-specific</strong>. Deepseek-r1 could not produce a <code>git apply</code>-clean diff for that instance under any of the three conditions. The 8B-class format-discipline ceiling is not a single-model artifact.</li>
+        <li>Retry-with-reason-code did not break the ceiling. 0 recoveries across 30 submissions. At 8B, diff-format failure is not mistake-that-can-be-corrected but cannot-produce-format-at-all &mdash; a sharper negative than v0.34.5's predicted 20&ndash;40% recovery band.</li>
+        </ul>
+        <p>Paper updates:</p>
+        <ul>
+        <li>Paper 5 §6.3 adds subsubsection &ldquo;Phase C: Cross-Model Check with Format-Correction Retry&rdquo; with setup, per-condition outcome table, comparison vs gemma4 v0.34.5, and what-Phase-C-does-and-does-not-say.</li>
+        <li>Paper 5 Limitations item: &ldquo;SWE-bench-lite ceiling at 8B, confirmed cross-model.&rdquo;</li>
+        </ul>
+
         <h2 id="v0345">v0.34.5</h2>
         <p>Focus:</p>
         <ul>
