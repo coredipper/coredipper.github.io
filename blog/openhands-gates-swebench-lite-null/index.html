@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Critic Fires, The Outcome Doesn&rsquo;t Move &mdash; Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin: 32px 0 16px;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre {
+            margin: 24px 0;
+            padding: 16px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+            vertical-align: top;
+        }
+        th {
+            color: #fff;
+            font-weight: 600;
+            background: #111;
+        }
+        tr:hover { background: #0f0f0f; }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .finding {
+            margin: 24px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #4a4;
+            background: #0a110a;
+        }
+        .finding.negative {
+            border-left-color: #a84;
+            background: #110e0a;
+        }
+        .finding.neutral {
+            border-left-color: #88a;
+            background: #0a0a11;
+        }
+        .finding strong {
+            color: #fff;
+        }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+
+        <article>
+            <header>
+                <h1>The Critic Fires, The Outcome Doesn&rsquo;t Move</h1>
+                <div class="subtitle">A structural stagnation critic rejected 60% of first-attempt patches on a SWE-bench-lite slice. After retries, pass@1 was identical to baseline. Zero flips in either direction. A real behavioral signal with a null correctness delta &mdash; and that&rsquo;s the finding.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; April 21, 2026</div>
+                <div class="version-note">operon-openhands-gates v0.1.0a2</div>
+            </header>
+
+            <h2>What this post is</h2>
+
+            <p>The <a href="/blog/operon-structural-guarantees/">structural-guarantees</a> thesis says: certain agent properties &mdash; priority preservation across compilers, stagnation detection, integrity monitoring &mdash; can be verified at the harness layer, independently of the model. <a href="/blog/operon-v028-certificates/">Certificates</a> make the guarantee auditable. <a href="/blog/operon-v035-phase-c-retry-and-cross-model/">Phase C</a> made the guarantees cross-model. But all of that was evidenced on benchmarks whose units are <em>behavior certificates</em>, not <em>task outcomes</em>.</p>
+
+            <p>This post is the first time one of those structural gates &mdash; <code>OperonStagnationCritic</code>, the operon-openhands-gates wrapper around the Paper 4 epiplexic-integral detector &mdash; was pointed at a real agent doing real work and measured against the task outcome itself. Specifically: OpenHands&rsquo; <code>CodeActAgent</code> on a 10-instance SWE-bench-lite slice, with pass@1 computed through the SWE-bench harness, not just inferred from the critic firing.</p>
+
+            <p>The result is honest in a particular way. <strong>The critic fires measurably</strong>: 6 of 10 first-attempt patches get rejected, vs 0 of 10 for the default LLM-judged critic. <strong>The outcome doesn&rsquo;t move</strong>: both conditions resolve exactly the same 6 of 10 instances. The retries cost 56% more and flipped zero instances in either direction &mdash; not up (unresolved &rarr; resolved), not down (resolved &rarr; unresolved). Behavioral delta without correctness delta.</p>
+
+            <h2>The experiment</h2>
+
+            <p>The <a href="https://github.com/coredipper/operon-openhands-gates/pull/3">harness PR</a> scaffolds a two-condition comparison on SWE-bench-lite:</p>
+
+            <ul>
+                <li><strong>baseline</strong> &mdash; OpenHands&rsquo; <code>CodeActAgent</code> with the default <code>AgentFinishedCritic</code> (the benchmarks-repo <code>finish_with_patch</code> preset). Stops on <code>FinishAction</code> with a non-empty <code>git_patch</code>.</li>
+                <li><strong>operon_stagnation</strong> &mdash; same agent + <code>OperonStagnationCritic(threshold=0.2, window=10, critical_duration=3)</code>. The critic returns the epiplexic integral as its success score; OpenHands&rsquo; iterative-refinement loop retries when the score drops below threshold for three consecutive measurements.</li>
+            </ul>
+
+            <p>Same model on both sides: <code>openai/gpt-5</code> with <code>reasoning_effort=high</code>, <code>max_output_tokens=8192</code>, local Docker workspace, <code>--num-workers 4</code>. Same instance slice (the 10 that survived Docker-Desktop-on-Mac&rsquo;s apt-signature bug during image build &mdash; more on that in the caveats).</p>
+
+            <p>Inference produced patches via <code>benchmarks/swebench/run_infer.py</code>. Then <code>benchmarks/swebench/eval_infer.py</code> applied each patch and ran its <code>FAIL_TO_PASS</code> / <code>PASS_TO_PASS</code> tests to populate <code>test_result.resolved</code>. The comparison is on the resolved counts &mdash; not on patch length or critic messages.</p>
+
+            <h2>Results</h2>
+
+            <div class="finding neutral">
+                <strong>pass@1 is identical.</strong> Both conditions resolved 6 of 10 instances. Same 6 resolved, same 4 unresolved. Zero retry-flips in either direction.
+            </div>
+
+            <table>
+                <tr><th>Metric</th><th>Baseline</th><th>Operon stagnation</th><th>&Delta;</th></tr>
+                <tr><td>Instances</td><td>10</td><td>10</td><td>&mdash;</td></tr>
+                <tr><td>pass@1</td><td>60%</td><td>60%</td><td><strong>+0 pp</strong></td></tr>
+                <tr><td>&nbsp;&nbsp;&nbsp;resolved</td><td>6</td><td>6</td><td>&mdash;</td></tr>
+                <tr><td>&nbsp;&nbsp;&nbsp;unresolved</td><td>4</td><td>4</td><td>&mdash;</td></tr>
+                <tr><td>Instances with &ge;1 critic rejection</td><td>0</td><td>6</td><td><strong>+60 pp</strong></td></tr>
+                <tr><td>&nbsp;&nbsp;&nbsp;with completed retry</td><td>&mdash;</td><td>5</td><td>&mdash;</td></tr>
+                <tr><td>&nbsp;&nbsp;&nbsp;with aborted retry (timeout)</td><td>&mdash;</td><td>1</td><td>&mdash;</td></tr>
+                <tr><td>Cumulative cost</td><td>$4.21</td><td>$6.58</td><td><strong>+56%</strong></td></tr>
+            </table>
+
+            <p>The retry-flip accounting is where the honest story lives. The treatment critic rejected 6 of 10 instances (5 retried to completion, 1 had its Attempt-2 timeout after 60 min and get killed). Of those 6 rejections:</p>
+
+            <ul>
+                <li><strong>0 improved</strong> (unresolved &rarr; resolved). No instance that failed at attempt 1 got rescued by the retry.</li>
+                <li><strong>0 broke</strong> (resolved &rarr; unresolved). No instance that succeeded at attempt 1 got clobbered by the retry.</li>
+                <li><strong>6 unchanged.</strong> Baseline and treatment agreed on every verdict.</li>
+            </ul>
+
+            <p>Every retried instance landed on the same <em>resolved</em>/<em>unresolved</em> bucket as the corresponding baseline run. The critic detected stagnation, triggered an additional LLM-driven refinement pass, and the agent converged on a patch with identical correctness. More tokens burned, no new bugs fixed or created.</p>
+
+            <h2>What this says about structural critics</h2>
+
+            <p>The honest reading is in three parts, and the first two are easy to confuse.</p>
+
+            <h3>1. The critic <em>detects</em> something real</h3>
+
+            <p>A 60 pp difference in rejection rate between two critics on the same trajectories is not noise. The default LLM critic accepted everything; the structural critic rejected most of it. They are measuring different things &mdash; the LLM critic checks &ldquo;does this look done?&rdquo; and the structural critic checks &ldquo;is the embedding distribution stagnating?&rdquo; &mdash; and on this slice those answers disagree 6 times out of 10.</p>
+
+            <p>This is a positive signal for the <a href="/blog/operon-v011-homeostasis/">epiplexity</a> substrate: the structural metric is doing work. It&rsquo;s not acting as a rubber stamp or a coin flip. It&rsquo;s picking out a real subset of the trajectory space where agent behavior has converged.</p>
+
+            <h3>2. The retry doesn&rsquo;t <em>fix</em> what the critic detects</h3>
+
+            <p>0 improved, 0 broke. On this slice, sending the rejected trajectories back for another pass produced no correctness change. The agent&rsquo;s second attempt on django-11001 resolved the issue the same way the first attempt did; the second attempt on django-11283 hit the same wall the first one did. The retry mechanism is doing work (5 new conversations, 10k+ extra reasoning tokens each), but it&rsquo;s not work that moves the outcome.</p>
+
+            <p>Why? Two plausible readings, both consistent with the data:</p>
+
+            <ul>
+                <li><strong>Capability-bound.</strong> The instances that baseline resolves are instances GPT-5 <em>can</em> resolve on this trajectory; the instances baseline fails are instances it <em>can&rsquo;t</em>. The critic is detecting that the agent plateaued, but plateauing is a symptom of the capability ceiling, not something a retry can cross. Matches the <a href="/blog/operon-v035-phase-c-retry-and-cross-model/">Phase C</a> finding that retry is a &ldquo;competence-with-lapses&rdquo; lever, not a &ldquo;capability-ceiling&rdquo; lever.</li>
+                <li><strong>Trajectory-correlated.</strong> The retry is stochastic in token space but deterministic in structural shape. If the agent&rsquo;s first-attempt stagnation is an artifact of the instance&rsquo;s structure &mdash; e.g. a subtle test that requires reading a specific docstring &mdash; then resampling the conversation gets you a different token path but the same structural failure. More samples of the same flawed reasoning.</li>
+            </ul>
+
+            <h3>3. The retry still costs</h3>
+
+            <p>+56% cumulative cost for zero outcome change is a real number. At <code>$0.47/completed retry round</code> on this slice and 5 completed retries, that&rsquo;s $2.37 of pure overhead. At n=300 (full SWE-bench-lite) and a rejection rate in this range, the overhead is about $70. At a retry rate that actually recovered instances, the overhead would be easily justified. At this rate, it&rsquo;s not.</p>
+
+            <div class="finding negative">
+                <strong>On this slice, the structural critic is a correct detector of a condition the retry mechanism can&rsquo;t leverage.</strong> It&rsquo;s not wrong about what it sees. It&rsquo;s paired with the wrong action. The right pairing for &ldquo;agent is in capability-bound stagnation&rdquo; isn&rsquo;t <em>do another pass</em> &mdash; it&rsquo;s <em>emit the stagnation certificate and terminate the loop</em>.
+            </div>
+
+            <h2>What this does not say</h2>
+
+            <p>It does not say the critic is broken or useless. The epiplexic-integral detector has 96% real-embedding convergence discrimination accuracy (<a href="/blog/operon-v011-homeostasis/">Paper 4 &sect;4.3</a>, n=300); that&rsquo;s measured on a different task, but it&rsquo;s the property the critic was designed to detect, and this experiment confirms the critic fires when the property is present. The question isn&rsquo;t &ldquo;does the critic detect stagnation?&rdquo; &mdash; it clearly does. The question is &ldquo;what should happen when it does?&rdquo;</p>
+
+            <p>It also doesn&rsquo;t say retry is useless in general. There&rsquo;s a regime &mdash; a model at the edge of its capability, trajectories with fixable format or phrasing errors &mdash; where retry-with-structural-signal would likely move the number. GPT-5 on SWE-bench-lite django is not that regime. A 70B model on a harder benchmark might be.</p>
+
+            <p>It doesn&rsquo;t generalize beyond this slice. n=10 is small; the slice is django-heavy because the Docker-on-Mac apt-signature bug blocked the matplotlib/sympy/flask/pytest images during inference; the model is fixed (GPT-5, high-reasoning); the critic&rsquo;s <code>threshold=0.2</code> was tuned on sentence-MiniLM embeddings from Paper 4 and might have different dynamics on GPT-5 trajectories. A Linux-host rerun at n=30 is the natural follow-up.</p>
+
+            <h2>Implications for the structural-guarantee thesis</h2>
+
+            <p>One honest consequence: the right contract for <code>OperonStagnationCritic</code> in the OpenHands harness is probably <em>terminate-on-fire</em>, not <em>retry-on-fire</em>. The detector&rsquo;s job is to say &ldquo;this trajectory is not going to converge to a better answer.&rdquo; If that&rsquo;s accurate &mdash; and on this slice it seems accurate, because retries didn&rsquo;t help &mdash; then the useful action is to stop burning tokens, emit a certificate of &ldquo;here&rsquo;s when the agent plateaued, with evidence,&rdquo; and surface the partial patch to the caller for review.</p>
+
+            <p>The iterative-refinement loop OpenHands exposes is a specific pairing of detector + action (detect drop &rarr; retry). That pairing is the default because &ldquo;LLM said not done yet &rarr; do another pass&rdquo; is a reasonable baseline when the signal is probabilistic. It&rsquo;s not the right pairing when the signal is structural: structural stagnation is itself evidence that the conversation is done producing differential information. The retry loop treats that evidence as &ldquo;try again.&rdquo; The harness contract should treat it as &ldquo;stop.&rdquo;</p>
+
+            <p>This is the kind of finding you only get from running the experiment. It doesn&rsquo;t weaken the certificate &mdash; <code>behavioral_stability_windowed</code> still verifies at the <code>Know</code> layer, independent of task outcome &mdash; but it reshapes what the certificate should be <em>used for</em>.</p>
+
+            <h2>Caveats standing for citation</h2>
+
+            <ol>
+                <li><strong>Sample bias.</strong> n=10, 9 django + 1 astropy. Docker-Desktop-on-Mac&rsquo;s apt-signature bug blocked the non-django images. Not representative of full SWE-bench-lite.</li>
+                <li><strong>Certificate metadata not on disk.</strong> <code>OperonStagnationCritic.evaluate()</code> emits <code>CriticResult.metadata</code> with <code>certificate_theorem="behavioral_stability_windowed"</code>, but openhands-sdk doesn&rsquo;t currently serialize <code>CriticResult.metadata</code> into <code>MessageEvent</code> / <code>ActionEvent</code> records. Critic firing is inferred from Attempt-2 presence, not from on-disk certificate records. Fix is a side-channel log from inside <code>evaluate()</code>, or an upstream SDK patch.</li>
+                <li><strong>Single model.</strong> GPT-5 only. The <code>threshold=0.2</code> from Paper 4 was tuned on sentence-MiniLM at n=300; different model families may have different stagnation dynamics.</li>
+                <li><strong>django-11019 aborted retry.</strong> The critic rejected Attempt-1 and triggered Attempt-2, which hit the 60-min per-attempt timeout ceiling and was killed. Counted as a critic rejection in the 60% rate, but no Attempt-2 patch reached the eval harness.</li>
+            </ol>
+
+            <h2>What ships</h2>
+
+            <p><code>operon-openhands-gates v0.1.0a2</code> on PyPI: <code>OperonStagnationCritic</code> with the <code>cert_evidence_n</code> metadata field that downstream collectors need. The harness scripts (<code>scripts/run_swebench_lite.py</code>, <code>scripts/eval</code> flow, <code>scripts/generate_delta_artifact.py</code>, <code>scripts/dedupe_for_eval.py</code>) are in the repo for reproducing the experiment, not in the wheel. The n=10 artifact is committed as <code>eval/results/swebench_lite_delta.json</code> + <code>.md</code> alongside the raw harness <code>.report.json</code> files.</p>
+
+            <h2>What&rsquo;s next</h2>
+
+            <ol>
+                <li><strong>Fix the certificate serialization.</strong> Side-channel log from <code>OperonStagnationCritic.evaluate()</code> so the cert theorem/evidence lands on disk for downstream analysis without requiring an openhands-sdk patch. Unblocks &ldquo;on-disk certificate evidence&rdquo; claim instead of the retry-count proxy.</li>
+                <li><strong>Swap the retry action for terminate-on-fire.</strong> Test the hypothesis above empirically: does <em>terminate when stagnation detected</em> beat <em>retry when stagnation detected</em> on cost with no outcome regression? Should be a config-level change in the iterative-refinement pairing.</li>
+                <li><strong>Unbiased n=30 rerun.</strong> Linux host or <code>--workspace remote</code> to kill the Docker-on-Mac sample bias. Plus maybe a second model (Sonnet 4.6) to diversify.</li>
+                <li><strong>Framework-portability in code.</strong> Same experiment on <code>operon-langgraph-gates</code> &mdash; sibling package with the same <code>EpiplexityMonitor</code> substrate &mdash; would be the strongest evidence that the structural critic pattern is framework-independent rather than OpenHands-specific. LangGraph has no SWE-bench harness out of the box; that&rsquo;s a scaffolding build first.</li>
+            </ol>
+
+            <h2>Honest summary</h2>
+
+            <p>A structural stagnation critic, pointed at GPT-5 doing real SWE-bench-lite work, detects something real on 60% of instances and changes the outcome on 0%. The detector works. The default action paired with it &mdash; retry &mdash; does not, on this slice. The right action is probably <em>stop</em>, not <em>try again</em>. That&rsquo;s a finding about <em>how</em> structural critics should be wired into agent loops, grounded in the first piece of task-outcome evidence for the <code>operon-openhands-gates</code> harness.</p>
+
+            <p>Code: <a href="https://github.com/coredipper/operon-openhands-gates/pull/3">harness PR</a> (scaffolding), <a href="https://github.com/coredipper/operon-openhands-gates/pull/4">release PR</a> (v0.1.0a2), <a href="https://github.com/coredipper/operon-openhands-gates/pull/5">eval PR</a> (pass@1 artifact). Released as <code>operon-openhands-gates v0.1.0a2</code> on PyPI. Artifact: <a href="https://github.com/coredipper/operon-openhands-gates/blob/main/eval/results/swebench_lite_delta.md">swebench_lite_delta.md</a>.</p>
+
+            <div class="footer">
+                <p><a href="/blog/">&larr; Back to blog</a></p>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
