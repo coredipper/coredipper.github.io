@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAM Already Solved Stagnation - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>SLAM Already Solved Stagnation</h1>
+                <div class="subtitle"><code>operon-langgraph-gates</code> v0.1 is a discrete-state port of factor-graph fixed-lag smoothing (Kaess 2012). The port is trivial &mdash; the scope discipline that falls out is the upgrade.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; April 23, 2026</div>
+                <div class="version-note">operon-langgraph-gates v0.1 (alpha)</div>
+            </header>
+
+            <p>A LangGraph user filed <a href="https://github.com/langchain-ai/langgraph/issues/6731">issue #6731</a> asking for protection against infinite agent loops. It was closed, not as <em>wontfix</em>, but as NOT_PLANNED &mdash; out of scope for the framework.</p>
+
+            <p>I do not blame the maintainers. It is out of scope. But it was also the most common pain point in the four-source LangGraph issues, discussions, and blog-posts sample I reviewed before starting on <code>operon-langgraph-gates</code> &mdash; four sources is not a census, but it was enough to shift my priors. Agents that cannot detect they have stopped making progress is a live unsolved reliability problem in production LangGraph deployments right now.</p>
+
+            <p>The thing I kept not saying out loud, because it felt a little too neat, is this: there is a well-understood structural pattern from a different domain that matches the shape of this problem. Factor-graph SLAM has been using it since the mid-2000s, formalised incrementally in iSAM2 (<a href="https://dspace.mit.edu/handle/1721.1/71582">Kaess et al. 2012</a>). It is called fixed-lag smoothing over a factor graph, and it is how the factor-graph formulation behind modern SLAM back-ends decides whether a belief about the world is getting better or getting stuck.</p>
+
+            <p>Frank Dellaert <a href="https://gtsam.org/2026/04/21/factor-graphs-and-world-models.html">just published a blog post</a> positioning factor graphs as a concrete, structured instance of the energy-based &ldquo;world models&rdquo; the JEPA line of work is building on differently. He calls the loop STAG: Sense, Think, Act, with Graphs. Past graph does perception (fixed-lag smoothing). Future graph does planning (predictive control). They share a dynamics model. Both are energy minimisation.</p>
+
+            <p>When I read that post the same morning I was writing the README for the LangGraph gates wedge, I realised something that had been sitting in the code for a year: <strong>Operon&rsquo;s runtime guards have the graph structure of a discrete-state STAG loop.</strong> The pre-guard is a dynamics-residual check against a standing checkpoint. The windowed stability verifier is the past-graph smoother it feeds into. The post-guard is a (degenerate) future-graph planner. The cleanest way to put it, borrowed from the companion paper appendix: the guards <em>admit</em> a STAG description even though the code does not use factor-graph machinery to compute it.</p>
+
+            <p>This post is the explanation. It is also the theoretical-basis paragraph for <code>operon-langgraph-gates</code> v0.1.</p>
+
+            <h2>Connected to: the April 21 post on cert-firing</h2>
+
+            <p>If you read <a href="/blog/openhands-gates-swebench-lite-null/">Score-Rejection Isn&rsquo;t Cert-Firing (and n=10 Isn&rsquo;t Enough)</a> from two days ago, you saw the sharper version of a distinction this blog keeps returning to: a <em>cert fires</em> only when a named structural property is attested, not when a score crosses a threshold. The April 21 update was me cleaning up that conflation at the evaluation-outcome layer. This post is the same discipline, one layer deeper, at the <em>mechanism</em> layer: what does it mean for the primitive that does the detecting to be structural and not algorithmic?</p>
+
+            <p>Factor graphs are the cleanest answer I know. They force you to be concrete about exactly three things &mdash; what is a state, what counts as an observation, what is the dynamics model &mdash; before you can even describe the loop. If you cannot write those down, your stagnation detector is not a detector; it is vibes. Every post on this blog since <a href="/blog/operon-structural-guarantees/">What Biological Agent Design Actually Buys You</a> has been making the same argument from a different angle: <em>structural guarantees, not algorithmic sophistication</em>. Factor graphs are what that slogan commits you to if you actually write down the math.</p>
+
+            <h2>The thing LangGraph users actually want</h2>
+
+            <p>The ask in issue #6731 is narrow and specific: make the agent halt when it is not making progress. The ask is not &ldquo;give me a world model&rdquo; or &ldquo;prove termination.&rdquo; The ask is the robot-operator version: if my smoother says the belief has not moved in the last W steps, stop.</p>
+
+            <p>The reason the ask is natural is that humans know stuck-ness when they see it. You have watched an LLM agent retry the same failing call six times in a row. You have watched it ask itself &ldquo;should I use tool X?&rdquo; and answer &ldquo;yes, I should use tool X&rdquo; and then not use tool X. The pattern is unmistakable. The question is only whether your framework can <em>detect</em> it before you hit the budget cap.</p>
+
+            <p>LangChain&rsquo;s answer, for reasons I actually find defensible, is &ldquo;observability will tell you, after the fact.&rdquo; LangSmith shows you the trace. You notice. You tighten the prompt. This is fine for one-off debugging and wrong as a runtime reliability story. There is a well-understood structural pattern from a different domain that fits the shape of this class of failures. You can port it, or you can keep not-porting it.</p>
+
+            <h2>Factor graphs, really briefly</h2>
+
+            <p>A factor graph has variables (what you care about) and factors (functions that score combinations of variables). The joint score is the product of factor values. For robotics, the variables are states at different times x<sub>t&minus;5</sub>, &hellip;, x<sub>t</sub>. The factors come in two flavours:</p>
+
+            <ul>
+                <li><strong>Measurement factors</strong> score how well a state matches a sensor reading.</li>
+                <li><strong>Dynamics factors</strong> score how well a state transition matches the motion model.</li>
+            </ul>
+
+            <p>Fixed-lag smoothing anchors the graph at the current time t and keeps the last W steps in memory. Every time a new observation arrives, you slide the window, add one measurement factor, add one dynamics factor, marginalise the oldest variable into a prior factor, and re-solve. You get a rolling MAP estimate of where the robot has been. If that estimate stops moving, the robot is stuck.</p>
+
+            <p>Dellaert&rsquo;s STAG framing adds the future side: the same variable x<sub>t</sub> is also the anchor of a second graph looking forward, with goal factors and control variables. Plan becomes energy minimisation on the future graph. Perception becomes energy minimisation on the past graph. One dynamics model, two graphs glued at the present.</p>
+
+            <p>The reason this has survived 20 years of scrutiny is that it forces you to be concrete about exactly three things: what is a state, what counts as an observation, and what is the dynamics model. You cannot wave your hands. If you cannot write those down, your smoother is not a smoother; it is vibes.</p>
+
+            <h2>The translation to LLM agents</h2>
+
+            <p>I want to do this term by term because the cleanness of the translation is the point.</p>
+
+            <p><strong>State.</strong> In Operon, x<sub>t</sub> is the agent&rsquo;s tuple of (genome, expression, short-term memory) between stages. It is symbolic, not Euclidean. The dynamics is deterministic &mdash; a checkpoint-predicted transition, not a learned model.</p>
+
+            <p><strong>Measurement factor (with one caveat).</strong> In <code>operon_ai/core/certificate.py</code>, the <code>behavioral_stability_windowed</code> verifier computes a per-window residual r = max(0, x &minus; &tau;) where x is the per-window mean of some quality signal and &tau; is the stability threshold. Each window&rsquo;s &ldquo;measurement factor&rdquo; is the indicator 1[r = 0] &mdash; which, to be fair to the factor-graph reader, collapses a likelihood factor to a hard admissibility constraint. We inherit the graph topology but not the probabilistic semantics: no Mahalanobis residual, no information matrix, no covariance on the smoothed belief. That is a real loss and it is the first place a SLAM reader should push back.</p>
+
+            <p><strong>Dynamics factor.</strong> <code>DNARepair.scan</code> in <code>operon_ai/state/dna_repair.py</code> checks whether the observed genome hash matches the checkpoint&rsquo;s predicted hash. That is the dynamics residual. The checkpoint is the (deterministic) dynamics model. If the residual is positive, the agent has transitioned into an inadmissible state, and the pre-guard halts.</p>
+
+            <p><strong>Past graph &mdash; windowed verifier, not the pre-guard.</strong> The windowed stability verifier is the piece that acts like a fixed-lag smoother: it marginalises a sequence of per-window residuals into a single pass/fail over the window. The <code>pre_guard</code> in <code>compile_guarded_graph</code> (<code>operon_ai/convergence/guarded_graph.py</code>) is a separate, one-step component &mdash; a <code>DNARepair.scan</code> against the standing checkpoint. Blog readers sometimes conflate these two; the appendix is careful, so the blog should be too. The pre-guard is the residual check; the windowed verifier is the smoother-shaped component that feeds into pass/fail decisions.</p>
+
+            <p><strong>Future graph.</strong> Same file, the post-guard runs a rubric verifier and either accepts or routes to retry. Horizon h=1. One goal factor. This is the degenerate but operationally honest version of STAG&rsquo;s future graph, and I want to be clear that it is deliberately small. The moment you go to h &gt; 1 you are planning, and planning is where agent systems go to die.</p>
+
+            <p><strong>Shared dynamics.</strong> Both guards use the same coalgebraic state transition defined in <code>operon_ai/core/coalgebra.py</code>. One dynamics model, two guards glued at the current stage. Exactly the STAG split.</p>
+
+            <p><strong>Joining across agents (with the same caveat).</strong> When two agents exchange certificates via the A2A codec (<code>operon_ai/convergence/a2a_certificate.py</code>), they are treating a certificate as a shared factor conditional on schema agreement. The receiving agent can verify the factor locally and fold it in, or forward-without-verify under the graceful-degradation rule. This is <em>not</em> full distributed-SLAM joining &mdash; distributed SLAM shares continuous latent state (agreement on a pose), while Operon agents share a predicate name plus a boolean. The monoidal structure of the optimiser is consistent with associative certificate composition; I would not claim more than that without writing the functor down. It is a shared-evidence pattern under a shared schema, with the topology of factor joining but not its semantics.</p>
+
+            <p>That is the whole mapping. No new math, no new optimiser, no learned factors. Just the claim that the pre/post-guard pattern in front of an LLM has the same graph topology as the rolling reliability loop SLAM has been running in front of a camera for a decade and a half. To borrow a line from the appendix: there is no dual benefit from the structure, only a dual <em>description</em>.</p>
+
+            <h2>What this gets you that naming does not</h2>
+
+            <p>The translation matters for four reasons, and I want to separate them so the useful ones stand out from the merely-aesthetic.</p>
+
+            <p><strong>1. Citation lineage.</strong> &ldquo;We gate agents with an ad-hoc stagnation check&rdquo; is a weaker story than &ldquo;we gate agents with a discrete-state analogue of fixed-lag smoothing, a technique used in production robotics since Kaess et al. 2012.&rdquo; The second is also what the code actually does. For reviewers, for reliability engineers picking a framework, and frankly for me, the second framing earns its keep.</p>
+
+            <p><strong>2. Composition is not ad-hoc.</strong> The A2A codec was, in my head, a serialisation format with graceful degradation. After the translation, it is shared-evidence-under-shared-schema with the topology of factor joining. That is still a load-bearing upgrade &mdash; reliability gates at different agents <em>compose</em>, and the composition inherits associativity from the schema-and-monoidal structure &mdash; but the joining is over booleans, not over continuous latents, so the algebra you get is correspondingly weaker than in distributed SLAM. Still useful. Do not over-read it.</p>
+
+            <p><strong>3. Vocabulary for future scope.</strong> Every reasonable extension of the gates wedge &mdash; longer pre-guard windows, goal factors in the post-guard, richer dynamics from richer checkpoints &mdash; now has a name. When somebody proposes learning the factors from data, we know exactly what we are signing up for: we are giving up the structural guarantee and taking on an empirical one. That is sometimes fine. But at least it is <em>visible</em> now.</p>
+
+            <p><strong>4. A hard line against scope drift.</strong> Here is the load-bearing one. It is very tempting, once you write down a factor graph, to start training the factors. That is the whole JEPA direction, and it is a perfectly respectable research programme. It is also not what Operon does and not what <code>operon-langgraph-gates</code> is going to do. Factors fixed in code. Topology fixed. Only the set of theorems grows. The moment we start fitting residuals to data, the reliability story becomes an empirical one, and I have enough empirical reliability stories in this field.</p>
+
+            <h2>What I am not claiming</h2>
+
+            <p>I want to say this clearly because the translation is neat enough that it invites overreach.</p>
+
+            <ul>
+                <li><strong>I am not claiming this is novel.</strong> Fixed-lag smoothing is 20+ years old. What is new-ish is running it over a symbolic LLM agent state with verification instead of gradient descent as the solver. That is a porting exercise, not a breakthrough.</li>
+                <li><strong>I am not claiming Operon is a world model.</strong> There is no learned dynamics, no predictive rollout, no energy function in the JEPA sense. The analogy to STAG is structural, not dynamical. Our &ldquo;energy&rdquo; is a residual count.</li>
+                <li><strong>I am not claiming factor graphs solve LangGraph #6731 by themselves.</strong> They give a vocabulary and a design discipline. The actual closing of the loop happens in code, in the wedge repo, in about 200 lines.</li>
+            </ul>
+
+            <h2>The wedge</h2>
+
+            <p><code>operon-langgraph-gates</code> v0.1 ships two primitives. <code>StagnationGate</code> wraps the rolling-window stagnation detector Paper 4 §4.3 benchmarks at 0.960 on convergence and false-stagnation scenarios with real sentence embeddings; its test is, in the language of this post, &ldquo;the smoothed belief did not move in the last W steps.&rdquo; <code>IntegrityGate</code> wraps user-defined invariants against a standing checkpoint &mdash; a dynamics-residual check. Both are drop-in LangGraph nodes. Neither mentions the word &ldquo;organism,&rdquo; &ldquo;skill,&rdquo; or anything biological, because nobody wiring up their LangGraph agent cares about the mitochondrial analogy and I have finally internalised that.</p>
+
+            <p>What the README says, in the paragraph this post exists to earn, is that the primitives are not new. They are a port. They come from the oldest, best-tested reliability loop in autonomy research. And the reason the field has drifted away from them is not that they stopped working &mdash; it is that LLM agents arrived on a separate vocabulary track and nobody stopped to notice the overlap.</p>
+
+            <p>This post is me stopping and noticing.</p>
+
+            <ul>
+                <li><a href="https://github.com/coredipper/operon-langgraph-gates">operon-langgraph-gates on GitHub</a></li>
+                <li><a href="https://github.com/coredipper/operon/blob/main/article/paper6/sections/08-factor-graphs.tex">Paper 6 appendix &sect;8</a> &mdash; the full term-by-term mapping, worked example with real seed-0 numbers, and an explicit record of where the analogy stops</li>
+                <li><a href="https://gtsam.org/2026/04/21/factor-graphs-and-world-models.html">Dellaert, &ldquo;Factor Graphs and World Models&rdquo;</a> &mdash; the GTSAM post this one is written in reply to</li>
+                <li><a href="https://huggingface.co/spaces/coredipper/operon-stagnation-gate">StagnationGate demo on HuggingFace Spaces</a></li>
+            </ul>
+
+            <div class="footer">
+                <a href="/blog/">&larr; Back to blog</a>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
