@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harness Engineering as Categorical Architecture - Bogdan Banu</title>
+    <style>
+        ::selection { background: #505050; }
+        ::-moz-selection { background: #505050; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background-color: #000; }
+        body {
+            background-color: #0a0a0a;
+            color: #d0d0d0;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.8;
+            font-size: 17px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 120px;
+        }
+        nav {
+            margin-bottom: 48px;
+            font-family: 'SF Mono', 'Monaco', monospace;
+        }
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: #fff; }
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid #222;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #888;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+        .author {
+            font-size: 15px;
+            color: #999;
+            font-family: 'SF Mono', monospace;
+        }
+        .author a {
+            color: #999;
+            text-decoration: none;
+            border-bottom: 1px solid #444;
+        }
+        .author a:hover {
+            color: #fff;
+            border-color: #888;
+        }
+        .version-note {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 12px;
+            background: #1a2a1a;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6a6;
+            font-family: 'SF Mono', monospace;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #222;
+        }
+        p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 16px 0 16px 24px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'SF Mono', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #111;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        blockquote {
+            margin: 32px 0;
+            padding: 16px 24px;
+            border-left: 3px solid #333;
+            color: #b0b0b0;
+            font-style: italic;
+        }
+        a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #222;
+            font-size: 14px;
+            color: #666;
+            font-family: 'SF Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="/blog/">&larr; Blog</a>
+        </nav>
+
+        <article>
+            <header>
+                <h1>Harness Engineering as Categorical Architecture</h1>
+                <div class="subtitle">Paper 5 is on arXiv. The triple (G, Know, &Phi;) is the formalism behind every gate, certificate, and adapter Operon has shipped &mdash; here is what it claims, what it does not, and what it unlocks for the rest of the work.</div>
+                <div class="author"><a href="/">Bogdan Banu</a> &middot; May 13, 2026</div>
+                <div class="version-note">paper-track post &middot; <a href="https://arxiv.org/abs/2605.12239" style="color:#6a6;border:none;">arXiv:2605.12239</a></div>
+            </header>
+
+            <p>Five papers in, the load-bearing object across Operon &mdash; certificates, gates, compilers, adapters, the whole runtime &mdash; finally has the formal name it has been wearing implicitly. <a href="https://arxiv.org/abs/2605.12239">Paper 5: <em>Harness Engineering as Categorical Architecture</em></a> (arXiv:2605.12239, posted today) takes the categorical Architecture triple <code>(G, Know, &Phi;)</code> from <a href="https://arxiv.org/abs/2603.28906">de los Riscos et al.&rsquo;s ArchAgents framework</a> and shows that the four pillars of agent externalization &mdash; <strong>Memory, Skills, Protocols, Harness</strong> &mdash; map onto the triple exactly, with no slack and no daylight.</p>
+
+            <p>This post is the trailing-edge companion to the paper. It is what I would tell someone who reads the abstract, raises an eyebrow, and asks &ldquo;what does this actually do that the previous four papers did not?&rdquo; The answer is short: it turns the per-paper engineering claims into one structural claim with a single preservation theorem, and it locates Operon&rsquo;s contribution against neighbour formalisms (typed lambda calculi, fixed-substrate frameworks, output-validation harnesses) in a way that survives review.</p>
+
+            <h2>The triple, in one breath</h2>
+
+            <p><strong>G</strong> is the syntactic wiring &mdash; the directed graph of stage names and edges, the part you see when you read a LangGraph spec or a Swarms <code>GraphWorkflow</code> or an organism YAML. It is the part everyone agrees is &ldquo;the architecture&rdquo; in the colloquial sense. It is also the least load-bearing component: two graphs with identical <code>G</code> can behave wildly differently if their <code>Know</code> and <code>&Phi;</code> differ.</p>
+
+            <p><strong>Know</strong> is the knowledge component &mdash; <em>not</em> stored facts, but <em>self-verifiable structural guarantees</em>. Integrity gates, quality-based escalation, supported convergence checks. Every certificate Operon emits (<code>behavioral_stability_windowed</code>, <code>langgraph_state_integrity</code>, <code>dna_repair</code>, <code>dspy_compile_pinned_inputs</code>, <code>agentflow_evolve_pinned_inputs</code>) is a <code>Know</code>-component object. The closure property the paper proves is that <code>Know</code> is preserved by Operon&rsquo;s compiler functors: rewriting the graph does not break the certificate predicate.</p>
+
+            <p><strong>&Phi;</strong> is the interface mapping &mdash; the profunctor that says how stages of a given <em>mode</em> (fast / fuzzy / deep) bind to model tiers. In current Operon, <code>&Phi;</code> is hand-coded in the compiler; in a future Operon it could be learned, but the contract is that <code>&Phi;</code>&rsquo;s preservation is what makes mode swaps safe.</p>
+
+            <p>The four-pillar mapping, stated bluntly: <strong>Memory is coalgebraic state living over &Phi;.</strong> <strong>Skills are operad-composed objects living in Know.</strong> <strong>Protocols are exactly G.</strong> <strong>The full Harness is the Architecture itself</strong> &mdash; the whole triple, not any one component. The naming convention I have been using on Twitter and in talks for two years (&ldquo;harness engineering is its own discipline&rdquo;) was waiting for this sentence.</p>
+
+            <h2>Why property preservation is the discriminating guarantee</h2>
+
+            <p>The neighbour formalisms make adjacent claims. <a href="https://arxiv.org/abs/2604.11767">Liu&rsquo;s typed lambda calculus <code>&lambda;<sub>A</sub></code></a> gives type safety and termination, with empirical work showing 94.1% of GitHub agent configurations are structurally incomplete under that formalization. That is a strong result on a different axis. Liu binds <em>at the language layer</em>; Paper 5 binds <em>at the compilation layer</em>. Type safety says &ldquo;this expression&rsquo;s shape will not crash.&rdquo; Property preservation says &ldquo;this certificate predicate&rsquo;s truth value survives every compiler functor in <code>Comp(Operon &rarr; X)</code>.&rdquo; The two are stackable, not competitive &mdash; an obvious follow-up paper is to land both formalisms in one project.</p>
+
+            <p>Where Operon&rsquo;s formalism distinguishes itself is on the question of what survives the harness rewrite. Operon&rsquo;s preservation is <em>structural replay</em>: the compiler checks identity-of-Know and verifier-replay-of-Know, not output-layer correctness, not model behaviour, not human-readability. This is a smaller claim than the field default (&ldquo;the agent will produce a correct answer&rdquo;) and a larger claim than the typed-lambda default (&ldquo;the program is well-formed&rdquo;). It is the right scope for the harness-engineering problem because the harness is the only layer where you can <em>structurally guarantee</em> anything in a system whose terminal layer is a non-deterministic model.</p>
+
+            <h2>The reference implementation: five compiler functors, three certificates, one preservation theorem</h2>
+
+            <p>The paper validates the correspondence with a reference implementation in the operon repo. Five external targets: <strong>Swarms, DeerFlow, Ralph, Scion, and LangGraph.</strong> Each gets a compiler functor &mdash; <code>parse_X_topology()</code> on the way in, <code>organism_to_X()</code> on the way out, plus <code>compile_guarded_graph</code> for the LangGraph-native execution path. Three named certificate types are validated for preservation by identity and replay across all five targets: <code>behavioral_stability_windowed</code>, <code>langgraph_state_integrity</code>, <code>dna_repair</code>.</p>
+
+            <p>The LangGraph compiler in particular is worth flagging because it pays back the formal investment with concrete observability. It creates one LangGraph node per organism stage using the same per-stage method the native runtime uses &mdash; not a re-implementation, but a shared executor. That gives you LangGraph-native tracing, LangSmith integration, and <code>langgraph-cli</code> compatibility for free, without forking the harness logic. The categorical theorem is what makes this safe: the LangGraph rewrite is a compiler functor in <code>Comp</code>, so the <code>Know</code>-component is preserved, so the certificates emitted by the native runtime remain valid in the LangGraph wrapping.</p>
+
+            <p>One escalation experiment with real LLM agents (two models, one task) confirms that the quality-based escalation control path is model-parametric &mdash; the structural guarantee survives the model swap, which is exactly the substrate-independence claim under empirical pressure. The experiment is bounded; the paper is honest about that. It is not the result that earns its keep, the framework is.</p>
+
+            <h2>Connected to: pinecones and SLAM</h2>
+
+            <p>Two earlier posts on this blog set up the cross-domain context the paper now formally consumes. <a href="/blog/pinecones-and-the-portable-certificate/">Pinecones and the Portable Certificate</a> walks through the <a href="https://arxiv.org/abs/2604.26367">Marom, Tibbits, Zardini, Buehler preprint</a> from materials engineering &mdash; the same compositional-verification framework arrived at by a fundamentally different problem (biological mechanics &rarr; 4D-printed bilayer composites), with a fundamentally different validation culture (substrate-validated rather than property-validated). That is the cross-domain hit that should reduce the prior on &ldquo;this is just an LLM-internal trick.&rdquo;</p>
+
+            <p><a href="/blog/factor-graphs-for-langgraph-gates/">SLAM Already Solved Stagnation</a> grounds the wedge mechanism: the structural pattern Operon&rsquo;s pre-/post-guard implements is a discrete-state port of factor-graph fixed-lag smoothing from robotics SLAM (Kaess et al., recently re-framed by Dellaert as STAG). That post argued the gates implementation has the right citation lineage. This paper argues the gates implementation has the right <em>formalism</em>. SLAM gives the mechanism; Marom-Buehler give the cross-domain corroboration; Paper 5 gives the load-bearing theorem.</p>
+
+            <h2>What this is not</h2>
+
+            <p>Marking the bound clearly because the abstraction is attractive enough to invite overreach.</p>
+
+            <ul>
+                <li><strong>This is not a claim about output equivalence.</strong> Operon preserves recorded structural guarantees across compiler functors. It does <em>not</em> claim that two harnesses with the same <code>Know</code> will produce the same model output. They will not. The certificate predicate is the only thing that survives the rewrite; everything else is downstream of model non-determinism.</li>
+                <li><strong>This is not a typed lambda calculus.</strong> Liu&rsquo;s <code>&lambda;<sub>A</sub></code> binds at the language layer with type-safety and termination as the guarantees. Paper 5 binds at the compilation layer with property-preservation as the guarantee. The two are complementary; stacking them is a clean follow-up paper, not a contradiction in this one.</li>
+                <li><strong>This is not a replacement for output-validation harnesses.</strong> Guardrails AI and the validators-hub family operate <em>downstream</em> of the model output. Operon operates <em>structurally</em> over the harness. They are sibling layers. The paper&rsquo;s &sect;5 maps the relationship; this post is not the place to relitigate it.</li>
+                <li><strong>This is not a claim that the empirical escalation experiment generalises.</strong> Two models, one task, one escalation control path. The result is &ldquo;model-parametric in this experiment.&rdquo; The framework&rsquo;s value is independent of how that one experiment grows; the experiment is illustrative, not load-bearing.</li>
+                <li><strong>This is not a wedge change.</strong> <code>operon-langgraph-gates</code> v0.1.0 ships <code>StagnationGate</code> and <code>IntegrityGate</code>; that scope is fixed. This paper sharpens the explanation of <em>why</em> those two gates are the right v0.1 surface (they are the cheapest non-trivial <code>Know</code>-component objects under the categorical lens) but does not move the v0.2 line.</li>
+            </ul>
+
+            <h2>What it does unlock</h2>
+
+            <p>The formal payoff is that the next round of cross-framework adapters &mdash; the agentflow L1+L2 pair shipped in v0.39 and the gascity adapter in v0.38 &mdash; can be read as compiler-functor instances of preservation, not as bespoke engineering. The L2 hooks (<code>Certificate.from_dspy_compile</code>, <code>Certificate.from_agentflow_compile</code>) become provenance-binding morphisms in a specific subcategory of <code>Comp</code>; their cheap variants (recording-integrity) and their deferred heavy variants (re-execution-check) become two ends of the same morphism family. Each new framework integration is now &ldquo;another arrow in this diagram,&rdquo; not &ldquo;another bespoke contract to write down.&rdquo;</p>
+
+            <p>The methodological payoff is that the <code>(G, Know, &Phi;)</code> language gives an honest way to compare frameworks without picking a winner. A framework that ships only <code>G</code> (LangGraph circa 2024) has a real and valuable surface but cannot claim preservation. A framework that ships <code>(G, Know)</code> without <code>&Phi;</code> (early Operon) can claim preservation under fixed-mode execution but not under mode-swap. A framework that ships the full triple opens up the substrate-independence move. This is descriptive, not prescriptive: most production agent stacks do not <em>need</em> the full triple, and saying so is part of the paper&rsquo;s honesty.</p>
+
+            <p>The strategic payoff is that the gates wedge (<a href="https://github.com/coredipper/operon-langgraph-gates"><code>operon-langgraph-gates</code></a> v0.1.0) now has a paper-grade citation it can point at when asked &ldquo;why those two gates and not a different two?&rdquo; The answer is short: integrity and stagnation are the two cheapest <code>Know</code>-component objects with non-trivial preservation properties under the LangGraph compiler functor. That sentence is now <a href="https://arxiv.org/abs/2605.12239">in arXiv</a>, which is worth quite a lot for the next twelve months of conversations with LangGraph users, framework authors, and prospective collaborators.</p>
+
+            <h2>Links</h2>
+
+            <ul>
+                <li><a href="https://arxiv.org/abs/2605.12239">Paper 5 &mdash; <em>Harness Engineering as Categorical Architecture</em></a> (arXiv:2605.12239) &mdash; this post&rsquo;s reference.</li>
+                <li><a href="https://github.com/coredipper/operon">coredipper/operon</a> &mdash; the reference implementation. Compiler functors live in <code>operon_ai/convergence/</code>; the LangGraph one is <code>guarded_graph.py</code>.</li>
+                <li><a href="https://github.com/coredipper/operon-langgraph-gates"><code>operon-langgraph-gates</code></a> v0.1.0 &mdash; the wedge implementation of two cert-emitting gates.</li>
+                <li><a href="https://huggingface.co/spaces/bogdan-banu/space-harness-inspector">Operon Harness Inspector</a> &mdash; interactive Hugging Face space for exploring the triple on toy organisms.</li>
+                <li><a href="/blog/pinecones-and-the-portable-certificate/">Pinecones and the Portable Certificate</a> &mdash; the materials-engineering cross-domain corroboration post.</li>
+                <li><a href="/blog/factor-graphs-for-langgraph-gates/">SLAM Already Solved Stagnation</a> &mdash; the robotics-mechanism grounding post.</li>
+                <li><a href="https://arxiv.org/abs/2603.28906">de los Riscos et al., ArchAgents framework</a> (arXiv:2603.28906) &mdash; the categorical Architecture triple itself.</li>
+                <li><a href="https://arxiv.org/abs/2604.11767">Liu, typed lambda calculus for agent composition</a> (arXiv:2604.11767) &mdash; the language-layer neighbour formalism.</li>
+            </ul>
+
+            <div class="footer">
+                <a href="/blog/">&larr; Back to blog</a>
+            </div>
+        </article>
+    </div>
+</body>
+</html>
