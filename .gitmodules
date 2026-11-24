@@ -1,0 +1,8 @@
+[submodule "59"]
+	path = 59
+	url = https://github.com/coredipper/fifty-nine-icosahedra.git
+	branch = main
+[submodule "60"]
+	path = 60
+	url = https://github.com/coredipper/hexecontahedron.git
+	branch = main
