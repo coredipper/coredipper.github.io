@@ -323,49 +323,49 @@
             <div class="abstract">
                 <p class="abstract-title">Summary</p>
                 <p>
-                    This post introduces three new mechanisms in Operon v0.11 that complete the homeostatic loop:
+                    Operon v0.11 adds three mechanisms to complete the homeostatic loop:
                     <strong>Epiplexity</strong> for detecting epistemic stagnation, <strong>Innate Immunity</strong> for
                     fast pattern-based defense, and <strong>Morphogen Gradients</strong> for multi-cellular coordination.
-                    These additions are grounded in recent mitochondrial neuroscience&mdash;particularly the
-                    <em>Mitochondrial Information Processing System (MIPS)</em>&mdash;which reframes the Runtime not as
-                    a passive battery, but as the cell's "Motherboard" for decision gating.
+                    The design draws on recent mitochondrial neuroscience, specifically the
+                    <em>Mitochondrial Information Processing System (MIPS)</em> model, reframing the Runtime from
+                    a passive battery into the cell's "Motherboard" for decision gating.
                 </p>
             </div>
 
-            <h2>1. The Problem: Epistemic Starvation</h2>
+            <h2>1. Epistemic Starvation</h2>
 
             <p>
                 In the <a href="/blog/biological-motifs-agentic-control/">original paper</a>, we identified four agentic
                 pathologies mapping to biological diseases: Oncology (infinite loops), Autoimmunity (hallucination cascades),
-                Prion Disease (prompt injection), and Ischemia (token exhaustion). But there's a fifth pathology we didn't
-                fully address: <strong>Epistemic Starvation</strong>.
+                Prion Disease (prompt injection), and Ischemia (token exhaustion). A fifth pathology was left
+                unaddressed: <strong>Epistemic Starvation</strong>.
             </p>
 
             <p>
-                Biological cells require continuous <em>trophic factors</em>&mdash;novel signals from the environment&mdash;to
-                inhibit suicide programs. A neuron deprived of growth factors doesn't just stop; it actively initiates apoptosis.
-                The insight: <strong>life requires informational nutrition</strong>.
+                Biological cells need continuous <em>trophic factors</em> (novel signals from their environment) to
+                keep suicide programs suppressed. Deprived of growth factors, a neuron initiates apoptosis instead of
+                simply idling; sustained survival depends on ongoing informational input.
             </p>
 
             <p>
-                Agentic systems exhibit the same pathology. An agent can be "active" (burning tokens, generating outputs) while
-                being informationally <em>dead</em>&mdash;stuck in a loop where outputs stabilize but uncertainty remains high.
-                The system is computing but not learning.
+                Agentic systems exhibit the same failure mode. An agent can stay "active", burning tokens and emitting
+                responses, while making no informational progress: its outputs repeat while its uncertainty stays high,
+                so it spends compute without converging on an answer.
             </p>
 
             <div class="insight">
-                <p class="insight-title">Key Insight</p>
+                <p class="insight-title">Diagnosis</p>
                 <p>
-                    A healthy agent minimizes surprise through learning or effective action. A stagnant agent does neither&mdash;it
-                    has entered a pathological attractor where token burn continues without epistemic progress.
+                    A healthy agent reduces surprise through learning or effective action. A stagnant agent does neither:
+                    it sits in a pathological attractor where token burn continues with no epistemic gain.
                 </p>
             </div>
 
             <h2>2. Epiplexity: Measuring Informational Health</h2>
 
             <p>
-                To detect epistemic starvation, we introduce <strong>Epiplexity</strong>&mdash;a Bayesian Surprise metric
-                that quantifies the information gain of each agent output. The name combines "epistemic" (knowledge-related)
+                To detect epistemic starvation, we introduce <strong>Epiplexity</strong>, a Bayesian Surprise metric
+                that measures the information gain of each agent output. The name combines "epistemic" (knowledge-related)
                 with "perplexity" (model uncertainty).
             </p>
 
@@ -392,9 +392,9 @@
             <h3>2.2 The Diagnostic Pattern</h3>
 
             <p>
-                A recursive hang is characterized by <strong>low novelty + high perplexity</strong>: the agent's outputs
-                are repetitive (embeddings converge), but the model remains uncertain (perplexity stays high). This is the
-                signature of a pathological loop&mdash;the agent is "trying" but not "progressing."
+                A recursive hang shows up as <strong>low novelty paired with high perplexity</strong>: the agent's outputs
+                repeat (embeddings converge) while the model remains uncertain (perplexity stays high). That combination
+                flags a pathological loop in which the agent keeps retrying without making progress.
             </p>
 
             <table>
@@ -463,8 +463,8 @@ stateDiagram-v2
             <h2>3. MIPS: The Mitochondrial Information Processing System</h2>
 
             <p>
-                The original paper modeled Mitochondria as "ATP Synthesis"&mdash;a passive battery providing deterministic
-                computation. Recent mitochondrial neuroscience suggests a more active role.
+                The original paper modeled Mitochondria as "ATP Synthesis", a passive battery supplying deterministic
+                computation. Recent mitochondrial neuroscience points to a more active role.
             </p>
 
             <blockquote>
@@ -476,9 +476,9 @@ stateDiagram-v2
             <h3>3.1 The Runtime Supervisor</h3>
 
             <p>
-                In the refined isomorphism, the Symbolic Runtime (Mitochondria) doesn't just execute tools&mdash;it actively
-                <strong>governs the quality of compute</strong>. If the Runtime detects "Metabolic Stress" (high token burn
-                with low informational yield), it acts as a logic gate, overriding the LLM to trigger a <em>Retrograde Response</em>:
+                In the refined isomorphism, the Symbolic Runtime (Mitochondria) both executes tools and
+                <strong>governs the quality of compute</strong>. When the Runtime detects "Metabolic Stress" (high token burn
+                with low informational yield), it acts as a logic gate and overrides the LLM to trigger a <em>Retrograde Response</em>:
             </p>
 
             <ul>
@@ -529,16 +529,16 @@ flowchart TB
             <h2>4. Innate Immunity: Fast Pattern Defense</h2>
 
             <p>
-                The original Membrane provided adaptive immunity&mdash;learning to recognize threats through training.
-                But biological immune systems have two layers: <strong>adaptive</strong> (slow, learned) and
-                <strong>innate</strong> (fast, hardcoded). Innate immunity handles &gt;99% of threats with minimal overhead.
+                The original Membrane provided adaptive immunity, learning to recognize threats through training.
+                Biological immune systems, however, have two layers: <strong>adaptive</strong> (slow, learned) and
+                <strong>innate</strong> (fast, hardcoded), with the innate layer handling &gt;99% of threats at minimal cost.
             </p>
 
             <h3>4.1 TLR Patterns (PAMPs)</h3>
 
             <p>
-                In biology, Toll-Like Receptors (TLRs) recognize Pathogen-Associated Molecular Patterns (PAMPs)&mdash;conserved
-                structures found in pathogens but not host cells. We implement the same pattern for prompt injection defense:
+                In biology, Toll-Like Receptors (TLRs) recognize Pathogen-Associated Molecular Patterns (PAMPs), conserved
+                structures present in pathogens and absent from host cells. We apply the same idea to prompt injection defense:
             </p>
 
             <table>
@@ -581,7 +581,7 @@ flowchart TB
             <h3>4.2 The Inflammation Cascade</h3>
 
             <p>
-                When PAMPs are detected, the system triggers an inflammation response&mdash;a coordinated multi-faceted alert:
+                When PAMPs are detected, the system triggers a coordinated inflammation response:
             </p>
 
             <ul>
@@ -617,9 +617,9 @@ flowchart LR
             <h2>5. Morphogen Gradients: Multi-Cellular Coordination</h2>
 
             <p>
-                When agents need to coordinate without a central controller, we turn to embryonic development. In morphogenesis,
-                cells coordinate through <strong>morphogen gradients</strong>&mdash;diffusible signaling molecules whose
-                concentration varies spatially. Each cell reads its local concentration and adapts accordingly.
+                To coordinate agents without a central controller, we borrow from embryonic development. During morphogenesis,
+                cells coordinate via <strong>morphogen gradients</strong>, diffusible signaling molecules whose
+                concentration varies across space. Each cell reads its local concentration and adjusts its behavior.
             </p>
 
             <h3>5.1 The Gradient Types</h3>
@@ -691,8 +691,8 @@ flowchart LR
             <div class="insight">
                 <p class="insight-title">Coordination Without Central Control</p>
                 <p>
-                    Agents don't communicate directly. They read a shared gradient and adapt independently&mdash;just
-                    like cells in an embryo. This enables emergent coordination without message-passing overhead.
+                    Instead of exchanging messages directly, agents read a shared gradient and adapt independently,
+                    much like cells in an embryo. Coordination emerges from the shared field without message-passing overhead.
                 </p>
             </div>
 
@@ -701,18 +701,18 @@ flowchart LR
                 and <code>examples/42_morphogen_gradients.py</code>.
             </div>
 
-            <h2>6. The Vermeij Trend: Why This Matters</h2>
+            <h2>6. The Vermeij Trend</h2>
 
             <p>
-                Finally, we situate these mechanisms within the broader history of complexity. Geerat Vermeij argues that
-                evolution is driven by the maximization of <strong>Power</strong>&mdash;the rate at which a system acquires
-                and applies energy. Life has consistently trended from low-power (anaerobic bacteria) to high-power
-                (endothermic mammals) by internalizing energy production.
+                These mechanisms fit a broader pattern described by Geerat Vermeij, who argues that evolution favors
+                systems that increase <strong>Power</strong> (the rate at which an organism acquires and applies energy).
+                Life has repeatedly moved from low-power forms such as anaerobic bacteria to high-power ones such as
+                endothermic mammals by internalizing energy production.
             </p>
 
             <p>
-                We observe the same trend in AI. The shift from Zero-Shot to Chain-of-Thought is a shift from low-metabolism
-                to high-metabolism architectures. But Vermeij notes a crucial constraint:
+                AI architectures follow a similar trajectory: moving from Zero-Shot prompting to Chain-of-Thought
+                shifts execution from low-metabolism to high-metabolism. Vermeij points out the accompanying constraint:
             </p>
 
             <blockquote>
@@ -721,10 +721,9 @@ flowchart LR
             </blockquote>
 
             <p>
-                The Operon framework is not merely a safety feature&mdash;it is the necessary evolutionary adaptation that
-                enables high-power cognition to function without collapsing into incoherent noise. The MIPS, Epiplexity,
-                and Morphogen systems are the "vascularization" of software&mdash;the infrastructure required for
-                sustainable metabolic intensity.
+                In this view, Operon provides the structural constraints required to run high-metabolism agent loops
+                reliably. MIPS, Epiplexity, and Morphogen Gradients act as the software analogue of vascularization,
+                supplying the regulatory plumbing needed to sustain high compute intensity.
             </p>
 
             <h2>7. What's New in v0.11</h2>
@@ -765,15 +764,14 @@ flowchart LR
 
             <p>
                 Operon v0.11 completes the homeostatic loop. Where v0.10 introduced self-healing (Chaperone Loop, Autophagy),
-                v0.11 adds the sensory apparatus: Epiplexity to detect stagnation, Innate Immunity for fast defense, and
-                Morphogen Gradients for emergent coordination.
+                v0.11 adds the sensory and coordination layers: Epiplexity to detect stagnation, Innate Immunity for fast
+                pattern defense, and Morphogen Gradients for decentralized coordination.
             </p>
 
             <p>
-                These aren't arbitrary features&mdash;they're the biological mechanisms that enable high-power systems
-                to maintain stability. As agents become more capable (higher metabolic rate), they require proportionally
-                more sophisticated homeostatic infrastructure. The Vermeij Trend applies to software: power without
-                integrity leads to collapse.
+                Together, these mechanisms provide the homeostatic infrastructure higher-metabolism agent architectures
+                need. As agents run longer loops and consume more tokens, their regulatory machinery has to scale with
+                their metabolic rate.
             </p>
 
             <p>

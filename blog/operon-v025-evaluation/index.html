@@ -229,7 +229,7 @@
         <article>
             <header>
                 <h1>Operon v0.25: The Compile&ndash;Decompile Loop</h1>
-                <p class="subtitle">Why comparing agent frameworks requires a round-trip through structure, and what Scion taught us about isolation</p>
+                <p class="subtitle">Comparing agent frameworks via a compile&ndash;decompile round-trip, and how Scion handles container isolation</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -240,40 +240,40 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    The multi-agent ecosystem now has at least six serious orchestration
-                    frameworks &mdash; <a href="https://github.com/kyegomez/swarms">Swarms</a>,
+                    The multi-agent ecosystem now includes at least six orchestration
+                    frameworks (<a href="https://github.com/kyegomez/swarms">Swarms</a>,
                     <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>,
                     <a href="https://github.com/xuiltul/animaworks">AnimaWorks</a>,
                     <a href="https://github.com/mikeyobrien/ralph-orchestrator">Ralph</a>,
                     <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a>, and
-                    <a href="https://github.com/GoogleCloudPlatform/scion">Scion</a> &mdash;
-                    each with different coordination philosophies. Operon v0.25 introduces an
-                    evaluation harness that answers a question none of them can answer on
-                    their own: does structural guidance actually reduce risk? The key mechanism
-                    is a compile&ndash;decompile round-trip: compile an Operon organism into
-                    any framework&rsquo;s native config, parse it back through an adapter into
-                    a source-agnostic intermediate representation, then apply epistemic bounds
-                    as a structural linter. This post explains why that loop matters, what the
-                    evaluation results show, and what Google&rsquo;s Scion project reveals
-                    about the future of agent isolation.
+                    <a href="https://github.com/GoogleCloudPlatform/scion">Scion</a>),
+                    each built around a different coordination model. Operon v0.25 adds
+                    an evaluation harness to test whether structural guidance reduces risk
+                    across them. It works through a compile&ndash;decompile round-trip:
+                    compile an Operon organism into a framework&rsquo;s native config,
+                    parse that config back through an adapter into a source-agnostic
+                    intermediate representation, and run Operon&rsquo;s epistemic bounds
+                    on the result. Below are the round-trip mechanics, the synthetic and
+                    live evaluation results, and how Google&rsquo;s Scion fits in through
+                    container-level isolation.
                 </p>
             </div>
 
-            <h2>1. The Round-Trip That Makes Comparison Possible</h2>
+            <h2>1. The Compile&ndash;Decompile Round-Trip</h2>
 
             <p>
-                If you want to compare agent frameworks, you need a common language. Not a
-                common API &mdash; the frameworks are too different for that &mdash; but a
-                common <em>structural representation</em> that captures what matters:
-                how many agents, how they communicate, and what topology they form.
+                Comparing agent frameworks requires a shared representation. Their APIs
+                are too different to unify directly, so the common ground has to be
+                <em>structural</em>: how many agents exist, how they communicate, and
+                what topology they form.
             </p>
 
             <p>
-                Operon v0.24 introduced <code>ExternalTopology</code>: a frozen dataclass
-                that any framework&rsquo;s config can be parsed into. v0.25 closes the loop
-                by adding four <strong>compilers</strong> that go the other direction: from
+                Operon v0.24 introduced <code>ExternalTopology</code>, a frozen dataclass
+                that any framework&rsquo;s config can be parsed into. v0.25 adds four
+                <strong>compilers</strong> going in the opposite direction, from
                 Operon&rsquo;s internal representation <em>out</em> to each framework&rsquo;s
-                native format. This creates a bidirectional bridge:
+                native format, forming a bidirectional pipeline:
             </p>
 
             <div class="diagram">
@@ -290,41 +290,39 @@ RunMetrics        (success probability, token cost, latency, interventions)</pre
             </div>
 
             <p>
-                The compile step is lossy by design &mdash; each framework has different
-                expressivity. A Swarms <code>SequentialWorkflow</code> doesn&rsquo;t
-                know about cognitive modes. A Ralph hat config doesn&rsquo;t preserve
-                timeout values. A DeerFlow session collapses all stages into a
-                flat skill list. That&rsquo;s fine. The point isn&rsquo;t to preserve
-                every detail; it&rsquo;s to produce a config that each framework
-                would actually accept, then measure what structural properties
-                survive the round-trip.
+                Compilation is lossy because each framework exposes different
+                primitives. A Swarms <code>SequentialWorkflow</code> has no concept
+                of cognitive modes, a Ralph hat config drops timeout values, and a
+                DeerFlow session flattens stages into a skill list. The goal is to
+                emit a valid native config for each target and measure which
+                structural properties survive the round-trip.
             </p>
 
             <p>
-                The decompile step parses that native config back through the
-                same adapter that handles real framework configs. This means the
-                analysis pipeline doesn&rsquo;t know or care whether it&rsquo;s
-                looking at a config that came from Operon or one that was written
-                by hand in Swarms. Same code path, same epistemic bounds, same
-                risk scoring.
+                The decompile step feeds that native config back through the same
+                adapter used for handwritten framework configs. Because both inputs
+                take the same code path, the analysis pipeline applies identical
+                epistemic bounds and risk scoring whether a config was generated by
+                Operon or written directly in Swarms.
             </p>
 
             <div class="insight">
-                <p class="insight-title">Why This Matters</p>
+                <p class="insight-title">What the Round-Trip Measures</p>
                 <p>
-                    The round-trip turns a subjective question (&ldquo;which framework
-                    is better?&rdquo;) into a structural one (&ldquo;which framework
-                    preserves more topology information, and does that reduce the
-                    risk score?&rdquo;). The answer is measurable and reproducible.
+                    Instead of asking subjectively which framework is better, the
+                    round-trip lets us test which framework preserves more topology
+                    information and whether that lowers the risk score. Both questions
+                    have measurable, reproducible answers.
                 </p>
             </div>
 
-            <h2>2. Four Compilers, Five Adapters</h2>
+            <h2>2. Compilers and Adapters</h2>
 
             <p>
-                Each compiler is a pure function: <code>SkillOrganism &rarr; dict</code>.
-                No framework imports. No side effects. The output is a plain, JSON-serializable
-                dictionary that matches what each framework expects as input.
+                Each compiler is a pure function (<code>SkillOrganism &rarr; dict</code>)
+                with no framework imports and no side effects. It returns a plain,
+                JSON-serializable dictionary matching what the target framework expects
+                as input.
             </p>
 
             <table>
@@ -463,27 +461,26 @@ print(f"Risk score: {result.risk_score:.2f}")</code></pre>
             </ol>
 
             <p>
-                The noise is controlled: each task-config pair gets a deterministic
-                RNG seeded with <code>SHA-256(seed:task_id:config_id)</code>. Same seed,
-                same results. The harness produces ranking tables, per-config aggregate
-                metrics with Wilson 95% confidence intervals, and structural variation
-                summaries.
+                Noise is deterministic: each task-config pair gets an RNG seeded with
+                <code>SHA-256(seed:task_id:config_id)</code>, so identical seeds produce
+                identical results. The harness outputs ranking tables, per-config
+                aggregate metrics with Wilson 95% confidence intervals, and structural
+                variation summaries.
             </p>
 
             <div class="insight">
                 <p class="insight-title">What the Live Evaluation Found</p>
                 <p>
-                    We ran the evaluation with real LLM providers: Gemini&nbsp;2.0&nbsp;Flash
+                    We ran the evaluation against real LLM providers: Gemini&nbsp;2.0&nbsp;Flash
                     (API), Claude&nbsp;Code (CLI), and Codex (CLI). Guided multi-stage
                     pipelines showed a consistent <strong>+6.2% quality improvement</strong>
-                    over unguided configurations. Single-agent CLI execution showed
-                    no effect &mdash; confirming that structural guidance helps when
-                    there is topology to guide, and has no effect on single-node
-                    topologies. The compile&rarr;decompile round-trip revealed where
-                    structural information gets lost: guidance affects stage mode
-                    assignment before compilation, but external compilers discard
-                    that information, producing identical topologies for guided
-                    and unguided configs.
+                    over unguided configurations, while single-agent CLI execution showed
+                    no effect, confirming that structural guidance only applies when there
+                    is a multi-node topology to shape. The compile&rarr;decompile round-trip
+                    also showed where structural information is lost: guidance sets stage
+                    mode assignments before compilation, and external compilers discard
+                    that metadata, producing identical topologies for guided and unguided
+                    configs.
                 </p>
             </div>
 
@@ -563,61 +560,60 @@ print(f"Risk score: {result.risk_score:.2f}")</code></pre>
             </table>
 
             <p>
-                <strong>Guidance effect:</strong> Gemini and Claude both show
-                <strong>+6.2%</strong> quality improvement with guidance. Codex shows
-                no difference &mdash; expected, since CLI providers run as single-agent
-                (guidance affects multi-stage topology, not single-node execution).
+                <strong>Guidance effect.</strong> Gemini and Claude both gained
+                <strong>+6.2%</strong> in quality with guidance, while Codex showed
+                no difference because CLI providers execute as a single agent where
+                multi-stage topology changes do not apply.
             </p>
 
             <p>
-                <strong>Cross-provider differences are larger than guidance effects.</strong>
-                Codex scored highest quality (0.625) despite being the simplest topology.
-                Gemini was fastest (12.7s). Claude produced the best single result
-                (1.00 on guided translation) but was slowest (24&ndash;27s). The choice of
-                LLM matters more than the topology configuration for simple tasks &mdash;
-                but for complex multi-stage pipelines, structural guidance provides a
+                <strong>Provider choice outweighs topology on simple tasks.</strong>
+                Codex reached the highest average quality (0.625) with the simplest
+                topology, Gemini was fastest (12.7s), and Claude produced the top
+                single-task score (1.00 on guided translation) while taking the
+                longest (24&ndash;27s). On simple tasks the choice of model dominates,
+                whereas on multi-stage pipelines structural guidance provides a
                 consistent quality floor.
             </p>
 
             <p>
-                <strong>Risk scores reflect real topology differences.</strong>
-                CLI providers get risk&nbsp;=&nbsp;0.050 (single agent, minimal topology).
-                Gemini multi-stage pipelines get risk&nbsp;=&nbsp;0.170 (2-stage sequential
-                with error amplification). The risk score correctly identifies that
-                multi-stage pipelines have more structural risk than single-agent execution.
+                <strong>Risk scores track topology structure.</strong>
+                Single-agent CLI runs receive risk&nbsp;=&nbsp;0.050, while
+                Gemini&rsquo;s 2-stage sequential pipelines receive risk&nbsp;=&nbsp;0.170
+                due to sequential error amplification. The score reflects the higher
+                structural risk of multi-stage execution compared to a single node.
             </p>
 
             <h3>Credit Assignment</h3>
 
             <p>
-                Beyond aggregate risk, the harness includes credit assignment: for each
-                run, it attributes outcomes to individual stage contributions. Which
-                stage drove the risk score up? Which one reduced it? This lets you
-                identify structural bottlenecks &mdash; the single agent in a pipeline
-                whose error amplification dominates the topology&rsquo;s risk profile.
+                Beyond aggregate risk, the harness performs credit assignment,
+                attributing run outcomes to individual stage contributions. Breaking
+                the risk score down by stage makes structural bottlenecks visible,
+                pinpointing the single agent whose error amplification dominates the
+                topology&rsquo;s risk profile.
             </p>
 
-            <h2>4. What Scion Reveals About Isolation</h2>
+            <h2>4. Scion and Container Isolation</h2>
 
             <p>
                 Google&rsquo;s <a href="https://github.com/GoogleCloudPlatform/scion">Scion</a>
-                is the newest entrant in this space, and it approaches multi-agent
-                orchestration from a fundamentally different angle. Where Swarms and
-                DeerFlow focus on in-process coordination, Scion starts with
+                takes a different starting point from in-process orchestrators like
+                Swarms and DeerFlow. Its primary primitive is
                 <strong>container isolation</strong>: each agent runs in its own Docker
-                container with its own git worktree and isolated credentials.
+                container with a dedicated git worktree and isolated credentials.
             </p>
 
             <p>
                 Scion&rsquo;s <a href="https://googlecloudplatform.github.io/scion/philosophy/">philosophy</a>
-                is &ldquo;less is more&rdquo; &mdash; fewer agents, maximum isolation per agent,
-                minimal shared state. This is a direct contrast to the Swarms approach of
-                orchestrating dozens of lightweight agents in a single process. Both are
-                valid; they optimize for different failure modes.
+                is &ldquo;less is more&rdquo;: fewer agents, strict per-agent isolation,
+                and minimal shared state. That sits at the opposite end of the design
+                space from Swarms, which orchestrates dozens of lightweight agents inside
+                one process. Each design optimizes for a different failure mode.
             </p>
 
             <div class="comparison">
-                <p class="comparison-title">Scion vs. Swarms: Two Philosophies</p>
+                <p class="comparison-title">Scion vs. Swarms</p>
                 <table style="margin:8px 0 0 0;">
                     <tr>
                         <th>Dimension</th>
@@ -653,12 +649,13 @@ print(f"Risk score: {result.risk_score:.2f}")</code></pre>
             </div>
 
             <p>
-                The Scion compiler in Operon (<code>organism_to_scion()</code>) produces
-                a &ldquo;grove&rdquo; config: each stage becomes a containerized agent
-                with <code>git_worktree: true</code> and <code>credentials: "isolated"</code>.
-                A dedicated <code>operon-watcher</code> agent is automatically injected
-                for telemetry monitoring and convergence detection. The watcher is the
-                only agent with shared credentials &mdash; it needs to observe all others.
+                Operon&rsquo;s Scion compiler (<code>organism_to_scion()</code>) emits
+                a &ldquo;grove&rdquo; config in which each stage becomes a containerized
+                agent with <code>git_worktree: true</code> and
+                <code>credentials: "isolated"</code>. It also injects a dedicated
+                <code>operon-watcher</code> agent for telemetry monitoring and
+                convergence detection; the watcher is the only agent given shared
+                credentials, since it has to observe the rest of the grove.
             </p>
 
 <pre><code># Scion compilation
@@ -683,81 +680,78 @@ grove = organism_to_scion(organism, runtime="docker")
 #   "isolation": {"git_worktree": False, "credentials": "shared"}
 # }</code></pre>
 
-            <h3>The Scion Trade-Off in Numbers</h3>
+            <h3>Combining Isolation with Structural Analysis</h3>
 
             <p>
-                When the evaluation harness compares &ldquo;Scion unguided&rdquo; (config 6)
-                against &ldquo;Scion + Operon&rdquo; (config 7), it measures whether
-                adding Operon&rsquo;s structural guidance on top of Scion&rsquo;s
-                container isolation produces measurably different risk profiles. The
-                two address orthogonal concerns:
+                Comparing &ldquo;Scion unguided&rdquo; (config 6) against
+                &ldquo;Scion + Operon&rdquo; (config 7) tests whether structural
+                guidance changes the risk profile on top of container isolation. The
+                two layers cover orthogonal failure modes:
             </p>
 
             <ul>
-                <li><strong>Scion alone</strong> provides runtime isolation &mdash; one agent&rsquo;s crash or credential leak doesn&rsquo;t propagate</li>
-                <li><strong>Operon on top</strong> provides structural analysis &mdash; error amplification, sequential penalty, and topology mismatch warnings detected before deployment</li>
+                <li><strong>Scion alone</strong> provides runtime isolation, so one agent&rsquo;s crash or credential leak cannot propagate to another.</li>
+                <li><strong>Operon on top</strong> adds static structural analysis, catching error amplification, sequential penalties, and topology mismatches before deployment.</li>
             </ul>
 
             <p>
-                These are complementary, not competing. A topology with a 6.4x error
-                amplification bound is dangerous whether its agents run in Docker
-                containers or not. Container isolation prevents <em>runtime</em> cascades;
-                structural analysis prevents <em>logical</em> cascades. You want both.
+                A topology with a 6.4x error amplification bound will still compound
+                mistakes across stages even when every agent sits in its own Docker
+                container. Container isolation contains <em>runtime</em> cascades,
+                while structural analysis flags <em>logical</em> cascades before the
+                run starts.
             </p>
 
-            <h2>5. Implications for the Agent Orchestration Ecosystem</h2>
+            <h2>5. Practical Implications</h2>
 
             <h3>Framework authors get a free structural linter</h3>
 
             <p>
-                Writing an adapter is a single parse function. Once your framework can
-                produce an <code>ExternalTopology</code>, you get error amplification
-                bounds, sequential penalty estimates, tool density scores, and topology
-                recommendations &mdash; all computed from Operon&rsquo;s epistemic layer,
-                with no changes to your own code.
+                Writing an adapter requires a single parse function. Once a framework
+                emits an <code>ExternalTopology</code>, Operon&rsquo;s epistemic layer
+                computes error amplification bounds, sequential penalty estimates, tool
+                density scores, and topology recommendations with no changes to the
+                framework itself.
             </p>
 
             <h3>Template exchange becomes framework-portable</h3>
 
             <p>
-                A coordination pattern discovered in Swarms can be imported into Operon&rsquo;s
-                <code>PatternLibrary</code>, scored against historical run records, and
-                re-exported as a DeerFlow session, a Ralph hat config, or a Scion grove.
-                The pattern travels; the framework binding doesn&rsquo;t.
+                A coordination pattern discovered in Swarms can be imported into
+                Operon&rsquo;s <code>PatternLibrary</code>, scored against historical
+                run records, and re-exported as a DeerFlow session, a Ralph hat config,
+                or a Scion grove without tying the pattern to its original runtime.
             </p>
 
             <h3>Evaluation becomes apples-to-apples</h3>
 
             <p>
-                The compile&ndash;decompile loop means every framework is evaluated against
-                the same structural analysis pipeline. The risk score doesn&rsquo;t
-                depend on which framework compiled the config &mdash; it depends on the
-                topology that emerged from the compilation. Framework A might produce
-                a deeper chain than Framework B for the same task; the risk score will
-                reflect that structural difference, not an implementation preference.
+                Because every framework passes through the same compile&ndash;decompile
+                pipeline, its risk score depends purely on the topology its compiler
+                produces. If Framework A emits a deeper sequential chain than
+                Framework B for the same task, the higher risk score reflects that
+                chain depth directly.
             </p>
 
             <h3>The &ldquo;less is more&rdquo; hypothesis is testable</h3>
 
             <p>
-                Scion argues that fewer, more isolated agents are better. The Swarms
-                ecosystem argues that many lightweight agents enable richer coordination.
-                With the evaluation harness, this is no longer a philosophical debate.
-                Compile the same 20 tasks through both, decompile, analyze, compare risk
-                scores. The structural properties are measurable; the trade-offs are
-                quantifiable.
+                Scion favors a few heavily isolated agents, while Swarms favors many
+                lightweight ones. With the evaluation harness, you can compile the same
+                20 tasks through both targets, decompile the outputs, and compare the
+                resulting risk scores directly rather than arguing the trade-off in the
+                abstract.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Deeper Point</p>
+                <p class="insight-title">Orchestrators as Compilers</p>
                 <p>
-                    Agent orchestration frameworks are not applications &mdash; they are
-                    <em>compilers</em>. They take a task description and produce a
-                    coordination topology. Operon treats them that way: the four compilers
-                    formalize the &ldquo;code generation&rdquo; step, the six adapters
-                    formalize the &ldquo;decompilation&rdquo; step, and the analysis
-                    pipeline is the type checker. The evaluation harness is a benchmark
-                    suite that tests the compiler&rsquo;s output quality.
+                    It helps to treat agent orchestration frameworks as compilers that
+                    map a task specification to a coordination topology. Under that
+                    view, Operon&rsquo;s four compilers handle code generation, its six
+                    adapters handle decompilation, the analysis pipeline acts as a type
+                    checker, and the evaluation harness serves as the benchmark suite
+                    for the generated output.
                 </p>
             </div>
 
@@ -770,7 +764,7 @@ grove = organism_to_scion(organism, runtime="docker")
 
             <ul>
                 <li>
-                    <strong><code>PromptOptimizer</code></strong> &mdash; a
+                    <strong><code>PromptOptimizer</code>:</strong> a
                     <code>@runtime_checkable Protocol</code> for prompt-level tuning.
                     The reference implementation (<code>NoOpOptimizer</code>) is a
                     pass-through; <code>EvolutionaryOptimizer</code> defines the
@@ -779,7 +773,7 @@ grove = organism_to_scion(organism, runtime="docker")
                     stages of an organism.
                 </li>
                 <li>
-                    <strong><code>WorkflowGenerator</code></strong> &mdash; a protocol
+                    <strong><code>WorkflowGenerator</code>:</strong> a protocol
                     for natural-language-to-topology generation. <code>HeuristicGenerator</code>
                     provides rule-based workflow construction as a baseline;
                     <code>ReasoningGenerator</code> defines the protocol for LLM-powered
@@ -789,14 +783,13 @@ grove = organism_to_scion(organism, runtime="docker")
             </ul>
 
             <p>
-                These are deliberately defined as Protocols rather than abstract base
-                classes. Any object with the right method signatures satisfies the
-                contract &mdash; no inheritance required. This means DSPy optimizers,
-                LangChain generators, or custom implementations can plug in without
-                importing Operon.
+                Both interfaces are defined as Python Protocols rather than abstract
+                base classes, so any object with matching method signatures satisfies
+                the contract without inheritance. DSPy optimizers, LangChain
+                generators, or custom classes can plug in without importing Operon.
             </p>
 
-            <h2>7. The Numbers</h2>
+            <h2>7. Release Summary</h2>
 
             <table>
                 <tr>
@@ -870,10 +863,10 @@ python examples/105_prompt_optimization_interface.py
 python examples/106_workflow_generation_interface.py</code></pre>
 
             <p>
-                The mock evaluation harness (example 104) requires no API keys &mdash;
-                it uses structural analysis to derive synthetic metrics. The live evaluation
-                (example 107) runs real LLM calls through Gemini API, Claude CLI, and
-                Codex CLI with LLM-as-judge quality scoring.
+                The mock evaluation harness (example 104) requires no API keys and
+                derives synthetic metrics purely from structural analysis. The live
+                evaluation (example 107) runs real LLM calls through the Gemini API,
+                Claude CLI, and Codex CLI with LLM-as-judge quality scoring.
             </p>
 
             <p>

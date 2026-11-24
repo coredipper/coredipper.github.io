@@ -219,7 +219,7 @@
         <article>
             <header>
                 <h1>Operon v0.24: Why Your Agent Framework Needs a Structural Linter</h1>
-                <p class="subtitle">Five-layer convergence architecture, TLA+ verification, and what it means for Swarms, DeerFlow, and the rest</p>
+                <p class="subtitle">A source-agnostic IR for five agent frameworks, four TLA+ protocol specs, and co-design convergence</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -230,76 +230,71 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    The agent orchestration ecosystem has fractured into dozens of
-                    incompatible frameworks &mdash; <a href="https://github.com/kyegomez/swarms">Swarms</a>,
+                    Multi-agent orchestration is split across incompatible frameworks
+                    (<a href="https://github.com/kyegomez/swarms">Swarms</a>,
                     <a href="https://github.com/bytedance/deer-flow">DeerFlow</a>,
                     <a href="https://github.com/Anima-Lab/AnimaWorks">AnimaWorks</a>,
                     <a href="https://github.com/aimbase/ralph">Ralph</a>,
-                    <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a> &mdash;
-                    each making different coordination choices. But they all share the
-                    same structural failure modes: error amplification in deep chains,
-                    sequential handoff overhead, tool-density coordination tax. What if
-                    you could analyze any agent topology for these risks before deploying
-                    it, regardless of which framework built it? That is what v0.24
-                    delivers: a universal structural linter for agent systems, backed by
-                    four TLA+ formal specifications.
+                    <a href="https://github.com/A-EVO-Lab/a-evolve">A-Evolve</a>,
+                    among others), each with its own coordination primitives. Beneath
+                    those APIs, they share the same structural failure modes: error
+                    amplification in deep chains, sequential handoff overhead, and
+                    tool-density coordination tax. Operon v0.24 introduces a
+                    source-agnostic structural linter that checks any framework&rsquo;s
+                    agent topology for these risks before deployment, alongside four
+                    TLA+ formal specifications for its coordination protocols.
                 </p>
             </div>
 
-            <h2>1. The Problem: Framework Fragmentation</h2>
+            <h2>1. Framework Fragmentation</h2>
 
             <p>
                 The <a href="https://arxiv.org/abs/2503.13657">ACG survey</a> catalogs over forty
-                distinct multi-agent coordination methods. Each reinvents the same
-                set of coordination patterns &mdash; supervisor hierarchies, sequential
-                pipelines, parallel fan-out &mdash; with different names, different
-                APIs, and different failure characteristics. There is no shared
-                vocabulary for the structural properties that determine whether a
-                given agent topology will amplify errors or incur unnecessary
-                overhead.
+                multi-agent coordination methods. Most reinvent the same underlying
+                patterns (supervisor hierarchies, sequential pipelines, parallel
+                fan-out) under incompatible names, APIs, and failure modes, leaving
+                no shared vocabulary for judging whether a topology will amplify
+                errors or accumulate coordination overhead.
             </p>
 
             <p>
-                This matters because, as Evans et al. argue in their work on
-                collective intelligence, intelligence is plural: different
-                problem shapes call for different coordination patterns. We need
-                interoperation between frameworks, not a winner-take-all
-                consolidation. But interoperation requires a shared structural
-                language &mdash; something that describes what a topology <em>is</em>,
-                independent of which framework instantiated it.
+                As Evans et al. argue in their work on collective intelligence,
+                different problem shapes call for different coordination patterns,
+                so expecting a single framework to replace the rest is unrealistic.
+                Interoperation is more practical, and it requires a shared structural
+                language that describes a topology independently of whichever
+                framework instantiated it.
             </p>
 
             <p>
-                The practical consequence is that framework authors are flying
-                blind. A Swarms <code>HierarchicalSwarm</code> with eight agents
-                and a deep delegation chain may have an error amplification bound
-                of 6.4x, but you would never know it until it failed in
-                production. A DeerFlow <code>LangGraph</code> session with twelve
-                sequential handoffs may spend 40% of its wall-clock time on
-                coordination overhead, but the framework has no way to warn you.
-                These are structural properties &mdash; they follow from the
-                topology itself, not from the prompts or models.
+                Without that shared layer, teams discover topology bugs only after
+                deployment. A Swarms <code>HierarchicalSwarm</code> with eight agents
+                in a deep delegation chain can carry a 6.4x error amplification bound
+                with no warning before production. A DeerFlow <code>LangGraph</code>
+                session with twelve sequential handoffs can spend 40% of its
+                wall-clock time on coordination overhead while the runtime reports
+                nothing amiss. Both outcomes follow directly from the graph structure,
+                regardless of the prompts or models inside each node.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Core Claim</p>
+                <p class="insight-title">Static Topology Checks</p>
                 <p>
-                    Structural failure modes &mdash; error amplification,
-                    sequential penalty, tool-density tax &mdash; are properties of
-                    the agent <em>topology</em>, not the agent <em>implementation</em>.
-                    They can be detected statically, before any LLM call is made.
+                    Error amplification, sequential penalty, and tool-density tax
+                    are properties of the coordination graph itself. Because they
+                    depend on topology rather than runtime behavior, they can be
+                    checked statically before making a single LLM call.
                 </p>
             </div>
 
-            <h2>2. The Solution: ExternalTopology as Universal IR</h2>
+            <h2>2. ExternalTopology as a Shared IR</h2>
 
             <p>
-                Operon v0.24 introduces <code>ExternalTopology</code>: a single
-                frozen dataclass that any agent framework&rsquo;s configuration
-                can be parsed into. It captures the minimal structural information
-                needed for analysis &mdash; agent names, roles, directed edges,
-                and metadata &mdash; without importing anything from the source
-                framework.
+                Operon v0.24 introduces <code>ExternalTopology</code>, a frozen
+                dataclass that any framework&rsquo;s configuration can be parsed into.
+                It holds only the structural data needed for analysis (agent names,
+                roles, directed edges, and metadata) and imports nothing from the
+                source framework.
             </p>
 
 <pre>
@@ -313,21 +308,20 @@ class ExternalTopology:
 </pre>
 
             <p>
-                The key function is <code>analyze_external_topology()</code>. It
-                takes any <code>ExternalTopology</code> and applies Operon&rsquo;s
-                four epistemic theorems as a structural linter:
+                The main entry point is <code>analyze_external_topology()</code>,
+                which takes any <code>ExternalTopology</code> and applies
+                Operon&rsquo;s four epistemic theorems as a structural linter:
             </p>
 
             <ol>
-                <li><strong>Error amplification bound</strong> &mdash; how badly can errors cascade through the topology?</li>
-                <li><strong>Sequential penalty</strong> &mdash; how much wall-clock time is lost to handoff coordination?</li>
-                <li><strong>Tool density</strong> &mdash; is the planning cost ratio manageable?</li>
-                <li><strong>Topology classification</strong> &mdash; does the external topology match Operon&rsquo;s recommendation for the detected task shape?</li>
+                <li><strong>Error amplification bound:</strong> upper bound on how far errors can compound across the topology.</li>
+                <li><strong>Sequential penalty:</strong> estimated wall-clock overhead introduced by sequential handoffs.</li>
+                <li><strong>Tool density:</strong> planning-cost ratio across the assigned tool set.</li>
+                <li><strong>Topology classification:</strong> comparison between the parsed topology and Operon&rsquo;s recommendation for the detected task shape.</li>
             </ol>
 
             <p>
-                Here is what it looks like in practice, analyzing a Swarms
-                <code>HierarchicalSwarm</code>:
+                For example, analyzing a Swarms <code>HierarchicalSwarm</code>:
             </p>
 
 <pre>
@@ -363,19 +357,19 @@ print(f"Template: {result.suggested_template}")   # ready for PatternLibrary</co
 </pre>
 
             <p>
-                The output is an <code>AdapterResult</code> containing a composite
-                risk score, a list of structural warnings, Operon&rsquo;s topology
-                recommendation, and a <code>PatternTemplate</code> that can be
-                registered directly in a <code>PatternLibrary</code> for reuse.
-                Zero coupling: the adapter never imports the <code>swarms</code>
-                package. It operates entirely on dicts and tuples.
+                The call returns an <code>AdapterResult</code> with a composite
+                risk score, structural warnings, a topology recommendation, and a
+                <code>PatternTemplate</code> ready to register in a
+                <code>PatternLibrary</code>. Because the adapter works exclusively
+                on dicts and tuples, it never imports the <code>swarms</code>
+                package.
             </p>
 
-            <h2>3. Five Frameworks, One Abstraction</h2>
+            <h2>3. Five Framework Adapters</h2>
 
             <p>
-                v0.24 ships adapters for five distinct agent orchestration
-                frameworks, each representing a different coordination paradigm:
+                v0.24 ships adapters for five agent orchestration frameworks, each
+                built around a different coordination model:
             </p>
 
             <table>
@@ -430,12 +424,12 @@ print(f"Template: {result.suggested_template}")   # ready for PatternLibrary</co
             </p>
 
             <p>
-                The adapters also provide source-specific converters &mdash;
-                <code>swarm_to_template()</code>, <code>deerflow_to_template()</code>,
+                Each adapter also includes a source-specific converter
+                (<code>swarm_to_template()</code>, <code>deerflow_to_template()</code>,
                 <code>ralph_to_template()</code>, <code>animaworks_to_template()</code>,
-                <code>aevolve_to_template()</code> &mdash; that produce richer
-                <code>PatternTemplate</code> objects with framework-specific metadata
-                preserved. These templates can be registered in a
+                <code>aevolve_to_template()</code>) that builds a
+                <code>PatternTemplate</code> while preserving framework-specific
+                metadata. Those templates can be registered in a
                 <code>PatternLibrary</code> and exchanged between organisms using
                 the social learning protocol.
             </p>
@@ -443,67 +437,64 @@ print(f"Template: {result.suggested_template}")   # ready for PatternLibrary</co
             <h2>4. Formal Verification: TLA+ for Agent Systems</h2>
 
             <p>
-                Structural linting catches topology-level risks. But there are
-                deeper coordination properties that static analysis cannot reach:
-                does template exchange always respect developmental stage
-                requirements? Can a critical period accidentally reopen? Will a
-                non-converging organism always be halted? These are questions
-                about all possible interleavings of concurrent operations &mdash;
-                and they require formal verification.
+                Static linting catches topology-level risks, while concurrency
+                properties require checking across execution histories: whether
+                template exchange always respects developmental stage requirements,
+                whether a closed critical period can ever reopen, and whether a
+                non-converging organism is guaranteed to halt. Answering those
+                questions across every possible interleaving of concurrent actions
+                requires formal verification.
             </p>
 
             <h3>What is TLA+?</h3>
 
             <p>
                 TLA+ (Temporal Logic of Actions) is Leslie Lamport&rsquo;s
-                specification language for modeling concurrent and distributed
-                systems. It lets you describe a system as a state machine &mdash;
-                an initial state plus a set of actions that transition between
-                states &mdash; and then state invariants and temporal properties
-                that should hold across all reachable states. The TLC model
-                checker exhaustively explores every possible state to verify these
-                properties.
+                specification language for concurrent and distributed systems. You
+                model a system as a state machine (an initial state and a set of
+                transition actions) and specify invariants and temporal properties
+                that must hold over all reachable states. The TLC model checker then
+                exhaustively explores the state space to verify those properties.
             </p>
 
             <p>
-                TLA+ is not an academic curiosity. Amazon uses it to verify
+                It is used in production systems where concurrency bugs are costly:
+                Amazon uses TLA+ for
                 <a href="https://lamport.azurewebsites.net/tla/amazon-excerpt.html">AWS
-                infrastructure protocols</a>. Microsoft uses it for Azure Cosmos DB&rsquo;s
-                consistency guarantees. MongoDB uses it for their replication
-                protocol. These are organizations that discovered, the hard way,
-                that testing concurrent systems is insufficient &mdash; bugs that
-                depend on specific interleavings of operations will slip through
-                any finite test suite.
+                infrastructure protocols</a>, Microsoft for Azure Cosmos DB&rsquo;s
+                consistency guarantees, and MongoDB for its replication protocol.
+                Finite test suites only cover the interleavings you happen to write
+                tests for, so subtle timing-dependent bugs slip past them.
             </p>
 
-            <h3>Why it matters for agent systems</h3>
+            <h3>Concurrency in agent coordination</h3>
 
             <p>
-                Agent orchestration <em>is</em> a distributed systems problem.
-                When organism A imports a template from organism B, that is a
-                distributed state update involving trust scoring, stage
-                verification, and library modification. When a watcher checks
-                convergence while stages are still running, that is a concurrent
-                safety check. When A-Evolve&rsquo;s evolution loop accepts a
-                mutation while another organism is reading the workspace, that is
-                a classic read-write concurrency scenario.
+                Multi-agent orchestration involves the same concurrency hazards as
+                any distributed system. Importing a template from organism B into
+                organism A couples trust scoring, stage verification, and library
+                updates into a shared state transition. A watcher checking
+                convergence while stages are still executing performs a concurrent
+                safety check, and A-Evolve accepting a mutation while another
+                organism reads the workspace creates a standard read-write race.
             </p>
 
             <p>
-                Testing catches bugs in the interleavings your tests happen to
-                exercise. TLA+ catches bugs in <em>all</em> interleavings &mdash;
-                including the ones that only manifest when three organisms
-                simultaneously attempt template exchange while one of them is
-                mid-stage-advance. Those are the bugs that make multi-agent
-                systems fail in production in ways nobody can reproduce.
+                Unit and integration tests exercise whichever action orders you
+                thought to script, whereas TLC checks every interleaving within
+                the model bounds, including cases where three organisms attempt
+                template exchange while one advances a developmental stage. Those
+                rare orderings are usually the ones behind irreproducible failures
+                in production.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Verification Thesis</p>
+                <p class="insight-title">Protocol-Level Verification</p>
                 <p>
-                    Agent orchestration protocols have the same concurrency
-                    characteristics as distributed databases and cloud
-                    infrastructure. They deserve the same verification rigor.
+                    Agent orchestration protocols share the concurrency failure
+                    modes of distributed databases and cloud infrastructure, so
+                    checking them with the same model-checking tools catches
+                    protocol flaws before they reach code.
                 </p>
             </div>
 
@@ -528,11 +519,10 @@ print(f"Template: {result.suggested_template}")   # ready for PatternLibrary</co
                 <p style="margin-top: 12px;">
                     <strong>Safety invariant S1 (TemplateAdoptionSafety):</strong>
                     An adopted template&rsquo;s minimum stage requirement never exceeds
-                    the adopter&rsquo;s current developmental stage. In plain English:
-                    an organism in the JUVENILE stage can never accidentally import a
-                    template that requires MATURE capabilities &mdash; no matter what
-                    sequence of exports, imports, and stage advances other organisms
-                    perform concurrently.
+                    the adopter&rsquo;s current developmental stage. An organism in the
+                    JUVENILE stage cannot import a template requiring MATURE capabilities
+                    under any concurrent sequence of exports, imports, and stage advances
+                    by other organisms.
                 </p>
                 <p style="margin-top: 8px;">
                     <strong>Safety invariant S2 (TrustMonotonicity):</strong>
@@ -562,17 +552,17 @@ Import(org, peer) ==
                     <code>operon_ai/state/development.py</code>. Organisms consume
                     telomere capacity over time, advancing through four stages
                     (EMBRYONIC, JUVENILE, ADOLESCENT, MATURE). Critical periods
-                    open and close permanently. The analogy is neurodevelopmental
-                    critical periods &mdash; windows of maximal plasticity for
-                    language acquisition or imprinting.
+                    open and close permanently, mirroring neurodevelopmental
+                    critical periods (bounded windows of high plasticity for
+                    language acquisition or imprinting).
                 </p>
                 <p style="margin-top: 12px;">
                     <strong>Safety invariant S2 (CriticalPeriodIrreversibility):</strong>
-                    Once a critical period is closed, it never reopens. Periods only
-                    advance: pending to open to closed, never backwards. Once an
-                    organism closes its &ldquo;rapid learning&rdquo; window, no
-                    sequence of events &mdash; no concurrent ticks, no scaffolding
-                    from other organisms, no tool acquisitions &mdash; can reopen it.
+                    Once a critical period closes, it never reopens; periods only
+                    move forward from pending to open to closed. After an organism
+                    closes its &ldquo;rapid learning&rdquo; window, no combination
+                    of concurrent ticks, scaffolding from peers, or tool acquisitions
+                    can reopen it.
                 </p>
                 <p style="margin-top: 8px;">
                     <strong>Safety invariant S3 (StageMonotonicity):</strong>
@@ -601,10 +591,9 @@ Import(org, peer) ==
                 <p style="margin-top: 8px;">
                     <strong>Liveness property (BoundedNonConvergence):</strong>
                     If an organism&rsquo;s intervention rate exceeds the threshold,
-                    it <em>will</em> be stopped &mdash; no matter what other agents
-                    are doing concurrently. Non-convergence detection is bounded:
-                    the system cannot remain in a state where the rate exceeds the
-                    threshold without halting.
+                    it is eventually halted regardless of what other agents do
+                    concurrently. The system cannot remain indefinitely in a state
+                    above the threshold without halting.
                 </p>
             </div>
 
@@ -628,60 +617,54 @@ Import(org, peer) ==
                 </p>
                 <p style="margin-top: 8px;">
                     <strong>Safety invariant S2 (GateBeforeDeploy):</strong>
-                    Workspace versions only advance through the gate &mdash; never
-                    jump or decrement. Every version increment is preceded by a
-                    fitness check. No mutation reaches the workspace without
-                    passing the gate.
+                    Workspace versions only increment by passing through the gate,
+                    never jumping ahead or decrementing. Every version change is
+                    preceded by a fitness check, so unvalidated mutations cannot
+                    reach the workspace.
                 </p>
             </div>
 
             <h3>How TLC model checking works</h3>
 
             <p>
-                TLC, the TLA+ model checker, works by exhaustive state
-                exploration. You define a small model &mdash; say, 2 organisms,
-                3 templates, 5 telomere units &mdash; and TLC explores every
-                reachable state from the initial configuration. For the
-                TemplateExchangeProtocol with 2 organisms and 3 templates, this
-                means exploring every possible interleaving of Export, Import,
-                RecordOutcome, and StageAdvance actions across both organisms.
+                TLC works by exhaustive state exploration. Given a finite model
+                (for example, 2 organisms, 3 templates, and 5 telomere units), it
+                visits every state reachable from the initial configuration. For
+                TemplateExchangeProtocol with 2 organisms and 3 templates, that
+                covers every interleaving of Export, Import, RecordOutcome, and
+                StageAdvance actions across both organisms.
             </p>
 
             <p>
-                If any reachable state violates a safety invariant, TLC produces
-                a counterexample trace: the exact sequence of actions that leads
-                to the violation. This is invaluable for debugging &mdash; it
-                tells you not just that something can go wrong, but exactly
-                <em>how</em>.
+                Whenever a reachable state violates an invariant, TLC outputs a
+                counterexample trace showing the exact sequence of actions that
+                triggered the failure, which makes protocol bugs much easier to
+                diagnose and fix.
             </p>
 
             <p>
-                Operon&rsquo;s four specs pass TLC on their configured small
-                models. All safety invariants and temporal properties hold for
-                every reachable state in the explored state space.
+                All four Operon specs pass TLC on their configured finite models,
+                with every safety invariant and temporal property holding across
+                all explored states.
             </p>
 
             <h3>The gap between model and reality</h3>
 
             <p>
-                Honesty demands a caveat. TLA+ proves properties of the
-                <em>model</em>, not the implementation. The model abstracts away
-                timing, network failures, floating-point precision, and Python&rsquo;s
-                GIL. The TemplateExchangeProtocol spec models trust as a real
-                number in [0, 1]; the implementation uses IEEE 754 doubles. The
-                ConvergenceDetection spec models intervention rate as exact
-                rational division; the implementation uses floating-point
-                comparison.
+                TLA+ verifies the <em>model</em> rather than the Python
+                implementation. The specs abstract away wall-clock timing, network
+                failures, floating-point precision, and Python&rsquo;s GIL.
+                TemplateExchangeProtocol models trust as a real number in [0, 1],
+                whereas the implementation uses IEEE 754 doubles;
+                ConvergenceDetection models intervention rate as exact rational
+                division, whereas the code uses floating-point comparisons.
             </p>
 
             <p>
-                But these abstractions are deliberate and documented. TLA+ catches
-                design-level bugs &mdash; the kind that emerge from incorrect
-                protocol logic, missing guards, or unanticipated action
-                interleavings. These are exactly the bugs that make multi-agent
-                systems fail in ways that testing never reproduces, because the
-                failure requires a specific interleaving of concurrent operations
-                across multiple organisms.
+                Those abstractions are deliberate and documented. Model checking
+                targets protocol-level defects: missing guards, broken state
+                transitions, and unexpected interleavings across concurrent
+                organisms that finite tests rarely trigger.
             </p>
 
             <blockquote>
@@ -695,20 +678,19 @@ Import(org, peer) ==
             <h2>5. Co-Design Convergence: Does the Adaptive Loop Stabilize?</h2>
 
             <p>
-                The five adapters raise a composition question: when you chain
-                them together in an adaptive assembly loop &mdash; run a topology,
-                score its performance, select a better template, repeat &mdash;
-                does the loop converge? Or does it oscillate forever between
-                configurations?
+                Chaining the five adapters inside an adaptive assembly loop
+                (run a topology, score its performance, select a better template,
+                repeat) raises a composition question: does the loop converge, or
+                can it oscillate indefinitely between configurations?
             </p>
 
             <p>
-                This is where Zardini&rsquo;s co-design theory from ETH Zurich
-                becomes directly applicable. In the co-design framework, each
-                adapter is a <em>design problem</em> (DP): a monotone map from a
-                resource poset (inputs, constraints) to a functionality poset
-                (outputs, capabilities). Monotonicity means: more resources yield
-                at least as many functionalities.
+                Zardini&rsquo;s co-design theory from ETH Zurich applies directly
+                here. In the co-design framework, each adapter is a
+                <em>design problem</em> (DP): a monotone map from a resource poset
+                (inputs, constraints) to a functionality poset (outputs,
+                capabilities), where monotonicity means more resources yield at
+                least as many functionalities.
             </p>
 
 <pre>
@@ -759,86 +741,84 @@ print(f"Final risk: {final_state['risk']}")</code>
             </p>
 
             <div class="insight">
-                <p class="insight-title">Why This Matters</p>
+                <p class="insight-title">Preventing Oscillation</p>
                 <p>
-                    Without convergence guarantees, an adaptive assembly loop
-                    can oscillate indefinitely &mdash; template A scores better
-                    than B in context X, but B scores better in context Y, and
-                    switching templates changes the context. Co-design theory
-                    provides the mathematical scaffolding to prove this does not
-                    happen when the scoring function is well-behaved.
+                    Without a convergence guarantee, an adaptive assembly loop
+                    can cycle indefinitely: template A scores higher than B in
+                    context X, B scores higher in context Y, and switching
+                    templates flips the context. Co-design theory gives the
+                    conditions under which a monotone, bounded scoring function
+                    avoids that cycle.
                 </p>
             </div>
 
-            <h2>6. What This Means for Framework Authors</h2>
+            <h2>6. Integrating with External Frameworks</h2>
 
             <p>
-                If you are building an agent framework, Operon can serve as your
-                structural linter. The integration model is deliberately
-                lightweight:
+                If you are building an agent framework, Operon can serve as a
+                structural linter with a lightweight integration boundary:
             </p>
 
             <ul>
                 <li>
-                    <strong>Zero coupling.</strong> Adapters operate on dicts and
-                    tuples. They never import your framework. You never import
-                    Operon at runtime. The boundary is a serialization format.
+                    <strong>No runtime coupling:</strong> Adapters take plain
+                    dicts and tuples across a serialization boundary, so Operon
+                    never imports your framework and your framework never has to
+                    import Operon at runtime.
                 </li>
                 <li>
-                    <strong>Free structural analysis.</strong> Parse your
-                    framework&rsquo;s config into an <code>ExternalTopology</code>,
-                    call <code>analyze_external_topology()</code>, and you get
-                    error amplification bounds, sequential penalty estimates, tool
-                    density ratios, and topology recommendations. These are
-                    properties your users care about but your framework probably
-                    does not compute.
+                    <strong>Static analysis out of the box:</strong> Parsing a
+                    config into an <code>ExternalTopology</code> and passing it
+                    to <code>analyze_external_topology()</code> yields error
+                    amplification bounds, sequential penalty estimates, tool
+                    density ratios, and topology recommendations without
+                    building that analysis yourself.
                 </li>
                 <li>
-                    <strong>Template exchange.</strong> The
-                    <code>PatternTemplate</code> objects produced by adapters are
-                    interoperable. A template extracted from a Swarms workflow can
-                    be registered in a <code>PatternLibrary</code> and offered to
-                    organisms running DeerFlow sessions. Cross-framework
-                    collaboration patterns become possible.
+                    <strong>Portable templates:</strong> Because every adapter
+                    emits standard <code>PatternTemplate</code> objects, a
+                    template extracted from a Swarms workflow can be registered
+                    in a <code>PatternLibrary</code> and reused by organisms
+                    running DeerFlow sessions.
                 </li>
                 <li>
-                    <strong>Extensibility.</strong> The <code>ExternalTopology</code>
-                    abstraction is intentionally minimal. Adding an adapter for a
-                    new framework is approximately 100 lines of parsing code: extract
-                    agent names, roles, and edges from your config format. The
-                    analysis pipeline is source-agnostic.
+                    <strong>Small adapter surface:</strong>
+                    <code>ExternalTopology</code> only needs agent names, roles,
+                    and directed edges, so adding support for another framework
+                    takes roughly 100 lines of parsing code on top of the same
+                    source-agnostic analyzer.
                 </li>
             </ul>
 
             <p>
-                The convergence adapters also provide catalog-seeding functions
-                &mdash; <code>seed_library_from_swarms()</code>,
+                The convergence adapters also include catalog-seeding functions
+                (<code>seed_library_from_swarms()</code>,
                 <code>seed_library_from_deerflow()</code>,
-                <code>seed_library_from_ralph()</code> &mdash; that populate a
+                <code>seed_library_from_ralph()</code>) that populate a
                 <code>PatternLibrary</code> with pre-analyzed templates from each
-                framework&rsquo;s standard workflow patterns. These are ready to
-                use as starting points for the adaptive assembly loop.
+                framework&rsquo;s standard workflow patterns, giving the adaptive
+                assembly loop a baseline catalog to start from.
             </p>
 
-            <h2>7. What&rsquo;s Next</h2>
+            <h2>7. Roadmap</h2>
 
             <p>
                 v0.24 completes the convergence adapter layer (phases C1 through
-                C4). The roadmap continues:
+                C4). The next phases cover:
             </p>
 
             <ul>
                 <li>
-                    <strong>C5: Compilers.</strong> Reverse the flow &mdash;
-                    compile Operon organisms back into Swarms, DeerFlow, and Ralph
-                    configurations. <code>organism_to_swarms()</code>,
-                    <code>organism_to_deerflow()</code>,
-                    <code>organism_to_ralph()</code>. Currently in design.
+                    <strong>C5: Compilers.</strong> Reverse the direction by
+                    compiling Operon organisms back into Swarms, DeerFlow, and
+                    Ralph configurations via <code>organism_to_swarms()</code>,
+                    <code>organism_to_deerflow()</code>, and
+                    <code>organism_to_ralph()</code> (currently in design).
                 </li>
                 <li>
                     <strong>C6: Cross-target evaluation.</strong> Run the same
                     organism blueprint against A-Evolve benchmarks across all five
-                    frameworks. Compare structural predictions against empirical
+                    frameworks and compare structural predictions against empirical
                     performance.
                 </li>
                 <li>
@@ -858,22 +838,20 @@ print(f"Final risk: {final_state['risk']}")</code>
             <h2>8. Closing</h2>
 
             <p>
-                The agent ecosystem does not need one framework to win. It needs
-                a shared structural language for reasoning about agent
-                coordination &mdash; what Operon calls the &ldquo;structural
-                layer.&rdquo; v0.24 is a concrete step toward that goal: five
-                adapters proving that one abstraction works across graph-based,
-                event-driven, and evolutionary paradigms. Four TLA+ specifications
-                proving that the coordination protocols are safe under all
-                interleavings. And a co-design convergence theorem proving that
-                the adaptive assembly loop stabilizes.
+                Rather than consolidating on a single orchestration framework,
+                multi-agent systems benefit from a shared structural layer for
+                analyzing coordination graphs. v0.24 puts three pieces of that
+                layer in place: five adapters showing that one IR covers
+                graph-based, event-driven, and evolutionary frameworks; four TLA+
+                specifications verifying protocol safety across concurrent
+                interleavings; and a co-design convergence formulation bounding
+                the adaptive assembly loop.
             </p>
 
             <p>
-                The structural linter is free, the adapters are zero-coupling,
-                and the formal specs are open. If your framework coordinates
-                agents, Operon can tell you what will go wrong before you deploy
-                it.
+                The structural linter, zero-coupling adapters, and TLA+ specs are
+                all open source and ready to run against any framework&rsquo;s
+                workflow configuration before deployment.
             </p>
 
             <blockquote>

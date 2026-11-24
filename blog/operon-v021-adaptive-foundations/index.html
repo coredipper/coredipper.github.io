@@ -205,7 +205,7 @@
         <article>
             <header>
                 <h1>Operon v0.21: Adaptive Foundations</h1>
-                <p class="subtitle">Pattern Repository, Watcher Component, Adaptive Assembly, and the Experience Pool That Learns from Its Own Interventions</p>
+                <p class="subtitle">Pattern Repository, Watcher Component, Adaptive Assembly, and an Intervention Experience Pool</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -216,20 +216,19 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.19 gave Operon temporal epistemics. v0.20 wired it into the
-                    runtime. v0.21 adds the other missing piece: the ability to learn
-                    from experience and intervene when things go wrong. The theoretical
-                    backbone comes from Dupoux, LeCun, and Malik&rsquo;s
-                    &ldquo;Why AI Systems Don&rsquo;t Learn&rdquo; (arXiv:2603.15381),
-                    which proposes a three-system cognitive architecture &mdash;
-                    System&nbsp;A (observation), System&nbsp;B (action), System&nbsp;M
-                    (meta-control) &mdash; and an evolutionary-developmental framework
-                    for bootstrapping them. This release maps those ideas onto Operon:
-                    a <code>PatternLibrary</code> as evolutionary memory, a
-                    <code>WatcherComponent</code> as System&nbsp;M, and the run-loop
-                    intervention mechanism as the meta-action surface. Together they
-                    form the static scaffolding for Phase&nbsp;4&rsquo;s dynamic
-                    assembly &mdash; the point where Operon starts choosing its own
+                    After adding temporal epistemics in v0.19 and wiring them into the
+                    runtime in v0.20, v0.21 gives Operon the ability to learn from past
+                    runs and intervene when execution degrades. The design draws on
+                    Dupoux, LeCun, and Malik&rsquo;s &ldquo;Why AI Systems Don&rsquo;t
+                    Learn&rdquo; (arXiv:2603.15381), which proposes a three-system
+                    cognitive architecture (System&nbsp;A for observation, System&nbsp;B
+                    for action, and System&nbsp;M for meta-control) bootstrapped through
+                    an evolutionary-developmental loop. This release maps those pieces
+                    onto Operon: <code>PatternLibrary</code> serves as evolutionary
+                    memory, <code>WatcherComponent</code> implements System&nbsp;M, and
+                    run-loop interventions form the meta-action surface. Together they
+                    provide the scaffolding for Phase&nbsp;4&rsquo;s dynamic assembly
+                    (completed in v0.21.1), where Operon starts choosing its own
                     structure.
                 </p>
             </div>
@@ -237,171 +236,158 @@
             <h2>1. What Was Missing</h2>
 
             <p>
-                After v0.20, Operon could build explicit multi-stage workflows, attach
-                telemetry, and maintain auditable bi-temporal state. What it could not
-                do was remember which workflow shapes worked for which kinds of tasks,
-                or detect and recover from runtime degradation without manual
-                intervention.
+                After v0.20, Operon could run explicit multi-stage workflows, attach
+                telemetry, and maintain auditable bi-temporal state. It still could not
+                remember which workflow shapes succeeded on which kinds of tasks, or
+                detect and recover from runtime degradation without manual oversight.
             </p>
 
             <p>
-                In biological terms: the organism had structure and memory, but no
-                immune response and no evolutionary selection. A cell that cannot
-                detect stagnation and cannot learn from prior infections is fragile
-                in exactly the ways that matter for production agent systems.
+                In biological terms, the organism had structure and memory, but neither
+                an immune response nor evolutionary selection. A cell that cannot spot
+                stagnation or retain lessons from past failures breaks down quickly
+                under production conditions.
             </p>
 
             <h2>2. Why AI Systems Don&rsquo;t Learn</h2>
 
             <p>
-                The theoretical grounding for v0.21 comes from a March 2026 paper by
-                Emmanuel Dupoux (EHESS / Meta FAIR), Yann LeCun (NYU / Meta FAIR),
-                and Jitendra Malik (UC Berkeley / Meta FAIR):
+                The theoretical basis for v0.21 is a March 2026 paper by Emmanuel
+                Dupoux (EHESS / Meta FAIR), Yann LeCun (NYU / Meta FAIR), and Jitendra
+                Malik (UC Berkeley / Meta FAIR):
                 <a href="https://arxiv.org/abs/2603.15381">&ldquo;Why AI Systems
                 Don&rsquo;t Learn and What to Do About It: Lessons on Autonomous
                 Learning from Cognitive Science.&rdquo;</a>
-                The paper argues that the dominant paradigm &mdash; hyperscaling
-                text-based LLMs &mdash; is hitting structural limits that no amount
-                of data or compute will resolve. The core problem is not model size.
-                It is that deployed AI systems are <em>static</em>: they cease to
-                learn the moment training ends, and every adaptation requires human
-                intervention.
+                They argue that hyperscaling text-based LLMs runs into structural
+                limits that additional data and compute alone will not resolve.
+                Deployed AI systems are <em>static</em>: learning stops the moment
+                training ends, and every subsequent adaptation depends on human
+                engineers.
             </p>
 
             <h3>Three Roadblocks</h3>
 
             <p>
-                The paper identifies three structural roadblocks that prevent current
-                AI from achieving autonomous learning:
+                The paper identifies three structural obstacles to autonomous learning
+                in current AI systems:
             </p>
 
             <ol>
                 <li><strong>Conceptual fragmentation.</strong> Observation-based
-                    learning (self-supervised learning on text, images, video) and
+                    learning (self-supervised learning on text, images, and video) and
                     action-based learning (reinforcement learning through trial and
-                    error) are treated as separate paradigms with separate data
-                    pipelines, separate training recipes, and separate research
-                    communities. In biological organisms, these are not siloed &mdash;
-                    they are deeply integrated from birth.</li>
-                <li><strong>Externalization of learning.</strong> The entire MLOps
-                    pipeline &mdash; data sourcing, curation, loss function design,
-                    training recipe orchestration, performance benchmarking, signal
-                    monitoring &mdash; is outsourced to human experts. The model
-                    itself does none of this. Once deployed, it is a fixed function.
-                    In contrast, biological organisms continuously adapt their own
-                    learning processes without external supervision.</li>
-                <li><strong>No scalable construction method.</strong> Even if you
-                    design a multi-component learning architecture, there is no
-                    established method for bootstrapping it. The components depend on
-                    each other &mdash; the meta-controller needs experience from the
-                    learners, but the learners need the meta-controller to guide their
-                    learning. This chicken-and-egg problem has no clean solution in
-                    current AI practice.</li>
+                    error) live in separate pipelines, training recipes, and research
+                    communities. Biological organisms integrate both from birth.</li>
+                <li><strong>Externalization of learning.</strong> Human experts handle
+                    the entire MLOps loop (data sourcing, curation, loss design,
+                    training orchestration, benchmarking, and monitoring). Once
+                    deployed, the model behaves as a fixed function, whereas biological
+                    organisms regulate their own learning continuously without outside
+                    supervision.</li>
+                <li><strong>No scalable construction method.</strong> Bootstrapping a
+                    multi-component learning architecture runs into a circular
+                    dependency: the meta-controller needs experience generated by the
+                    learners, while the learners need the meta-controller to guide
+                    their updates. Current AI practice lacks a standard way to break
+                    this cycle.</li>
             </ol>
 
             <h3>System A: Learning from Observation</h3>
 
             <p>
-                System&nbsp;A corresponds to passive, statistical learning from
-                sensory streams. In cognitive science, this is the infant accumulating
-                visual and auditory regularities &mdash; learning to discriminate
-                faces, recognize phonetic boundaries, and form intuitive models of
-                physics, all without being told what to look for. In AI, the closest
-                analogue is self-supervised learning (SSL): models trained on large
-                corpora of text, images, or video to predict masked inputs,
-                reconstruct corrupted signals, or match augmented views.
+                System&nbsp;A covers passive statistical learning from sensory streams.
+                In cognitive science, this is the infant picking up visual and auditory
+                regularities (discriminating faces, locating phonetic boundaries, and
+                building intuitive physics) without explicit instruction. In AI, the
+                closest analogue is self-supervised learning (SSL), where models trained
+                on large corpora of text, images, or video predict masked inputs,
+                reconstruct corrupted signals, or align augmented views.
             </p>
 
             <p>
-                System&nbsp;A scales beautifully with data. It discovers abstract,
-                hierarchical representations that transfer well to downstream tasks.
-                But it has two fundamental limitations: it cannot actively curate its
-                own training signal (it learns from whatever data humans provide),
-                and it struggles to distinguish correlation from causation (observing
-                that umbrellas correlate with rain does not teach you that rain causes
-                umbrellas to appear).
+                System&nbsp;A scales well with data and learns abstract, hierarchical
+                representations that transfer across downstream tasks. Its two main
+                limits are that it cannot curate its own training signal (it consumes
+                whatever data humans supply) and that it struggles to separate
+                correlation from causation: noticing that umbrellas appear during rain
+                does not establish which causes which.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Operon Mapping: System A &rarr; Fast Nucleus</p>
                 <p>
                     In Operon, System&nbsp;A maps to <code>fast_nucleus</code> stages
-                    (<code>mode=&quot;fixed&quot;</code>). These are cheap, statistical,
-                    pattern-matching stages &mdash; routing, classification, extraction.
-                    They process input efficiently but do not reason deeply or pursue
-                    goals. They are the organism&rsquo;s perceptual layer.
+                    (<code>mode=&quot;fixed&quot;</code>): cheap pattern-matching steps
+                    such as routing, classification, and extraction. They act as the
+                    organism&rsquo;s perceptual layer, processing input quickly without
+                    extended deliberation or goal pursuit.
                 </p>
             </div>
 
             <h3>System B: Learning from Action</h3>
 
             <p>
-                System&nbsp;B corresponds to active, goal-directed learning through
-                interaction with the environment. In cognitive science, this is the
-                toddler learning to walk &mdash; trying, falling, adjusting motor
-                commands based on consequences. In AI, the closest analogue is
-                reinforcement learning (RL): agents that learn policies by maximizing
-                reward signals through trial and error.
+                System&nbsp;B is active, goal-directed learning through interaction
+                with an environment, like a toddler learning to walk by trying,
+                falling, and adjusting motor commands in response to feedback. Its
+                nearest counterpart in AI is reinforcement learning (RL), where agents
+                learn policies by maximizing reward through trial and error.
             </p>
 
             <p>
-                System&nbsp;B is grounded in interaction. It can discover novel
-                solutions that no amount of passive observation would reveal. But it
-                is notoriously sample-inefficient, struggles with high-dimensional
-                action spaces, and requires well-specified reward functions &mdash;
-                which are often the hardest part of the problem to define.
+                Because System&nbsp;B is grounded in interaction, it can find solutions
+                that passive observation misses. The trade-off is high sample
+                complexity, difficulty scaling to large action spaces, and reliance on
+                well-specified reward functions, which are often the hardest part of
+                a problem to formulate.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Operon Mapping: System B &rarr; Deep Nucleus</p>
                 <p>
                     In Operon, System&nbsp;B maps to <code>deep_nucleus</code> stages
-                    (<code>mode=&quot;fuzzy&quot;</code>). These are expensive,
-                    reasoning-heavy stages &mdash; planning, synthesis, evaluation.
-                    They pursue goals, weigh trade-offs, and produce outputs that
-                    require genuine deliberation. They are the organism&rsquo;s
-                    executive layer.
+                    (<code>mode=&quot;fuzzy&quot;</code>) that handle planning,
+                    synthesis, and evaluation. This is the organism&rsquo;s executive
+                    layer: slower and more expensive, reserved for weighing trade-offs
+                    and pursuing open-ended goals.
                 </p>
             </div>
 
-            <h3>The Synergy: A Helps B, B Helps A</h3>
+            <h3>How A and B Interact</h3>
 
             <p>
-                The paper&rsquo;s key insight is that neither system is sufficient
-                alone. They must be deeply integrated:
+                Neither system is sufficient on its own; each supplies what the other
+                lacks:
             </p>
 
             <ul>
-                <li><strong>A helps B</strong> by providing compressed
-                    representations (so the RL agent doesn&rsquo;t operate on raw
-                    pixels), predictive world models (so the agent can plan rather
-                    than blindly explore), and intrinsic reward signals (prediction
-                    error, novelty, uncertainty) that guide exploration.</li>
-                <li><strong>B helps A</strong> by actively selecting informative
-                    data for the SSL model to learn from (directing attention to
-                    complex or uncertain stimuli) and by generating rich, grounded,
-                    task-relevant experience through its own goal-directed behavior.</li>
+                <li><strong>A helps B</strong> by supplying compressed
+                    representations (keeping the RL agent off raw pixels), predictive
+                    world models for planning, and intrinsic reward signals such as
+                    prediction error, novelty, and uncertainty to steer exploration.</li>
+                <li><strong>B helps A</strong> by selecting informative inputs for
+                    self-supervised learning (directing attention toward complex or
+                    uncertain stimuli) and generating grounded, task-relevant experience
+                    through goal-directed behavior.</li>
             </ul>
 
             <p>
-                In Operon, this synergy is the <code>SkillOrganism</code> run loop
-                itself. Fast stages produce routing signals, classifications, and
-                summaries that deep stages consume. Deep stages produce rich outputs
-                that inform subsequent fast stages. The organism composes cheap
-                perception and expensive deliberation into a single coherent
-                workflow &mdash; the same integration the paper argues is essential.
+                In Operon, the <code>SkillOrganism</code> run loop provides this
+                coupling. Fast stages produce routing signals, classifications, and
+                summaries for deep stages, and deep stages produce outputs that shape
+                subsequent fast stages, combining cheap perception and expensive
+                deliberation in a single workflow.
             </p>
 
             <h3>System M: The Meta-Controller</h3>
 
             <p>
-                This is the paper&rsquo;s central proposal. System&nbsp;M is an
-                autonomous meta-controller &mdash; analogous to the prefrontal
-                cortex&rsquo;s executive functions or the control plane in
-                software-defined networking &mdash; that orchestrates the learning
-                process itself. It monitors low-dimensional &ldquo;meta-states&rdquo;
-                and issues &ldquo;meta-actions&rdquo; to dynamically route data
-                between System&nbsp;A and System&nbsp;B.
+                The paper&rsquo;s central proposal is System&nbsp;M, an autonomous
+                meta-controller (comparable to executive control in the prefrontal
+                cortex or the control plane in software-defined networking) that
+                orchestrates learning itself. It tracks low-dimensional
+                &ldquo;meta-states&rdquo; and issues &ldquo;meta-actions&rdquo; to
+                route data between System&nbsp;A and System&nbsp;B.
             </p>
 
             <p>
@@ -432,127 +418,115 @@
             </table>
 
             <p>
-                Based on these signals, System&nbsp;M issues meta-actions:
-                connect or disconnect learning modules, switch between operating
-                modes (learning, inference, optimization), provide internal rewards
-                or training targets, and activate or suppress specific data streams.
-                Crucially, the paper hypothesizes that System&nbsp;M&rsquo;s core
-                routing policy is largely <em>hardwired</em> &mdash; shaped by
-                evolution, not learned from scratch during an individual
-                agent&rsquo;s lifetime.
+                From these signals, System&nbsp;M chooses meta-actions: connecting or
+                disconnecting learning modules, switching between operating modes
+                (learning, inference, optimization), supplying internal rewards or
+                training targets, and enabling or suppressing data streams. The paper
+                hypothesizes that System&nbsp;M&rsquo;s core routing policy is largely
+                <em>hardwired</em> by evolution rather than learned from scratch during
+                an individual agent&rsquo;s lifetime.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Operon Mapping: System M &rarr; WatcherComponent</p>
                 <p>
-                    The <code>WatcherComponent</code> is Operon&rsquo;s concrete
+                    <code>WatcherComponent</code> is Operon&rsquo;s concrete
                     instantiation of System&nbsp;M. It monitors
                     <code>EpiplexityMonitor</code> (epistemic),
                     <code>ATP_Store</code> (somatic), and
                     <code>ImmuneSystem</code> (species-specific), then issues
                     meta-actions: <code>RETRY</code>, <code>ESCALATE</code>, or
-                    <code>HALT</code>. Its policy is configured, not learned &mdash;
-                    matching the paper&rsquo;s hypothesis that System&nbsp;M is
-                    hardwired. Phase&nbsp;4&rsquo;s experience pool will add
-                    learned refinement on top of this fixed scaffolding.
+                    <code>HALT</code>. Its base policy is explicitly configured,
+                    mirroring a hardwired System&nbsp;M; the Phase&nbsp;4 experience
+                    pool (covered in &sect;9) adds learned refinement on top of that
+                    fixed policy.
                 </p>
             </div>
 
             <h3>The Evo-Devo Framework</h3>
 
             <p>
-                The paper&rsquo;s third contribution is a strategy for bootstrapping
-                the A-B-M architecture. The chicken-and-egg problem &mdash; M needs
-                experience from A and B, but A and B need M to guide their
-                learning &mdash; is solved by borrowing from biology&rsquo;s own
-                solution: evolution and development operating at two timescales.
-            </p>
-
-            <p>
-                The framework is formalized as bilevel optimization:
+                To bootstrap the A-B-M architecture and break the circular dependency
+                between System&nbsp;M and Systems&nbsp;A and B, the paper separates
+                evolution and development across two timescales, formalized as bilevel
+                optimization:
             </p>
 
             <ul>
-                <li><strong>Inner loop (development):</strong> A single agent
-                    lifetime. The agent&rsquo;s architecture (A, B, M) is initialized
-                    from meta-parameters &phi;. Systems&nbsp;A and B update their
-                    parameters through interaction with the environment, guided by a
-                    <em>fixed</em> System&nbsp;M. This is one &ldquo;life.&rdquo;</li>
-                <li><strong>Outer loop (evolution):</strong> The meta-parameters
-                    &phi; are optimized over many lifetimes using a fitness function
-                    evaluated over entire life cycles in simulated environments. This
-                    is natural selection operating on the genome.</li>
+                <li><strong>Inner loop (development):</strong> During a single
+                    lifetime, the agent&rsquo;s architecture (A, B, M) is initialized
+                    from meta-parameters &phi;. Systems&nbsp;A and B update through
+                    interaction with the environment under a <em>fixed</em>
+                    System&nbsp;M.</li>
+                <li><strong>Outer loop (evolution):</strong> Across many lifetimes,
+                    meta-parameters &phi; are optimized against a fitness function
+                    evaluated over full life cycles in simulated environments, acting
+                    as selection on the genome.</li>
             </ul>
 
             <p>
-                The genome &phi; specifies everything: initial weights for A and B,
-                the routing policy of M, and the developmental curriculum (which
-                environments appear when, how complexity increases over the agent&rsquo;s
-                lifetime). Evolution shapes these biases; development instantiates
-                them.
+                The genome &phi; specifies initial weights for A and B, the routing
+                policy of M, and the developmental curriculum (which environments
+                appear and how task complexity ramps over a lifetime). Evolution tunes
+                those priors; development runs them.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Operon Mapping: Evo-Devo &rarr; PatternLibrary</p>
                 <p>
-                    The <code>PatternLibrary</code> is Operon&rsquo;s evolutionary
-                    memory. A <code>PatternTemplate</code> is the genome &phi; &mdash;
-                    it specifies the topology, stage specs, and intervention policy.
-                    <code>PatternRunRecord</code> instances are fitness evaluations.
-                    The <code>success_rate</code> feeds back into
-                    <code>top_templates_for()</code> scoring, so templates that
-                    consistently succeed rise in the rankings. One organism run is
-                    one &ldquo;lifetime&rdquo;; the library accumulates across
-                    many lifetimes. This is the outer loop.
+                    <code>PatternLibrary</code> serves as Operon&rsquo;s evolutionary
+                    memory, implementing the outer loop. Each
+                    <code>PatternTemplate</code> plays the role of the genome &phi;
+                    (specifying topology, stage specs, and intervention policy), and
+                    each <code>PatternRunRecord</code> is a fitness evaluation. Because
+                    <code>success_rate</code> feeds directly into
+                    <code>top_templates_for()</code>, templates that perform reliably
+                    across many organism runs (&ldquo;lifetimes&rdquo;) rise in the
+                    rankings.
                 </p>
             </div>
 
             <h3>Emergent Cognitive Modes</h3>
 
             <p>
-                The paper argues that even a fixed System&nbsp;M can give rise to
-                sophisticated learning behaviors that are typically associated with
-                large-brained species:
+                The paper argues that even a fixed System&nbsp;M can support
+                learning behaviors typically associated with large-brained species:
             </p>
 
             <ul>
                 <li><strong>Learning through communication.</strong>
                     System&nbsp;M&rsquo;s species-specific signals include attention
                     to pedagogical cues (direct gaze, pointing, infant-directed
-                    speech). This enables a form of social learning: attending
-                    selectively to informative teachers and trusting their signals
-                    proportionally to past reliability. This is epistemic
-                    vigilance &mdash; not blind trust, but calibrated trust.</li>
+                    speech). This enables social learning: attending selectively to
+                    informative teachers and weighting their signals by past
+                    reliability, a form of epistemic vigilance that calibrates trust
+                    to track record.</li>
                 <li><strong>Learning through imagination.</strong>
                     During periods of low external stimulation (sleep, rest),
                     System&nbsp;M can redirect data flow from external sensors to
-                    internal memory. Episodic memories are replayed, consolidated,
-                    and compressed into schemas. The agent can also simulate
-                    counterfactual scenarios &mdash; &ldquo;what would have happened
-                    if I had chosen differently?&rdquo; &mdash; using its world model
-                    from System&nbsp;A.</li>
+                    internal memory so episodic traces are replayed, consolidated,
+                    and compressed into schemas. Using System&nbsp;A&rsquo;s world
+                    model, the agent can also simulate counterfactuals (&ldquo;what
+                    would have happened if I had chosen differently?&rdquo;).</li>
             </ul>
 
             <p>
-                These are not implemented in v0.21. They are on the roadmap for
-                Phase&nbsp;5 (<code>SleepConsolidation</code> cycle,
+                Neither mode is implemented in v0.21; they are slated for
+                Phase&nbsp;5 (<code>SleepConsolidation</code> and
                 <code>counterfactual_replay()</code> over bi-temporal memory) and
-                Phase&nbsp;6 (<code>SocialLearning</code> extension of
-                <code>QuorumSensing</code>). The point is that the static
-                scaffolding &mdash; the hardwired System&nbsp;M policy, the
-                evolutionary template memory &mdash; is what makes those emergent
-                modes structurally possible. You cannot build sleep consolidation
-                without a watcher that knows when to trigger it.
+                Phase&nbsp;6 (<code>SocialLearning</code> on top of
+                <code>QuorumSensing</code>). Both depend on the scaffolding added here
+                (a hardwired System&nbsp;M policy and evolutionary template memory):
+                sleep consolidation requires a watcher that knows when to trigger it.
             </p>
 
             <h2>3. The Pattern Repository</h2>
 
             <p>
-                The <code>PatternLibrary</code> is evolutionary memory for collaboration
-                patterns. It stores <code>PatternTemplate</code> instances &mdash;
-                blueprints describing a topology, stage specifications, and default
-                intervention policies &mdash; and retrieves them by matching against
-                a <code>TaskFingerprint</code>.
+                <code>PatternLibrary</code> stores <code>PatternTemplate</code>
+                instances (blueprints specifying a topology, stage specifications,
+                and default intervention policies) and retrieves them by matching
+                against a <code>TaskFingerprint</code>.
             </p>
 
 <pre><code>from operon_ai import PatternLibrary, PatternTemplate, TaskFingerprint
@@ -604,46 +578,40 @@ ranked = lib.top_templates_for(TaskFingerprint(
             </table>
 
             <p>
-                The success rate component closes the feedback loop: as
-                <code>PatternRunRecord</code> instances accumulate, templates that
-                consistently succeed rise in the rankings, while those that fail
-                sink. This is the evo-devo outer loop described in &sect;2: the
-                template is the genome &phi;; run-record scoring is natural
-                selection.
+                The success-rate term closes the selection loop from &sect;2: as
+                <code>PatternRunRecord</code> entries accumulate, reliable templates
+                climb in score and failing ones drop, mapping template definitions to
+                &phi; and run records to fitness evaluations.
             </p>
 
             <h2>4. The Watcher Component</h2>
 
             <p>
-                The <code>WatcherComponent</code> is a
-                <code>SkillRuntimeComponent</code> that observes stage execution and
-                classifies signals into the three meta-state categories described
-                in &sect;2:
+                <code>WatcherComponent</code> is a <code>SkillRuntimeComponent</code>
+                that observes stage execution and sorts runtime signals into the three
+                meta-state categories from &sect;2:
             </p>
 
             <ol>
-                <li><strong>Epistemic</strong> &mdash; epiplexity and prediction error.
-                    Sourced from <code>EpiplexityMonitor</code>. Low epiplexity means
-                    the agent is repeating itself without learning &mdash; the
-                    stagnation signal.</li>
-                <li><strong>Somatic</strong> &mdash; ATP and metabolic state. Sourced
-                    from <code>ATP_Store</code>. When the budget is nearly exhausted,
-                    the organism is running on fumes.</li>
-                <li><strong>Species-specific</strong> &mdash; immune threats and
-                    membrane alerts. Sourced from <code>ImmuneSystem</code>. A
-                    confirmed or critical threat means the agent&rsquo;s behavior has
-                    diverged from its baseline in a way that looks adversarial.</li>
+                <li><strong>Epistemic:</strong> epiplexity and prediction error from
+                    <code>EpiplexityMonitor</code>. Low epiplexity indicates the agent
+                    is repeating itself without making progress (stagnation).</li>
+                <li><strong>Somatic:</strong> ATP and metabolic state from
+                    <code>ATP_Store</code>, signaling when the budget is nearly
+                    spent.</li>
+                <li><strong>Species-specific:</strong> immune threats and membrane
+                    alerts from <code>ImmuneSystem</code>, flagging confirmed or
+                    critical deviations from baseline that look adversarial.</li>
             </ol>
 
             <div class="insight">
-                <p class="insight-title">Why Three Categories</p>
+                <p class="insight-title">Matching Interventions to Signal Type</p>
                 <p>
-                    The distinction matters because the appropriate intervention depends
-                    on the signal type. Epistemic stagnation calls for escalation to a
-                    more capable model. Somatic depletion calls for conservation or halt.
-                    Immune threats call for immediate quarantine. Collapsing all signals
-                    into a single &ldquo;health score&rdquo; loses the information
-                    needed to choose the right response.
+                    Each category maps to a different response: epistemic stagnation
+                    calls for escalating to a stronger model, somatic depletion calls
+                    for conservation or halting, and immune threats require immediate
+                    quarantine. Collapsing them into a single &ldquo;health score&rdquo;
+                    throws away the signal needed to pick the right action.
                 </p>
             </div>
 
@@ -668,10 +636,9 @@ ranked = lib.top_templates_for(TaskFingerprint(
             </table>
 
             <p>
-                Component hooks are <em>not</em> re-invoked after retry or escalation.
-                This prevents recursive intervention loops: the watcher decided to
-                retry; the retry result stands. The next stage&rsquo;s hooks will
-                fire normally.
+                Component hooks are <em>not</em> re-invoked after a retry or
+                escalation, which prevents recursive intervention loops: the
+                replacement result stands, and hooks fire normally on the next stage.
             </p>
 
 <pre><code>from operon_ai import WatcherComponent, WatcherConfig, skill_organism
@@ -689,81 +656,73 @@ organism = skill_organism(
     components=[watcher, telemetry],
 )</code></pre>
 
-            <h2>6. The BIGMAS Insight: Why Routing Decisions Reveal Failure</h2>
+            <h2>6. Routing Decisions as a Failure Signal (BIGMAS)</h2>
 
             <p>
-                The most interesting intervention is the one that stops the organism
-                entirely. The theoretical grounding comes from a second paper:
+                The halting rule draws on a second March 2026 paper:
                 <a href="https://arxiv.org/abs/2603.15371">&ldquo;Brain-Inspired
                 Graph Multi-Agent Systems for LLM Reasoning&rdquo;</a> by Hao, Dai,
-                Qin, and Yu (Chinese Academy of Sciences, March 2026). The paper
-                proposes BIGMAS &mdash; a multi-agent framework inspired by Global
-                Workspace Theory (GWT) &mdash; and in the process reveals an
-                empirical regularity that turns out to be directly useful for
-                Operon&rsquo;s watcher.
+                Qin, and Yu (Chinese Academy of Sciences). Their framework, BIGMAS,
+                adapts Global Workspace Theory (GWT) to multi-agent reasoning and
+                reports an empirical pattern that translates directly into a stopping
+                condition for Operon&rsquo;s watcher.
             </p>
 
             <h3>Global Workspace Theory in Multi-Agent Systems</h3>
 
             <p>
                 GWT, originally a theory of human consciousness, posits that
-                flexible cognition arises from the dynamic formation of coalitions
-                among distributed specialized processors, coordinated via a shared
-                central workspace. BIGMAS operationalizes this for LLM reasoning:
+                flexible cognition arises from dynamic coalitions of distributed
+                specialized processors coordinated through a central workspace.
+                BIGMAS translates this into three components for LLM reasoning:
             </p>
 
             <ol>
-                <li><strong>Problem-adaptive graph design.</strong> A
-                    <code>GraphDesigner</code> agent analyzes each problem and
-                    autonomously constructs a task-specific directed agent graph
-                    &mdash; nodes are specialized roles (generator, validator,
-                    analyzer, optimizer), edges are information flow. No fixed
-                    topology; the structure adapts to the problem.</li>
-                <li><strong>Centralized workspace.</strong> All agents coordinate
-                    exclusively through a shared workspace with four partitions:
-                    context (read-only problem), work (read-write intermediate
-                    results), system metadata (execution history), and answer
-                    (final output). No point-to-point communication.</li>
-                <li><strong>Global orchestrator.</strong> A routing agent sees
-                    the full workspace state and complete execution history before
-                    deciding which node activates next. This avoids the
-                    partial-information bottleneck of reactive systems like ReAct.</li>
+                <li><strong>Problem-adaptive graph design.</strong> Rather than using
+                    a fixed topology, a <code>GraphDesigner</code> agent inspects each
+                    problem and constructs a task-specific directed graph whose nodes
+                    are specialized roles (generator, validator, analyzer, optimizer)
+                    and whose edges define information flow.</li>
+                <li><strong>Centralized workspace.</strong> Agents communicate only
+                    through a shared workspace with four partitions (read-only problem
+                    context, read-write intermediate work, execution metadata, and
+                    final answer), with no point-to-point messaging.</li>
+                <li><strong>Global orchestrator.</strong> A routing agent reads the
+                    full workspace state and execution history before selecting the
+                    next node, avoiding the partial-information bottleneck of reactive
+                    loops like ReAct.</li>
             </ol>
 
             <div class="insight">
                 <p class="insight-title">Operon Mapping: BIGMAS Architecture</p>
                 <p>
-                    BIGMAS&rsquo;s workspace partitions map directly onto
-                    Operon&rsquo;s three-layer context model: <code>Bctx</code>
-                    (problem context) &rarr; topology layer;
-                    <code>Bwork</code> (intermediate results) &rarr;
-                    <code>shared_state</code> ephemeral layer;
-                    <code>Bsys</code> (execution metadata) &rarr; telemetry +
-                    watcher signals. The orchestrator role maps to the
-                    <code>WatcherComponent</code> &mdash; both make routing
-                    decisions conditioned on global state rather than local
-                    observation.
+                    BIGMAS&rsquo;s workspace partitions align with Operon&rsquo;s
+                    three-layer context model: <code>Bctx</code> (problem context)
+                    maps to the topology layer, <code>Bwork</code> (intermediate
+                    results) to the <code>shared_state</code> ephemeral layer, and
+                    <code>Bsys</code> (execution metadata) to telemetry and watcher
+                    signals. The orchestrator corresponds to
+                    <code>WatcherComponent</code>, since both condition routing
+                    decisions on global state rather than local observation.
                 </p>
             </div>
 
             <h3>The Empirical Finding</h3>
 
             <p>
-                BIGMAS was evaluated across six frontier LLMs (DeepSeek-V3.2,
-                Claude 4.5 Sonnet, Gemini 2.5 Pro, GPT-5) on three combinatorial
-                reasoning benchmarks. The results showed consistent improvements
-                &mdash; even GPT-5 went from 91% to 98% on Tower of London &mdash;
-                and crucially, gains were <em>orthogonal</em> to model-level
-                reasoning enhancements. Applying BIGMAS to LRMs (models with
-                extended chain-of-thought) yielded additional gains on top of the
-                thinking-mode improvements, proving that architectural coordination
-                and individual model capability are complementary.
+                Evaluated across six frontier LLMs (DeepSeek-V3.2, Claude 4.5 Sonnet,
+                Gemini 2.5 Pro, GPT-5) on three combinatorial reasoning benchmarks,
+                BIGMAS improved accuracy consistently (lifting GPT-5 from 91% to 98%
+                on Tower of London), and those gains were <em>orthogonal</em> to
+                model-level reasoning upgrades. Applying BIGMAS to LRMs (models with
+                extended chain-of-thought) added further gains on top of thinking
+                mode, indicating that architectural coordination complements
+                individual model capability.
             </p>
 
             <p>
-                But the most useful finding for Operon was in the routing analysis.
-                The paper measured how many orchestrator routing decisions each run
-                required and found a systematic pattern:
+                For Operon, the most directly useful result came from the routing
+                analysis, which counted how many orchestrator decisions each run took:
             </p>
 
             <table>
@@ -786,64 +745,57 @@ organism = skill_organism(
                 could inform early-stopping mechanisms.
             </p>
 
-            <h3>Operationalizing the Signal</h3>
+            <h3>Implementing the Stopping Rule</h3>
 
             <p>
-                That is exactly what Operon&rsquo;s watcher does. The
-                <code>_check_convergence()</code> method tracks the ratio of
-                cumulative interventions (retries + escalations) to observed stages.
-                When this ratio exceeds <code>max_intervention_rate</code>
-                (default 0.5), the watcher emits a non-convergence HALT. This is
-                approximately 20 lines of code in the decision function, but it
-                encodes the BIGMAS empirical insight: an organism that keeps needing
-                corrections is not converging, and continuing to retry is worse than
-                stopping.
+                Operon&rsquo;s watcher encodes this directly in
+                <code>_check_convergence()</code>, which tracks the ratio of
+                cumulative interventions (retries plus escalations) to observed
+                stages. Once that ratio exceeds <code>max_intervention_rate</code>
+                (default 0.5), the watcher emits a non-convergence HALT. It takes
+                roughly 20 lines in the decision function: an organism that repeatedly
+                needs correction is failing to converge, so stopping early beats
+                burning budget on more retries.
             </p>
 
             <p>
-                The pattern library can then record the failed run, demoting the
-                template for future tasks with similar fingerprints. This closes the
-                loop: BIGMAS provides the signal (routing decisions correlate with
-                failure), the watcher operationalizes it (intervention rate as
-                convergence proxy), and the pattern library learns from it (failed
-                runs lower template scores).
+                Recording the halted run in <code>PatternLibrary</code> then lowers
+                the template&rsquo;s score for future tasks with similar fingerprints,
+                feeding the watcher&rsquo;s non-convergence signal back into template
+                selection.
             </p>
 
-            <h3>What Operon Borrows, What It Doesn&rsquo;t</h3>
+            <h3>Architectural Differences from BIGMAS</h3>
 
             <p>
-                Operon borrows the convergence signal but not the architecture.
-                BIGMAS uses a single centralized workspace with a global orchestrator
-                that sees everything. Operon uses distributed component hooks where
-                the watcher sees stage results sequentially. BIGMAS constructs a
-                fresh graph per problem instance. Operon retrieves templates from a
-                scored library. BIGMAS validates workspace writes with a structured
-                protocol. Operon validates through stage-level type coercion and
-                bi-temporal append-only semantics.
+                Operon adopts the convergence signal while keeping a different runtime
+                architecture. Whereas BIGMAS routes everything through a centralized
+                workspace and a global orchestrator, Operon relies on distributed
+                component hooks where the watcher inspects stage results sequentially.
+                Instead of synthesizing a fresh graph for every problem instance and
+                validating workspace writes through a dedicated protocol, Operon
+                retrieves templates from a scored library and enforces integrity via
+                stage-level type coercion and bi-temporal append-only writes.
             </p>
 
             <p>
-                The architectural differences are deliberate. BIGMAS optimizes for
-                single-problem reasoning depth. Operon optimizes for multi-run
-                pattern learning across many problems. BIGMAS&rsquo;s per-problem
-                graph design is expensive (the paper reports 18-37% of total tokens
-                spent on graph design alone) but appropriate for complex combinatorial
-                problems. Operon&rsquo;s template retrieval is cheap (a dict lookup +
-                scoring function) and appropriate for repeated enterprise workflows
-                where the same topology works across many similar tasks.
+                Those choices reflect different cost trade-offs. BIGMAS optimizes for
+                single-problem reasoning depth; the paper reports 18-37% of total
+                tokens spent on graph design alone, which pays off on hard
+                combinatorial puzzles. Operon optimizes for repeated enterprise
+                workflows where one topology fits many similar tasks, keeping
+                selection cost to a dictionary lookup and scoring pass.
             </p>
 
             <div class="insight">
-                <p class="insight-title">Complementary, Not Competing</p>
+                <p class="insight-title">Adaptation Cost Trade-Off</p>
                 <p>
-                    BIGMAS and Operon sit at different points on the
-                    adaptation-cost spectrum. BIGMAS pays high per-problem cost
-                    for maximum structural adaptation. Operon pays low per-problem
-                    cost by amortizing adaptation across many runs via the pattern
-                    library. A hybrid &mdash; use BIGMAS-style graph design for
-                    novel problems, then register successful graphs as Operon
-                    templates for future retrieval &mdash; is a natural Phase 4
-                    extension.
+                    BIGMAS and Operon occupy different points on the adaptation-cost
+                    spectrum: high per-problem outlay for bespoke structure versus
+                    amortized adaptation across runs via the pattern library. A
+                    natural Phase&nbsp;4 extension is a hybrid that runs BIGMAS-style
+                    graph design on novel tasks and registers the winning graphs as
+                    Operon templates for later reuse.
                 </p>
             </div>
 
@@ -863,21 +815,19 @@ organism = skill_organism(
             </ol>
 
             <p>
-                Higher-priority signals always win. A critical immune threat triggers
-                HALT even if the epiplexity looks fine. This is intentional: the
-                categories are not weighted against each other; they are checked in
-                order of severity.
+                Signals are evaluated lexicographically by severity rather than
+                combined into a weighted score, so a critical immune threat always
+                triggers HALT even when epiplexity looks healthy.
             </p>
 
             <h2>8. Zero Overhead When Not Attached</h2>
 
             <p>
-                Both new components are entirely opt-in. An organism with no
+                Both new components are opt-in. An organism with no
                 <code>WatcherComponent</code> in its <code>components</code> list
-                never checks for intervention keys. The
-                <code>PatternLibrary</code> is a standalone object with no coupling
-                to the run loop. Existing tests (987 from v0.20) pass without
-                modification.
+                never checks for intervention keys, and <code>PatternLibrary</code>
+                is a standalone object with no coupling to the run loop. Existing
+                tests (987 from v0.20) pass without modification.
             </p>
 
             <h2>9. Closing the Loop: Adaptive Assembly (v0.21.1)</h2>
@@ -916,10 +866,11 @@ result = adaptive.run("Prepare a Q4 earnings analysis.")
                 the task if no fingerprint is provided, queries
                 <code>PatternLibrary.top_templates_for()</code> for the best
                 template, and calls <code>assemble_pattern()</code> to dispatch
-                on topology &mdash; <code>skill_organism</code>,
+                on topology (<code>skill_organism</code>,
                 <code>reviewer_gate</code>, <code>specialist_swarm</code>, or
-                <code>single_worker</code>. A <code>WatcherComponent</code> and
-                <code>TelemetryProbe</code> are automatically attached.
+                <code>single_worker</code>), attaching a
+                <code>WatcherComponent</code> and <code>TelemetryProbe</code>
+                automatically.
             </p>
 
             <h3>Experience Pool</h3>
@@ -936,25 +887,23 @@ result = adaptive.run("Prepare a Q4 earnings analysis.")
             </p>
 
             <p>
-                Rule-based decisions always take priority. Experience is a fallback.
-                This ensures backward compatibility &mdash; an empty experience
-                pool changes nothing &mdash; while allowing the watcher to learn
-                from operational history.
+                Rule-based decisions always take priority, with the experience pool
+                acting as a fallback. An empty pool leaves behavior unchanged for
+                backward compatibility, while accumulated runs let the watcher draw
+                on operational history.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Evo-Devo Inner Loop, Realized</p>
+                <p class="insight-title">Lamarckian Refinement Over the Evo-Devo Loop</p>
                 <p>
-                    One organism run is one developmental lifetime. The library&rsquo;s
-                    scoring across many lifetimes is evolutionary selection. Templates
-                    that consistently succeed rise in the rankings; those that fail
-                    sink. The experience pool adds Lamarckian refinement on top:
-                    not just which templates work, but which interventions work
-                    within those templates. This is the progression the roadmap
-                    describes: <strong>structure &rarr; memory &rarr;
-                    adaptation</strong>. v0.17&ndash;0.18 gave explicit structure.
-                    v0.19&ndash;0.20 gave auditable memory. v0.21 delivers
-                    adaptation.
+                    Each organism run is one developmental lifetime, and library
+                    scoring across runs acts as evolutionary selection over templates.
+                    The experience pool adds a Lamarckian layer on top, tracking which
+                    interventions succeed within those templates. Together, the
+                    releases follow the roadmap progression of
+                    <strong>structure &rarr; memory &rarr; adaptation</strong>:
+                    explicit structure in v0.17&ndash;0.18, auditable memory in
+                    v0.19&ndash;0.20, and runtime adaptation in v0.21.
                 </p>
             </div>
 
@@ -1009,36 +958,32 @@ result = adaptive.run("Prepare a Q4 earnings analysis.")
             <h2>11. What Comes Next</h2>
 
             <p>
-                v0.21 delivers both the scaffolding (v0.21.0) and the adaptive
-                loop (v0.21.1). With patterns stored, scored, and automatically
-                assembled, and with interventions learned from operational history,
-                the next phases build the cognitive extensions that Dupoux, LeCun,
-                and Malik predict will emerge from a working System&nbsp;M.
+                v0.21 ships both the scaffolding (v0.21.0) and the adaptive loop
+                (v0.21.1). With patterns stored, scored, and assembled automatically,
+                and interventions refined from operational history, the next phases
+                target the cognitive extensions Dupoux, LeCun, and Malik describe for
+                a working System&nbsp;M.
             </p>
 
             <p>
                 Phase&nbsp;5 implements learning through imagination:
                 <code>SleepConsolidation</code> replays episodic memories from
                 bi-temporal storage, compresses successful patterns into templates,
-                and runs <code>counterfactual_replay()</code> to ask &ldquo;what
-                would have happened with different facts?&rdquo; Phase&nbsp;6
-                implements learning through communication:
-                <code>SocialLearning</code> extends <code>QuorumSensing</code> so
-                organisms can adopt templates that worked for peer organisms, with
-                epistemic vigilance (trust calibrated to track record) preventing
-                blind imitation.
+                and runs <code>counterfactual_replay()</code> to test what would have
+                happened under different facts. Phase&nbsp;6 implements learning
+                through communication: <code>SocialLearning</code> extends
+                <code>QuorumSensing</code> so organisms can adopt templates that
+                worked for peers, using epistemic vigilance (trust calibrated to
+                track record) to filter unreliable sources.
             </p>
 
             <p>
-                The deeper point is the one the paper makes: autonomous learning
-                requires all three systems working together. System&nbsp;A alone
-                gives you pattern recognition without grounding. System&nbsp;B
-                alone gives you trial-and-error without abstraction. System&nbsp;M
-                alone gives you monitoring without anything to monitor. v0.21
-                is the first release where all three systems are operational and
-                connected &mdash; the static scaffolding, the adaptive loop, and
-                the experience pool compose into a working whole. The cognitive
-                extensions are what comes next; the foundation is now in place.
+                Autonomous learning needs all three systems wired together:
+                observation without action lacks grounding, action without observation
+                lacks abstraction, and meta-control has nothing to steer without both.
+                v0.21 is the first release with all three pieces connected, combining
+                template selection, run-loop intervention, and the experience pool in
+                one runtime so Phases&nbsp;5 and 6 have a concrete base to build on.
             </p>
 
             <blockquote>

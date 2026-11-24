@@ -55,7 +55,7 @@
         <article>
             <header>
                 <h1>Operon v0.23: Developmental Staging</h1>
-                <p class="subtitle">Critical Periods, Capability Gating, and What Happens When Agents Grow Up</p>
+                <p class="subtitle">Critical Periods, Capability Gating, and Teacher-Learner Scaffolding</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -66,14 +66,13 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.22 gave Operon cognitive modes, sleep consolidation, social
+                    v0.22 added cognitive modes, sleep consolidation, social
                     learning, and curiosity. v0.23 adds the developmental layer:
-                    organisms now progress through four maturity stages, capabilities
-                    are gated by developmental stage, critical periods close
-                    permanently as the organism matures, and mature organisms
-                    scaffold younger ones&rsquo; learning. This is the penultimate
-                    phase of the roadmap &mdash; the point where agents stop being
-                    uniformly capable and start growing up.
+                    organisms progress through four maturity stages, tool access
+                    is gated by stage, critical periods close permanently as the
+                    organism matures, and mature organisms scaffold younger
+                    ones. This is the penultimate phase of the roadmap,
+                    replacing uniform capability sets with staged maturation.
                 </p>
             </div>
 
@@ -90,17 +89,17 @@
                 </thead>
                 <tbody>
                     <tr><td><strong>EMBRYONIC</strong></td><td>&lt;10%</td><td>1.0</td><td>Maximum learning, minimal capabilities</td></tr>
-                    <tr><td><strong>JUVENILE</strong></td><td>10&ndash;35%</td><td>0.75</td><td>Basic capabilities unlocked</td></tr>
+                    <tr><td><strong>JUVENILE</strong></td><td>10&ndash;35%</td><td>0.75</td><td>Basic capabilities enabled</td></tr>
                     <tr><td><strong>ADOLESCENT</strong></td><td>35&ndash;70%</td><td>0.5</td><td>Most capabilities available</td></tr>
                     <tr><td><strong>MATURE</strong></td><td>&gt;70%</td><td>0.25</td><td>Full capabilities, reduced plasticity</td></tr>
                 </tbody>
             </table>
 
             <p>
-                Transitions are one-directional. Even if telomeres are renewed
-                (the biological equivalent of telomerase), the developmental stage
-                never regresses. Once mature, always mature. This mirrors the
-                irreversibility of biological development.
+                Stage transitions are monotonic: even if an organism&rsquo;s
+                telomeres are renewed (the equivalent of telomerase activity),
+                its developmental stage never regresses, matching the
+                irreversibility of biological maturation.
             </p>
 
             <h2>2. Critical Periods</h2>
@@ -119,11 +118,11 @@
 )</code></pre>
 
             <p>
-                Once the organism passes <code>closes_at</code>, the window is
-                shut forever. This models the neurodevelopmental insight that
-                some forms of learning are only possible during specific
-                developmental windows &mdash; language acquisition in humans,
-                imprinting in birds, phonetic discrimination in infants.
+                Once the organism passes <code>closes_at</code>, the window
+                closes permanently. This mirrors biological critical periods in
+                which specific kinds of learning only happen during bounded
+                developmental windows, such as phonetic discrimination and
+                language acquisition in infants or imprinting in birds.
             </p>
 
             <h2>3. Capability Gating</h2>
@@ -138,22 +137,21 @@
             </p>
 
             <div class="insight">
-                <p class="insight-title">Why Gate Capabilities</p>
+                <p class="insight-title">Preventing Premature Tool Access</p>
                 <p>
-                    Premature capability exposure is a failure mode. An organism
-                    that gains full tool access before it has learned basic
-                    patterns is analogous to giving a child unsupervised access
-                    to power tools. The developmental gating ensures capabilities
-                    are unlocked progressively, matching the organism&rsquo;s
-                    growing competence.
+                    Exposing high-impact tools before an organism has built up a
+                    reliable pattern repertoire is a predictable failure mode:
+                    mistakes compound much faster when an uncalibrated agent has
+                    full permissions. Stage gating brings new capabilities
+                    online only as the organism accumulates experience.
                 </p>
             </div>
 
             <h2>4. Teacher-Learner Scaffolding</h2>
 
             <p>
-                <code>SocialLearning.scaffold_learner()</code> enables mature
-                organisms to guide younger ones. The teacher exports templates;
+                <code>SocialLearning.scaffold_learner()</code> lets mature
+                organisms guide younger ones. The teacher exports templates;
                 the scaffolding mechanism filters out templates too advanced for
                 the learner&rsquo;s current stage, applies a plasticity bonus
                 to the effective trust score (younger learners are more willing
@@ -161,18 +159,17 @@
             </p>
 
             <p>
-                As the learner matures, more templates become available. A
-                scaffold at EMBRYONIC might offer only basic single-stage
-                pipelines. The same scaffold at ADOLESCENT unlocks multi-stage
-                workflows. The teacher doesn&rsquo;t change &mdash; the
-                learner&rsquo;s readiness does.
+                As the learner matures, the same teacher export admits a wider
+                set of templates: an EMBRYONIC learner might receive only
+                single-stage pipelines, while an ADOLESCENT learner receives
+                multi-stage workflows from the exact same scaffolding call.
             </p>
 
-            <h2>5. The Full Arc</h2>
+            <h2>5. Roadmap Status</h2>
 
             <p>
-                v0.23 completes the seven-layer progression that the roadmap
-                described:
+                With v0.23, the first seven phases of the roadmap are complete,
+                spanning five architectural layers:
             </p>
 
             <ol>
@@ -184,9 +181,9 @@
             </ol>
 
             <p>
-                One phase remains: Phase 8 (release integration + publication),
-                which ties everything together with cross-subsystem integration
-                tests, paper polish, and publication-grade evaluation runs.
+                One phase remains: Phase 8 (release integration and publication),
+                covering cross-subsystem integration tests, paper revisions, and
+                evaluation runs.
             </p>
 
             <h2>6. Validation</h2>

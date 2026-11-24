@@ -205,7 +205,7 @@
         <article>
             <header>
                 <h1>Operon v0.20: Substrate Integration</h1>
-                <p class="subtitle">Three-Layer Context, Auditable Workflows, and the Question Every Multi-Stage System Should Answer</p>
+                <p class="subtitle">Three-Layer Context, Per-Stage Read/Write Hooks, and Auditable Workflows</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -216,82 +216,80 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.19 introduced <code>BiTemporalMemory</code> &mdash; an append-only
+                    v0.19 introduced <code>BiTemporalMemory</code>, an append-only
                     fact store with dual time axes. v0.20 connects it to the
-                    <code>SkillOrganism</code> runtime, so multi-stage workflows get an
-                    auditable shared substrate instead of relying solely on an unstructured
-                    dictionary. The motivating question: &ldquo;what did the organism know
-                    when stage X made its decision?&rdquo; This release formalizes a
-                    three-layer context model (topology, ephemeral, bi-temporal), adds
-                    per-stage read/write hooks, and preserves zero overhead when no
-                    substrate is attached.
+                    <code>SkillOrganism</code> runtime, giving multi-stage workflows an
+                    auditable shared substrate alongside their ephemeral state
+                    dictionary. With it, you can answer a concrete post-hoc question:
+                    what did the organism know when stage X made its decision? This
+                    release defines a three-layer context model (topology, ephemeral,
+                    bi-temporal), adds per-stage read and write hooks, and incurs no
+                    overhead when no substrate is attached.
                 </p>
             </div>
 
             <h2>1. The Missing Layer</h2>
 
             <p>
-                v0.18 gave <code>SkillOrganism</code> a clean multi-stage runtime:
+                v0.18 gave <code>SkillOrganism</code> a multi-stage runtime with
                 deterministic handlers, model-tier routing, and attachable components.
                 v0.19 added <code>BiTemporalMemory</code> as a standalone fact store.
-                But between them was a gap: stages could share state through a mutable
-                dictionary, and they could query a memory system, but the two were not
-                connected.
+                The two pieces had no wiring between them: stages passed data through
+                a mutable dictionary, and any memory queries had to be managed manually
+                outside the loop.
             </p>
 
             <p>
-                In practice, that means a four-stage enterprise workflow &mdash; research,
-                strategy, evaluation, adversarial critique &mdash; has no structural
-                answer to the question &ldquo;what facts were available when the
-                strategist made its recommendation?&rdquo; The strategist&rsquo;s inputs
-                are lost in the ephemeral state the moment the next stage overwrites them.
+                In a four-stage enterprise workflow (research, strategy, evaluation,
+                adversarial critique), that leaves no reliable way to reconstruct which
+                facts were visible when the strategist made its recommendation. Once a
+                downstream stage overwrites keys in ephemeral state, the strategist&rsquo;s
+                inputs are gone.
             </p>
 
             <p>
-                v0.20 closes the gap by making <code>BiTemporalMemory</code> a first-class
-                substrate of the organism runtime.
+                v0.20 wires <code>BiTemporalMemory</code> directly into the organism
+                runtime as an optional substrate.
             </p>
 
             <h2>2. Three Layers of Context</h2>
 
             <p>
-                The integration forced a question that had been implicit: when multiple
-                stages share and revise knowledge during a workflow, which state is
-                ephemeral coordination glue and which is durable auditable knowledge?
-                The answer is a three-layer model:
+                Wiring memory into the run loop requires separating short-lived
+                coordination state from durable facts. Operon splits runtime context
+                into three layers:
             </p>
 
             <ol>
                 <li><strong>Topology layer.</strong> The wiring diagram and observation
-                    structure. Structural and static within a single organism run. Epistemic
+                    structure, fixed for the duration of a single organism run. Epistemic
                     properties derive from this graph.</li>
-                <li><strong>Ephemeral layer.</strong> The <code>shared_state</code>
-                    dictionary. Carries routing hints, counters, morphogen concentrations,
-                    and temporary stage outputs. Mutable, lifetime of one run, not
-                    historically reconstructible.</li>
-                <li><strong>Bi-temporal layer.</strong> The <code>BiTemporalMemory</code>
-                    substrate. Carries durable factual knowledge with dual time axes.
-                    Append-only: corrections close old records and insert new ones with
-                    <code>supersedes</code> pointers. Belief state is exactly
-                    reconstructible at any historical coordinate.</li>
+                <li><strong>Ephemeral layer.</strong> The mutable <code>shared_state</code>
+                    dictionary, scoped to one run. It holds routing hints, counters,
+                    morphogen concentrations, and temporary stage outputs, without
+                    historical reconstruction.</li>
+                <li><strong>Bi-temporal layer.</strong> The append-only
+                    <code>BiTemporalMemory</code> substrate, which stores factual
+                    knowledge along dual time axes. Corrections close old records and
+                    insert new ones with <code>supersedes</code> pointers, so belief
+                    state can be reconstructed at any past coordinate.</li>
             </ol>
 
             <div class="insight">
-                <p class="insight-title">Why Three Layers</p>
+                <p class="insight-title">Lifetime and Mutability</p>
                 <p>
-                    The distinction matters because each layer has different lifetime and
-                    mutability semantics. Topology constrains visibility. Ephemeral state
-                    carries execution context. Bi-temporal memory provides the audit trail.
-                    Collapsing them into one dictionary (as most agent frameworks do) makes
-                    it impossible to reconstruct past belief states &mdash; the very thing
-                    you need for compliance, debugging, and trust.
+                    Each layer has different lifetime and mutability rules: topology
+                    constrains visibility, ephemeral state carries execution context,
+                    and bi-temporal memory provides the audit trail. Collapsing all
+                    three into one mutable dictionary, as most agent frameworks do,
+                    destroys the history needed for debugging and compliance audits.
                 </p>
             </div>
 
             <h2>3. The Substrate API</h2>
 
             <p>
-                Attaching a substrate to an organism is one parameter:
+                Attaching a substrate to an organism takes one parameter:
             </p>
 
 <pre><code>from operon_ai import BiTemporalMemory, SkillStage, skill_organism
@@ -306,9 +304,8 @@ organism = skill_organism(
 )</code></pre>
 
             <p>
-                When <code>substrate</code> is <code>None</code> (the default), the run
-                loop is unchanged: no datetime operations, no metadata injection, all
-                existing tests pass unmodified. This is the zero-overhead guarantee.
+                By default, <code>substrate</code> is <code>None</code>, leaving the
+                run loop untouched with zero overhead for existing callers.
             </p>
 
             <h2>4. Read Path: SubstrateView</h2>
@@ -329,7 +326,7 @@ class SubstrateView:
                 The <code>record_time</code> captures the moment of the read, establishing
                 the record-time horizon for this stage&rsquo;s knowledge. The view is
                 injected into handler stages as an additional argument (via arity-aware
-                dispatch &mdash; existing handlers are unaffected) or into agent stage
+                dispatch, leaving existing handlers unaffected) or into agent stage
                 metadata.
             </p>
 
@@ -347,15 +344,14 @@ SkillStage(name="evaluator", read_query=lambda task, state:
     BiTemporalQuery(subject=state.get("account_id")), ...)</code></pre>
 
             <div class="insight">
-                <p class="insight-title">Why Frozen Views</p>
+                <p class="insight-title">Read/Write Isolation</p>
                 <p>
-                    A <code>SubstrateView</code> is a frozen dataclass, not a reference
-                    to the memory. This means a stage cannot accidentally mutate the
-                    substrate through its read path. The only write path is through
-                    <code>fact_extractor</code> or <code>emit_output_fact</code>, which
-                    run after the stage completes. This separation is deliberate: reads
-                    happen before execution, writes happen after. The stage sees a
-                    consistent snapshot.
+                    Because <code>SubstrateView</code> is a frozen dataclass holding a
+                    snapshot of facts, a stage cannot accidentally mutate the substrate
+                    through its read path. Writes go exclusively through
+                    <code>fact_extractor</code> or <code>emit_output_fact</code> after
+                    the stage completes, so reads happen before execution, writes happen
+                    after, and every stage sees a consistent snapshot.
                 </p>
             </div>
 
@@ -368,9 +364,9 @@ SkillStage(name="evaluator", read_query=lambda task, state:
             <h3>emit_output_fact</h3>
 
             <p>
-                A convenience flag. When <code>True</code>, the runtime auto-records the
-                stage output as a fact with <code>subject=task</code>,
-                <code>predicate=stage.name</code>, <code>value=output</code>.
+                When <code>emit_output_fact=True</code>, the runtime automatically records
+                the stage output as a fact with <code>subject=task</code>,
+                <code>predicate=stage.name</code>, and <code>value=output</code>.
             </p>
 
 <pre><code>SkillStage(
@@ -383,10 +379,10 @@ SkillStage(name="evaluator", read_query=lambda task, state:
             <h3>fact_extractor</h3>
 
             <p>
-                A callable that converts the stage result into one or more factual events.
-                Each event specifies an operation &mdash; assert, correct, or invalidate
-                &mdash; and is applied to the substrate via the standard
-                <code>BiTemporalMemory</code> write API.
+                For finer control, <code>fact_extractor</code> accepts a callable that
+                converts the stage result into one or more factual events. Each event
+                specifies an operation (assert, correct, or invalidate) and is applied
+                through the standard <code>BiTemporalMemory</code> write API.
             </p>
 
 <pre><code>def adversary_extractor(task, state, outputs, stage, result):
@@ -427,8 +423,8 @@ SkillStage(
             <h2>6. The Audit Question</h2>
 
             <p>
-                With the substrate wired in, the motivating question has a structural
-                answer. After a workflow completes:
+                With the substrate attached, you can query historical belief states
+                directly after a workflow completes:
             </p>
 
 <pre><code># What did the organism believe when the strategist ran?
@@ -447,15 +443,15 @@ diff = mem.diff_between(
 )</code></pre>
 
             <p>
-                The answer is independent of subsequent corrections or ephemeral state
-                mutations. It comes from the append-only history, not from a mutable
-                dictionary that has long since been overwritten.
+                Because the query reads from the append-only history, subsequent
+                corrections and ephemeral state mutations leave what the strategist
+                saw untouched.
             </p>
 
             <h2>7. Backward Compatibility</h2>
 
             <p>
-                The integration is entirely opt-in. When <code>substrate=None</code>
+                The integration is opt-in. When <code>substrate=None</code>
                 (the default), every code path that touches the substrate is guarded
                 behind a <code>None</code> check. No datetime operations are invoked,
                 no metadata is injected, and all four original lifecycle hooks remain
@@ -465,12 +461,13 @@ diff = mem.diff_between(
             <p>
                 Existing handler signatures are unaffected thanks to arity-aware dispatch:
                 <code>_call_arity()</code> truncates arguments to match the handler&rsquo;s
-                parameter count. A handler that accepts <code>(task)</code> or
-                <code>(task, state, outputs, stage)</code> continues to work. A handler
-                that accepts a fifth parameter receives the <code>SubstrateView</code>.
+                parameter count. A handler accepting <code>(task)</code> or
+                <code>(task, state, outputs, stage)</code> continues to work unchanged,
+                while one that declares a fifth parameter receives the
+                <code>SubstrateView</code>.
             </p>
 
-            <h2>8. The Example: Enterprise Account Review</h2>
+            <h2>8. Example: Enterprise Account Review</h2>
 
             <p>
                 <a href="https://github.com/coredipper/operon/blob/main/examples/71_bitemporal_skill_organism.py" target="_blank" rel="noopener">Example 71</a>
@@ -478,14 +475,14 @@ diff = mem.diff_between(
             </p>
 
             <ol>
-                <li><strong>Research</strong> &mdash; records facts about an account
+                <li><strong>Research:</strong> records facts about an account
                     (risk level, sector, revenue) via <code>fact_extractor</code>.</li>
-                <li><strong>Strategist</strong> &mdash; reads the substrate via
+                <li><strong>Strategist:</strong> reads the substrate via
                     <code>read_query=&quot;acct:42&quot;</code>, produces a recommendation,
-                    auto-records it via <code>emit_output_fact=True</code>.</li>
-                <li><strong>Evaluator</strong> &mdash; records evaluation concerns via
+                    and auto-records it via <code>emit_output_fact=True</code>.</li>
+                <li><strong>Evaluator:</strong> records evaluation concerns via
                     <code>fact_extractor</code>.</li>
-                <li><strong>Adversary</strong> &mdash; corrects the original risk level
+                <li><strong>Adversary:</strong> corrects the original risk level
                     assessment from &ldquo;medium&rdquo; to &ldquo;high&rdquo; via
                     <code>fact_extractor</code> with <code>op=&quot;correct&quot;</code>.</li>
             </ol>
@@ -494,7 +491,7 @@ diff = mem.diff_between(
                 After the run, the example reconstructs the strategist&rsquo;s belief
                 state (which still shows &ldquo;medium&rdquo; risk) and diffs it against
                 the post-adversary state (which shows the correction to &ldquo;high&rdquo;).
-                The original belief state is fully preserved in the append-only history.
+                The original belief state remains intact in the append-only history.
             </p>
 
             <h2>9. Validation</h2>
@@ -538,27 +535,24 @@ diff = mem.diff_between(
             <h2>10. What Comes Next</h2>
 
             <p>
-                v0.20 connects the memory and the runtime. The next phases on the
-                roadmap continue building on this foundation: causal event logging
-                that tracks not just what facts were available but why a stage chose
-                what it chose; persistent storage backends so the append-only log
-                survives process restarts; and temporal reasoning primitives that let
-                agents query their own epistemic history as part of planning.
+                With memory wired into the runtime, the roadmap turns to three
+                follow-up capabilities: causal event logging to capture why a stage
+                chose an action alongside the facts available to it, persistent storage
+                backends so the append-only log survives process restarts, and temporal
+                reasoning primitives so agents can query their own epistemic history
+                during planning.
             </p>
 
             <p>
-                The three-layer context model is also a foundation for richer
-                cross-organism coordination. When two organisms share a substrate,
-                they get a shared auditable memory &mdash; without sharing ephemeral
-                state or coupling their topologies. That is the multi-organism story
-                for a future release.
+                The three-layer model also supports cross-organism coordination in a
+                future release: two organisms can share an auditable substrate without
+                sharing ephemeral state or coupling their topologies.
             </p>
 
             <p>
-                The deeper motivation remains the same: agents that cannot explain
-                their past decisions are agents you cannot trust with consequential
-                ones. v0.19 gave the memory the right structure. v0.20 wires it into
-                the place where decisions actually happen.
+                An agent that cannot account for its past decisions is hard to trust
+                with consequential ones. v0.19 built the append-only fact store; v0.20
+                places it directly in the execution path where those decisions happen.
             </p>
 
             <blockquote>

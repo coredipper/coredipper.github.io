@@ -188,7 +188,7 @@
         <article>
             <header>
                 <h1>Score-Rejection Isn&rsquo;t Cert-Firing (and n=10 Isn&rsquo;t Enough)</h1>
-                <div class="subtitle">I ran the same structural-critic experiment twice on the same 10 SWE-bench-lite instances. Two different pass@1 deltas. Zero certificate fires on either run. An honest update from an earlier post that conflated two different signals.</div>
+                <div class="subtitle">Running the same structural-critic experiment twice on 10 SWE-bench-lite instances produced two different pass@1 deltas and zero certificate fires, correcting an earlier post that conflated two distinct signals.</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 21, 2026 (updated)</div>
                 <div class="version-note">operon-openhands-gates v0.1.0a3</div>
             </header>
@@ -198,28 +198,28 @@
             <p>An <a href="https://github.com/coredipper/operon-openhands-gates/commit/a5948ef">earlier version of this post</a> (same URL, rewritten) reported a single n=10 run with a null correctness delta and argued &ldquo;the critic fires, the outcome doesn&rsquo;t move.&rdquo; Two things turned out to be wrong about that framing:</p>
 
             <ol>
-                <li><strong>The critic didn&rsquo;t fire.</strong> The <code>behavioral_stability_windowed</code> certificate was never emitted on that run. What I was calling &ldquo;the critic firing&rdquo; was actually the iterative-refinement loop retrying because <code>CriticResult.score &lt; success_threshold</code>. That&rsquo;s a different signal from sustained-stagnation cert-firing, and I was conflating them.</li>
-                <li><strong>n=10 is single-run variance, not a stable measurement.</strong> I reran the same experiment after shipping a library fix (v0.1.0a3 added <code>[CERT-FIRE]</code> stdout logging to disambiguate this exact question). Same 10 instances, same model, same prompts. <strong>Different pass@1</strong>: 60% on the first run, 70% on the second. Retry depth also moved: max attempt=2 on run one, max attempt=3 on run two.</li>
+                <li><strong>The critic didn&rsquo;t fire.</strong> The <code>behavioral_stability_windowed</code> certificate was never emitted on that run. What I called &ldquo;the critic firing&rdquo; was actually OpenHands&rsquo; iterative-refinement loop retrying because <code>CriticResult.score &lt; success_threshold</code>, which is a different signal from sustained-stagnation cert-firing.</li>
+                <li><strong>n=10 is dominated by single-run variance.</strong> After shipping v0.1.0a3 (which added <code>[CERT-FIRE]</code> stdout logging to separate the two signals), I reran the experiment with the exact same 10 instances, model, and prompts. Pass@1 moved from 60% on the first run to 70% on the second, and maximum retry depth shifted from attempt=2 to attempt=3.</li>
             </ol>
 
-            <p>The useful finding isn&rsquo;t either of those specific numbers. It&rsquo;s the distinction those numbers force: <em>score-rejection</em> and <em>cert-firing</em> are two separate signals in <code>OperonStagnationCritic</code>, and only the first one appears on this slice.</p>
+            <p>What matters here is the distinction forced by comparing the two runs: <em>score-rejection</em> and <em>cert-firing</em> are separate signals in <code>OperonStagnationCritic</code>, and only the first one triggered on this slice.</p>
 
             <h2>The two signals</h2>
 
-            <p>When OpenHands&rsquo; iterative-refinement loop decides whether to retry a trajectory, it reads <code>CriticResult.score</code> and compares it to a configurable <code>success_threshold</code>. <code>OperonStagnationCritic</code> returns the <em>epiplexic integral</em> as its score &mdash; a rolling-window measure of how much the agent&rsquo;s output embeddings are changing. Low integral &rArr; low score &rArr; retry.</p>
+            <p>When OpenHands&rsquo; iterative-refinement loop decides whether to retry a trajectory, it reads <code>CriticResult.score</code> and compares it to a configurable <code>success_threshold</code>. <code>OperonStagnationCritic</code> returns the <em>epiplexic integral</em> as that score, measuring how much the agent&rsquo;s output embeddings change over a rolling window (low integral &rArr; low score &rArr; retry).</p>
 
-            <p>Separately, the critic tracks whether the integral has stayed below <code>self.threshold=0.2</code> for <code>critical_duration=3</code> consecutive measurements. When that condition holds, it emits a <code>behavioral_stability_windowed</code> certificate &mdash; structured evidence that the agent is in sustained stagnation, not just a temporary dip.</p>
+            <p>Separately, the critic tracks whether the integral stays below <code>self.threshold=0.2</code> for <code>critical_duration=3</code> consecutive measurements. When that holds, it emits a <code>behavioral_stability_windowed</code> certificate recording sustained stagnation across multiple steps rather than a transient dip.</p>
 
             <blockquote>
                 Score-rejection is &ldquo;the integral is low right now, retry.&rdquo;<br>
                 Cert-firing is &ldquo;the integral has been consistently low, this isn&rsquo;t going to unstick.&rdquo;
             </blockquote>
 
-            <p>Both signals are real. Only one of them fired on either of my runs.</p>
+            <p>Both mechanisms are active in the code, though only the first fired on either run.</p>
 
             <h2>Two runs, same slice</h2>
 
-            <p>Same setup on both: OpenHands&rsquo; <code>CodeActAgent</code>, GPT-5 with <code>reasoning_effort=high</code>, 10 SWE-bench-lite instances (the ones whose Docker images built cleanly on my Mac &mdash; 9 django + 1 astropy). Same prompts. Same <code>OperonStagnationCritic(threshold=0.2, window=10, critical_duration=3)</code>. Patches evaluated through SWE-bench&rsquo;s test harness, not judged by the critic.</p>
+            <p>Both runs used the same configuration: OpenHands&rsquo; <code>CodeActAgent</code>, GPT-5 with <code>reasoning_effort=high</code>, identical prompts, and <code>OperonStagnationCritic(threshold=0.2, window=10, critical_duration=3)</code> on the 10 SWE-bench-lite instances whose Docker images built cleanly on my Mac (9 django + 1 astropy). Patches were scored by SWE-bench&rsquo;s test harness rather than by the critic.</p>
 
             <table>
                 <tr><th>Metric</th><th>Baseline</th><th>Run 1 (v0.1.0a2)</th><th>Run 2 (v0.1.0a3)</th></tr>
@@ -233,60 +233,60 @@
                 <tr><td><strong>Certificates emitted</strong></td><td>&mdash;</td><td><strong>0</strong></td><td><strong>0</strong></td></tr>
             </table>
 
-            <p>The score-rejection rate is stable across runs (60%, same 6 instances both times). The retry depth and the outcome delta are not stable &mdash; run two went deeper into the retry ladder and actually recovered one instance that run one left unresolved.</p>
+            <p>The score-rejection rate was identical across runs (60%, on the exact same 6 instances), while retry depth and final pass@1 moved: run two went deeper into the retry ladder and resolved one instance that run one missed.</p>
 
             <div class="finding neutral">
                 <strong>Zero cert fires across both runs.</strong> On 12 retry rounds in run two with integrals dipping below <code>success_threshold</code> repeatedly, not once did the integral stay below <code>self.threshold=0.2</code> for three consecutive measurements. The score oscillates; the sustained-stagnation predicate doesn&rsquo;t hold.
             </div>
 
-            <h2>What that tells us about the critic</h2>
+            <h2>What the runs show</h2>
 
             <h3>1. Score-rejection is doing the retry work</h3>
 
-            <p>The 60 pp gap in &ldquo;instances with &ge;1 rejection&rdquo; between baseline and treatment is real and stable. Six of ten instances produced low enough integrals on some measurement that the iterative-refinement loop retried. That&rsquo;s a measurable behavioral divergence from the default LLM critic, which accepts the first patch on every instance.</p>
+            <p>The 60 pp gap in &ldquo;instances with &ge;1 rejection&rdquo; between baseline and treatment is real and stable. Six of ten instances produced low enough integrals on some measurement that the iterative-refinement loop retried. That is a measurable behavioral divergence from the default LLM critic, which accepts the first patch on every instance.</p>
 
-            <p>But the <em>score</em> is a cheap proxy: any dip below threshold triggers retry, even a brief one. It doesn&rsquo;t carry the evidential payload of the certificate (which records the specific violating windows). It&rsquo;s an on/off signal, not a structural attestation.</p>
+            <p>The <em>score</em>, however, is a coarse trigger: any brief dip below threshold causes a retry without carrying the certificate&rsquo;s evidential payload recording which windows violated the bound.</p>
 
-            <h3>2. Cert-firing is the structural signal, and it&rsquo;s strict</h3>
+            <h3>2. The certificate predicate is strict</h3>
 
-            <p>The <code>behavioral_stability_windowed</code> theorem says: <em>every window in the last <code>critical_duration</code> rolling windows had a mean severity above the stability threshold</em>. That&rsquo;s a stronger claim than &ldquo;the score dipped low once.&rdquo; On GPT-5&rsquo;s trajectories, this condition didn&rsquo;t hold on any of the 10 instances in either run &mdash; the integral fluctuates enough that three-consecutive-below is rare.</p>
+            <p>The <code>behavioral_stability_windowed</code> theorem requires that <em>every window in the last <code>critical_duration</code> rolling windows had a mean severity above the stability threshold</em>, which is much stricter than a single low score. On GPT-5&rsquo;s trajectories, the integral fluctuated enough that three consecutive measurements below threshold never occurred on any of the 10 instances across either run.</p>
 
-            <p>That&rsquo;s useful information on its own. It tells me that <em>at this threshold and window size, on this model, the certificate is a stricter predicate than the retry loop uses</em>. The critic has two thresholds to care about: one for &ldquo;retry now&rdquo; (loose) and one for &ldquo;emit a certificate of stagnation&rdquo; (tight). GPT-5 apparently oscillates above the tight one.</p>
+            <p>At this threshold and window size on GPT-5, the certificate predicate is strictly tighter than the retry threshold. The critic effectively operates two cutoffs, a loose one for retrying now and a tight one for emitting a stagnation certificate, and GPT-5&rsquo;s trajectories stay above the tight one.</p>
 
-            <h3>3. Outcome delta rides the noise</h3>
+            <h3>3. Pass@1 deltas sit inside n=10 noise</h3>
 
-            <p>On the same slice, same prompts, same critic config, I got +0 pp pass@1 one day and +10 pp the next. That&rsquo;s a single instance flipping (django-11815 went unresolved &rarr; resolved on the second run, via an attempt=3 retry). At n=10 that&rsquo;s a 10 pp swing from one data point.</p>
+            <p>With identical inputs and critic settings, I saw +0 pp pass@1 on run one and +10 pp on run two: a single instance (django-11815) flipped from unresolved to resolved on an attempt=3 retry, which is a 10 pp swing at n=10.</p>
 
-            <p>Which means: if I&rsquo;d only run it once, I&rsquo;d have reported either &ldquo;null delta&rdquo; or &ldquo;+10 pp improvement,&rdquo; and both would have been wrong as structural claims. They&rsquo;d be right as run-specific observations, but wrong if quoted as &ldquo;what the critic does.&rdquo; n=10 on a deterministic-seeming experiment is still within model-noise territory.</p>
+            <p>Had I stopped after a single run, I would have reported either a null delta or a +10 pp gain, and either headline would have overstated what the data support. Both numbers accurately describe their own runs, yet at n=10 the experiment still sits well inside model-sampling noise.</p>
 
             <div class="finding negative">
-                <strong>The blog-post-sized takeaway from n=10:</strong> the critic&rsquo;s score-rejection signal is stable across runs (60% rate both times); the downstream outcome effect is not (0 pp to +10 pp swing on identical inputs); the cert predicate is strict enough that it doesn&rsquo;t fire at all on this model/threshold combination. Any narrative about &ldquo;does the structural critic improve agent correctness&rdquo; needs more than one run to adjudicate.
+                <strong>Summary of the n=10 results:</strong> score-rejection rate was stable across runs (60% both times), downstream pass@1 swung between 0 pp and +10 pp on identical inputs, and the certificate predicate never fired on this model and threshold combination. Evaluating whether the critic improves correctness requires multiple runs and a larger sample.
             </div>
 
-            <h2>What this does and doesn&rsquo;t say</h2>
+            <h2>What the data support and where they stop</h2>
 
-            <p>It says the <a href="/blog/operon-v011-homeostasis/">epiplexic-integral detector</a> is producing a non-trivial signal: 60% rejection rate, stable across runs, with a 2&times;-12&times; cost overhead depending on retry depth. That&rsquo;s measurable. The detector is doing work.</p>
+            <p>First, the <a href="/blog/operon-v011-homeostasis/">epiplexic-integral detector</a> produces a reproducible signal: a 60% rejection rate across both runs, with 2&times;-12&times; cost overhead depending on retry depth.</p>
 
-            <p>It also says the <code>threshold=0.2</code> + <code>critical_duration=3</code> combination tuned in <a href="/blog/operon-structural-guarantees/">Paper 4 &sect;4.3</a> is calibrated for a different model family (sentence-MiniLM embeddings at n=300). On GPT-5, the sustained-below-0.2 condition is too strict to fire under normal retry pressure &mdash; the agent&rsquo;s outputs oscillate enough that it never stays low for three consecutive measurements. That&rsquo;s not a bug; it&rsquo;s a calibration finding. If you want cert fires on GPT-5, <code>threshold</code> or <code>critical_duration</code> needs to be loosened for this model.</p>
+            <p>Second, the <code>threshold=0.2</code> and <code>critical_duration=3</code> settings tuned in <a href="/blog/operon-structural-guarantees/">Paper 4 &sect;4.3</a> were calibrated on a different embedding regime (sentence-MiniLM at n=300). On GPT-5, output trajectories oscillate enough that the integral never stays below 0.2 for three consecutive measurements. Getting certificates to fire on GPT-5 will require loosening <code>threshold</code> or <code>critical_duration</code> for this model.</p>
 
-            <p>It doesn&rsquo;t say &ldquo;the retry helps&rdquo; or &ldquo;the retry doesn&rsquo;t help&rdquo; as a structural claim. On run one it didn&rsquo;t; on run two it did, by exactly one instance. That&rsquo;s a distribution question, not a point estimate one. The honest answer is &ldquo;probably close to zero mean effect with high variance at n=10 on GPT-5 django.&rdquo;</p>
+            <p>On correctness, the two runs cannot settle whether retries help. Run one showed no gain and run two gained a single instance, which leaves the question as a distribution over runs rather than a single point estimate: on GPT-5 django tasks at n=10, the mean effect looks close to zero with high variance.</p>
 
-            <p>It doesn&rsquo;t generalize beyond this slice. n=10 is small; the slice is django-heavy because Docker-Desktop-on-Mac&rsquo;s apt-signature bug blocked the matplotlib/sympy/flask/pytest images during inference; the model is fixed (GPT-5, high-reasoning).</p>
+            <p>Nothing here generalizes beyond this slice. Ten instances is small, the set is heavily skewed toward django because Docker Desktop on Mac hit an apt-signature bug that blocked the matplotlib, sympy, flask, and pytest images during inference, and only one model configuration (GPT-5, high reasoning) was tested.</p>
 
             <h2>Implications for structural critics</h2>
 
-            <p>Two that I didn&rsquo;t fully appreciate before running this twice.</p>
+            <p>Running the experiment twice surfaced two design points I had underestimated:</p>
 
-            <p><strong>Distinguish the signals in the public API.</strong> <code>OperonStagnationCritic.score</code> is a cheap continuous signal for the retry loop; <code>self._certificate</code> is the expensive structural attestation for downstream auditing. The first version of <code>scripts/generate_delta_artifact.py</code> counted &ldquo;rejections&rdquo; via retry presence and called them &ldquo;cert fires.&rdquo; The v0.1.0a3 update splits them: <code>instances_with_rejection</code> (retry-triggering) and <code>certificates_emitted</code> (cert payload on disk). On these runs, the first is 6 and the second is 0 &mdash; surprising, and worth surfacing in the artifact schema.</p>
+            <p><strong>Distinguish the signals in the public API.</strong> <code>OperonStagnationCritic.score</code> is a lightweight continuous signal for the retry loop, whereas <code>self._certificate</code> is the structural attestation meant for downstream auditing. The first version of <code>scripts/generate_delta_artifact.py</code> inferred &ldquo;cert fires&rdquo; from retry presence. Version 0.1.0a3 splits the artifact schema into <code>instances_with_rejection</code> (retry-triggering) and <code>certificates_emitted</code> (certificate payload recorded on disk). On these runs those counts were 6 and 0, a gap large enough to keep separate by default.</p>
 
-            <p><strong>Calibrate per model, not per theorem.</strong> The structural-guarantee thesis is model-independent at the theorem layer &mdash; <code>behavioral_stability_windowed</code> means the same thing regardless of embedder. But the thresholds that make the theorem <em>useful</em> are model-dependent. <code>threshold=0.2</code> was meaningful for the sentence-MiniLM substrate that Paper 4 validated at n=300. For a 2026-tier reasoning model with different output distributions, it apparently needs to be looser to fire at all. Fixed thresholds don&rsquo;t port; the structural guarantee ports, the calibration doesn&rsquo;t.</p>
+            <p><strong>Calibrate thresholds per model.</strong> At the theorem layer, <code>behavioral_stability_windowed</code> means the same thing regardless of the model or embedder, so the structural definition itself is portable. The thresholds that make it trigger usefully, however, depend on the model&rsquo;s output distribution: <code>threshold=0.2</code> worked well for Paper 4&rsquo;s sentence-MiniLM runs at n=300, whereas a 2026-tier reasoning model needs looser parameters to fire at all.</p>
 
             <h2>What ships</h2>
 
             <p><code>operon-openhands-gates v0.1.0a3</code> on PyPI:</p>
 
             <ul>
-                <li><code>OperonStagnationCritic</code> now prints <code>[CERT-FIRE] {json}</code> to <code>sys.stdout</code> when a certificate is emitted. The benchmarks runner captures container stdout into <code>logs/instance_&lt;iid&gt;.output.log</code>; <code>scripts/generate_delta_artifact.py --treatment-logs-dir</code> parses those logs to populate <code>treatment_certificate</code> per-instance and <code>certificates_emitted</code> in the summary. No more inferring cert firing from retry counts.</li>
+                <li><code>OperonStagnationCritic</code> now prints <code>[CERT-FIRE] {json}</code> to <code>sys.stdout</code> when a certificate is emitted. The benchmarks runner captures container stdout into <code>logs/instance_&lt;iid&gt;.output.log</code>; <code>scripts/generate_delta_artifact.py --treatment-logs-dir</code> parses those logs to populate <code>treatment_certificate</code> per-instance and <code>certificates_emitted</code> in the summary, so cert firing is no longer inferred from retry counts.</li>
                 <li>The generator now unions <code>output.critic_attempt_*.jsonl</code> files (sorted by numeric suffix, dedupe&rsquo;d on <code>(instance_id, attempt)</code>, validated against <code>output.jsonl</code>) so cumulative cost is correct when the runner consolidates <code>output.jsonl</code> to max-attempt rows.</li>
                 <li>The delta artifact now distinguishes &ldquo;instances with &ge;1 rejection&rdquo; (retry-triggering score dip) from &ldquo;certificates emitted&rdquo; (sustained-stagnation structural payload). They are no longer conflated in the markdown.</li>
             </ul>
@@ -296,10 +296,10 @@
             <h2>Caveats for citation</h2>
 
             <ol>
-                <li><strong>n=10 single-run variance is &plusmn;10 pp on pass@1.</strong> Two runs on identical inputs produced 60% and 70%. Any structural claim about the critic&rsquo;s outcome effect on this slice requires more runs and a distribution, not a point estimate. Treat single-run deltas at this scale as noise unless corroborated.</li>
-                <li><strong>Sample bias.</strong> n=10, 9 django + 1 astropy &mdash; the 10 that survived Docker-Desktop-on-Mac&rsquo;s apt-signature bug. Not representative of full SWE-bench-lite. A Linux-host or <code>--workspace remote</code> rerun at n=30 is the natural follow-up.</li>
-                <li><strong>Threshold calibration.</strong> <code>threshold=0.2</code>, <code>critical_duration=3</code> tuned on sentence-MiniLM at n=300 (Paper 4). On GPT-5 in this harness, that combination didn&rsquo;t produce a single cert fire across 22 measurement-points-across-rejected-instances. Different model, different ideal threshold.</li>
-                <li><strong>Single model.</strong> GPT-5 only. Claude Sonnet 4.6 or another family would likely show a different score/cert-fire distribution.</li>
+                <li><strong>n=10 single-run variance is &plusmn;10 pp on pass@1.</strong> Two runs on identical inputs produced 60% and 70%, so any claim about the critic&rsquo;s effect on correctness needs a multi-run distribution rather than a single-run delta.</li>
+                <li><strong>Sample bias.</strong> The 10 instances (9 django + 1 astropy) are simply the ones that survived Docker Desktop on Mac&rsquo;s apt-signature bug, so they do not represent all of SWE-bench-lite. A Linux-host or <code>--workspace remote</code> rerun at n=30 is the natural follow-up.</li>
+                <li><strong>Threshold calibration.</strong> <code>threshold=0.2</code> and <code>critical_duration=3</code> were tuned on sentence-MiniLM at n=300 (Paper 4). On GPT-5 in this harness, that combination produced zero certificate fires across 22 measurement points on rejected instances, indicating that thresholds need per-model tuning.</li>
+                <li><strong>Single model.</strong> Only GPT-5 was evaluated; Claude Sonnet 4.6 or another model family would likely show a different score and cert-fire distribution.</li>
             </ol>
 
             <h2>What&rsquo;s next</h2>
@@ -307,15 +307,15 @@
             <ol>
                 <li><strong>Threshold sweep on a second model.</strong> If Sonnet 4.6 or Claude Opus produces different integral distributions on the same 10 instances, the per-model calibration finding becomes concrete. One extra run at a second model is cheap.</li>
                 <li><strong>Unbiased n=30 rerun on Linux.</strong> Kills the sample-bias caveat and gets the variance estimate onto a real sample.</li>
-                <li><strong>Sibling replication on <code>operon-langgraph-gates</code>.</strong> Same substrate, different harness. Would test whether the cert-vs-score distinction generalizes across frameworks &mdash; the strongest evidence for the framework-portability claim I&rsquo;ve been making.</li>
-                <li><strong>Terminate-on-fire, not retry-on-fire.</strong> Still worth testing, but only on trajectories where the cert actually fires. Until the threshold is recalibrated for GPT-5, there&rsquo;s nothing on this slice to trigger it.</li>
+                <li><strong>Sibling replication on <code>operon-langgraph-gates</code>.</strong> Running the same evaluation on a different harness tests whether the cert-vs-score distinction holds across frameworks, which directly probes the framework-portability claim.</li>
+                <li><strong>Terminate on certificate fire.</strong> Halting rather than retrying when a certificate fires is still worth testing, once the threshold is recalibrated for GPT-5 so certificates actually trigger on this slice.</li>
             </ol>
 
-            <h2>Honest summary</h2>
+            <h2>Summary</h2>
 
-            <p>A structural stagnation critic pointed at GPT-5 on SWE-bench-lite rejects 60% of first-attempt patches by score across two independent runs (stable). The rejected instances get retried and the downstream outcome delta is 0 pp on run one and +10 pp on run two &mdash; n=10 noise, not a stable measurement. The <em>certificate</em> &mdash; the actual structural attestation that distinguishes this critic from a probabilistic judge &mdash; didn&rsquo;t fire on either run. The threshold calibrated on Paper 4&rsquo;s MiniLM substrate is too strict for GPT-5&rsquo;s output distribution.</p>
+            <p>Pointed at GPT-5 on SWE-bench-lite, the structural stagnation critic rejected 60% of first-attempt patches by score across both runs. Retrying those instances yielded 0 pp pass@1 delta on run one and +10 pp on run two, reflecting n=10 variance rather than a stable effect. The <em>certificate</em> itself, the structural attestation distinguishing this critic from a probabilistic judge, did not fire on either run because the threshold calibrated on Paper 4&rsquo;s MiniLM runs is too strict for GPT-5&rsquo;s output distribution.</p>
 
-            <p>The useful part isn&rsquo;t any single number. It&rsquo;s that two runs on the same inputs tell two different outcome stories, and both are wrong as structural claims.</p>
+            <p>The main lesson is methodological: two runs on identical inputs produced two opposite outcome narratives, neither of which holds up as a general claim on its own.</p>
 
             <p>Code: <a href="https://github.com/coredipper/operon-openhands-gates/pull/3">harness (#3)</a> &middot; <a href="https://github.com/coredipper/operon-openhands-gates/pull/5">eval (#5)</a> &middot; <a href="https://github.com/coredipper/operon-openhands-gates/pull/6">cert stdout log (#6)</a> &middot; <a href="https://github.com/coredipper/operon-openhands-gates/pull/7">attempt-union accounting (#7)</a>. Released as <code>operon-openhands-gates v0.1.0a3</code> on PyPI. Artifact: <a href="https://github.com/coredipper/operon-openhands-gates/blob/main/eval/results/swebench_lite_delta.md">swebench_lite_delta.md</a>.</p>
 

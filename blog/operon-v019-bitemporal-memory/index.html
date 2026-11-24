@@ -216,76 +216,72 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.18 gave operon a thinner front door. v0.19 goes deeper in
-                    the opposite direction: it adds a memory subsystem that tracks
-                    not just what is true, but when it became true and when the
-                    system learned about it. These are two different questions, and
-                    conflating them is the source of a whole class of bugs in
-                    agent systems that ingest delayed or corrected information.
-                    The new <code>BiTemporalMemory</code> is append-only &mdash;
-                    corrections close old records and create new ones, so any
-                    past belief state can always be reconstructed. This is the
-                    foundation for compliance auditing, temporal reasoning, and
-                    eventually richer forms of agent self-knowledge.
+                    v0.18 simplified operon&rsquo;s public API. v0.19 works lower
+                    in the stack, adding a memory subsystem that tracks both
+                    when a fact became true in the world and when the system
+                    learned about it. Conflating those two timestamps causes a
+                    recurring class of bugs whenever an agent ingests delayed or
+                    retroactively corrected data. The new
+                    <code>BiTemporalMemory</code> is append-only: corrections
+                    close old records and append new ones, so any past belief
+                    state can always be reconstructed. That gives compliance
+                    auditing, temporal queries, and agent self-inspection a
+                    clean data model to build on.
                 </p>
             </div>
 
             <h2>1. The Problem with a Single Timestamp</h2>
 
             <p>
-                Most agent memory systems give each fact a single timestamp:
-                when was this stored? That works fine as long as the system
-                learns about things exactly when they happen. In practice,
-                that is almost never the case.
+                Most agent memory systems stamp each fact with a single time:
+                when it was stored. That works as long as the system learns
+                about events the moment they happen, which rarely holds in
+                practice.
             </p>
 
             <p>
                 A client&rsquo;s risk tier changes on Monday. The CRM sync
                 runs on Wednesday. A manual review on Friday discovers the
                 tier should have been &ldquo;high,&rdquo; not
-                &ldquo;medium.&rdquo; Now there are three different moments
-                in play, and a single timestamp cannot distinguish between
-                them.
+                &ldquo;medium.&rdquo; Now three different moments are in play,
+                and a single timestamp cannot distinguish between them.
             </p>
 
             <p>
-                This is not a niche scenario. It is the norm in compliance,
-                healthcare, finance, and anywhere else where facts arrive
-                with delay or get corrected retroactively. And it matters
-                for agents because the question &ldquo;what did the system
-                believe when it made that decision?&rdquo; is not the same
-                as &ldquo;what is true now?&rdquo;
+                Delayed ingestion and retroactive corrections are routine in
+                compliance, healthcare, and finance. For agents operating in
+                those domains, &ldquo;what did the system believe when it made
+                that decision?&rdquo; and &ldquo;what is true now?&rdquo; are
+                two separate questions.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Core Distinction</p>
+                <p class="insight-title">Valid Time vs. Record Time</p>
                 <p>
-                    <strong>Valid time</strong> is when a fact is true in the
+                    <strong>Valid time</strong> is when a fact holds in the
                     world. <strong>Record time</strong> is when the system
-                    learned about it. These diverge whenever information
-                    arrives late or gets corrected &mdash; and an agent that
-                    conflates them cannot explain its own past decisions.
+                    learned about it. The two diverge whenever information
+                    arrives late or gets corrected, and an agent that conflates
+                    them cannot reconstruct why it acted as it did.
                 </p>
             </div>
 
             <h2>2. Bi-Temporal Data in Databases</h2>
 
             <p>
-                The idea is not new. Snodgrass formalized bi-temporal data
-                models in the 1990s, and SQL:2011 added standard syntax for
-                temporal tables with <code>PERIOD FOR</code> and
-                <code>AS OF</code> semantics. What is newer is bringing this
-                into the agent memory layer directly, where the two time
-                axes govern what the agent can retrieve and reason about at
-                any given point.
+                Bi-temporal modeling goes back decades: Snodgrass formalized
+                it in the 1990s, and SQL:2011 standardized temporal tables
+                with <code>PERIOD FOR</code> and <code>AS OF</code> queries.
+                Operon brings the same two-axis model directly into the agent
+                memory layer, where valid time and record time govern what an
+                agent can retrieve at any given point.
             </p>
 
             <p>
-                The implementation in operon is deliberately simple. It is
-                an in-memory append-only store with no database dependency.
-                The point is not to compete with temporal databases. The
-                point is to give agent workflows the right retrieval
-                semantics without requiring external infrastructure.
+                Operon&rsquo;s implementation is an in-memory, append-only
+                store with no database dependency. It gives agent workflows
+                temporal retrieval semantics directly in Python, without
+                requiring external infrastructure.
             </p>
 
             <h2>3. The Data Model</h2>
@@ -313,12 +309,11 @@
 </pre>
 
             <p>
-                The frozen dataclass is a deliberate departure from the
-                mutable dataclasses used elsewhere in operon&rsquo;s memory
-                layer. The justification is simple: in an append-only store,
-                corrections produce new facts rather than mutating existing
-                ones. Immutability is not a constraint here &mdash; it is
-                the semantics.
+                Unlike the mutable dataclasses used elsewhere in operon&rsquo;s
+                memory layer, <code>BiTemporalFact</code> is frozen. In an
+                append-only store, corrections insert new records rather than
+                editing existing ones, so immutability directly enforces the
+                storage contract.
             </p>
 
             <table>
@@ -334,15 +329,15 @@
                 </tbody>
             </table>
 
-            <h2>4. Write Semantics: Record, Correct, Never Mutate</h2>
+            <h2>4. Write Semantics: Record and Correct</h2>
 
             <p>
-                The store exposes two write operations.
-                <code>record_fact()</code> appends a new fact.
-                <code>correct_fact()</code> closes the old record by
-                setting its <code>recorded_to</code> and appends a new
-                fact with <code>supersedes</code> pointing back to the
-                original.
+                The store exposes two write operations:
+                <code>record_fact()</code> appends a new fact, and
+                <code>correct_fact()</code> closes an existing record by
+                setting its <code>recorded_to</code> timestamp before
+                appending a replacement whose <code>supersedes</code> field
+                points back to the original.
             </p>
 
 <pre>
@@ -362,30 +357,28 @@ correction = mem.correct_fact(fact.fact_id, "high",
 </pre>
 
             <p>
-                The old fact is never deleted or overwritten. Its
-                <code>recorded_to</code> is set to the correction time,
-                closing it on the record-time axis. The new fact carries a
-                fresh <code>fact_id</code> and an open
-                <code>recorded_to</code>. Both coexist in the store. This
-                is what makes past belief states reconstructible.
+                The old record stays in the store with its
+                <code>recorded_to</code> set to the correction time, closing it
+                on the record-time axis. The replacement gets a fresh
+                <code>fact_id</code> and an open <code>recorded_to</code>.
+                Keeping both records is what makes past belief states
+                reconstructible.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Why Append-Only</p>
                 <p>
-                    If you mutate facts in place, you lose the ability to
-                    answer &ldquo;what did the system believe at decision
-                    time?&rdquo; That question is the foundation of
-                    compliance auditing. Append-only semantics make it
-                    structurally impossible to lose that information.
+                    Mutating facts in place destroys the state the agent
+                    actually saw at decision time. Keeping writes append-only
+                    preserves that snapshot by construction, which is what
+                    compliance audits require.
                 </p>
             </div>
 
             <h2>5. Three Retrieval Questions</h2>
 
             <p>
-                The dual time axes give rise to three distinct retrieval
-                modes, each answering a different question:
+                The two time axes support three retrieval modes:
             </p>
 
             <h3>What is true at time T?</h3>
@@ -432,7 +425,8 @@ mem.retrieve_belief_state(at_valid=day2, at_record=day6)  # &rarr; "high"</code>
                 It reconstructs exactly what the agent would have believed
                 at any past moment. The first query returns
                 &ldquo;medium&rdquo; because the correction had not arrived
-                yet. The second returns &ldquo;high&rdquo; because it had.
+                by day 4; the second returns &ldquo;high&rdquo; because it
+                had arrived by day 6.
             </p>
 
             <h2>6. History, Diff, and Timeline</h2>
@@ -442,9 +436,9 @@ mem.retrieve_belief_state(at_valid=day2, at_record=day6)  # &rarr; "high"</code>
             </p>
 
             <ul>
-                <li><code>history(subject)</code> &mdash; all facts for a subject, including closed records, sorted by record time. Shows the full correction chain.</li>
-                <li><code>diff_between(t1, t2, axis)</code> &mdash; facts that appear at <code>t2</code> but not <code>t1</code> on the specified axis. Useful for &ldquo;what changed between these two points?&rdquo;</li>
-                <li><code>timeline_for(subject)</code> &mdash; all facts sorted by valid time. Shows the world-time narrative including superseded records.</li>
+                <li><code>history(subject)</code>: all facts for a subject, including closed records, sorted by record time, showing the full correction chain.</li>
+                <li><code>diff_between(t1, t2, axis)</code>: facts present at <code>t2</code> but not <code>t1</code> on the specified axis, showing what changed between two points in time.</li>
+                <li><code>timeline_for(subject)</code>: all facts sorted by valid time, showing the world-time narrative including superseded records.</li>
             </ul>
 
 <pre>
@@ -461,9 +455,9 @@ mem.timeline_for("client:42")</code>
             <h2>7. Relationship to Existing Memory Systems</h2>
 
             <p>
-                Operon already has two memory subsystems, and bi-temporal
-                memory is not a replacement for either. They solve
-                different problems:
+                Operon already includes two other memory subsystems.
+                <code>BiTemporalMemory</code> complements them; each handles a
+                different kind of memory:
             </p>
 
             <table>
@@ -494,12 +488,12 @@ mem.timeline_for("client:42")</code>
 
             <p>
                 <code>HistoneStore</code> annotates retrievals with
-                epigenetic marks &mdash; access frequency, recency, context.
+                epigenetic marks (access frequency, recency, context).
                 <code>EpisodicMemory</code> manages tiered decay and
                 promotion between working, short-term, and long-term memory.
                 Neither tracks corrections or supports dual-axis retrieval.
-                <code>BiTemporalMemory</code> fills a different niche:
-                domains where the audit trail is the point.
+                <code>BiTemporalMemory</code> serves domains where keeping an
+                audit trail of past beliefs matters.
             </p>
 
             <h2>8. Article Updates</h2>
@@ -511,7 +505,7 @@ mem.timeline_for("client:42")</code>
             <ul>
                 <li><strong>Related work</strong> (Section 2): new subsection on temporal databases and bi-temporal data models, citing Snodgrass and SQL:2011.</li>
                 <li><strong>Categorical mapping</strong> (Section 3): new paragraph formalizing the dual-interval state space as temporal coalgebra.</li>
-                <li><strong>Discussion</strong> (Section 6): new subsection on temporal epistemics &mdash; what did the agent know, and when did it know it?</li>
+                <li><strong>Discussion</strong> (Section 6): new subsection on temporal epistemics, covering what the agent knew and when it knew it.</li>
                 <li><strong>Implementation</strong> (Section 8): new subsection documenting the <code>BiTemporalMemory</code> implementation.</li>
             </ul>
 
@@ -555,22 +549,19 @@ mem.timeline_for("client:42")</code>
             <h2>10. What Comes Next</h2>
 
             <p>
-                Bi-temporal memory is Phase 1 of a longer roadmap. The
-                next phases build on this foundation: causal event logging
-                that tracks why decisions were made, not just what facts
-                were available; persistent storage backends so the
-                append-only log survives process restarts; and eventually
-                temporal reasoning primitives that let agents query their
-                own epistemic history as part of planning.
+                Bi-temporal memory is Phase 1 of the memory roadmap. The planned
+                next pieces are causal event logging (recording why decisions
+                were made alongside the facts available at the time), persistent
+                storage backends so the append-only log survives process
+                restarts, and temporal query primitives that let agents inspect
+                their own epistemic history during planning.
             </p>
 
             <p>
-                The deeper motivation is that agents that cannot explain
-                their past decisions are agents you cannot trust with
-                consequential ones. Bi-temporal memory is the first step
-                toward that kind of accountability &mdash; not as a
-                governance layer bolted on after the fact, but as a
-                structural property of the memory system itself.
+                If an agent cannot reconstruct what it believed when it acted,
+                it is hard to trust with consequential decisions. Putting
+                dual-axis history directly in the memory store builds
+                auditability into the data model from the start.
             </p>
 
             <blockquote>

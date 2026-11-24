@@ -282,55 +282,51 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.17 is the point where operon stopped feeling to me like a growing collection
-                    of motifs and started feeling like a language for reasoning about agent
-                    architecture. The release adds an epistemic layer to both the framework and the
-                    white paper: observation profiles, topology classification, and four structural
-                    predictions about error amplification, sequential overhead, parallelism, and
-                    tool coordination. It also ships the new machinery as code, example, and public
-                    demos, then checks the story against Kim et al.'s scaling study without
-                    pretending that qualitative agreement is stronger than it is.
+                    With v0.17, operon shifts from a collection of biological motifs to a language
+                    for analyzing multi-agent architecture. The release adds an epistemic layer to
+                    both the library and the white paper: observation profiles, topology
+                    classification, and four structural predictions covering error amplification,
+                    sequential overhead, parallelism, and tool coordination. It ships this analysis
+                    as code, a walkthrough example, and two public demos, and checks the predictions
+                    qualitatively against Kim et al.'s scaling study.
                 </p>
             </div>
 
             <h2>1. The Question After v0.16</h2>
 
             <p>
-                The previous releases built out the biological stack: membranes, chaperones,
+                Previous releases built out operon's biological primitives: membranes, chaperones,
                 metabolic control, multicellular composition, coalgebraic state machines,
-                morphogen diffusion, optics, and resource-aware diagram optimization.
-                v0.16 added a pragmatic bridge to the wider ecosystem via an
-                OpenAI-compatible provider layer.
+                morphogen diffusion, optics, and resource-aware diagram optimization. v0.16 then
+                added an OpenAI-compatible provider layer so those primitives could run against
+                standard LLM backends.
             </p>
 
             <p>
-                What changed after that was the question I kept coming back to while writing the
-                paper and while looking at the library. It was no longer just how to compose more
-                motifs. It became: <em>what does a wiring diagram let each agent actually know?</em>
-                That question mattered because the failures I kept seeing in multi-agent systems
-                were usually structural, not mysterious. A long sequential pipeline necessarily pays
-                handoff cost. Independent workers necessarily widen the error surface. Fragmenting
-                tools across agents necessarily creates remote-tool planning overhead. The structure
-                comes first; the symptoms come later.
+                While writing the paper and working through the library after v0.16, I kept coming
+                back to a different question: <em>what does a wiring diagram let each agent actually
+                know?</em> Most of the failure modes I saw in multi-agent systems traced back to the
+                topology itself. Long sequential pipelines accumulate handoff cost, independent
+                workers widen the error surface, and splitting tools across agents adds remote-tool
+                planning overhead. Those symptoms follow directly from the wiring.
             </p>
 
             <div class="insight">
-                <p class="insight-title">The Shift in One Sentence</p>
+                <p class="insight-title">Core Idea</p>
                 <p>
-                    v0.17 is the point where operon stops just collecting motifs and starts treating
-                    topology itself as an analyzable object.
+                    In v0.17, operon treats the wiring topology itself as an object you can analyze
+                    statically, alongside the motifs wired into it.
                 </p>
             </div>
 
             <h2>2. Observation as Architecture</h2>
 
             <p>
-                The new paper section reinterprets a wiring diagram as an observation structure.
-                I like this move because it did not require inventing a new layer out of nowhere.
-                The wires, optics, and filters were already there. The epistemic view just makes
-                explicit what they imply. Each module's knowledge is determined by the values that
-                can reach its input ports, after any optic or denaturation filter on the wire has
-                acted.
+                The new section of the paper reinterprets a wiring diagram as an observation
+                structure. I liked this framing because it required no new primitives: the wires,
+                optics, and filters were already in the diagram. Each module's knowledge is
+                determined by the values that can reach its input ports after any optic or
+                denaturation filter on the incoming wires has acted.
             </p>
 
             <div class="definition">
@@ -369,13 +365,13 @@ flowchart TD
             </div>
 
             <p>
-                The diamond above is a good example of why this matters. Both intermediate modules
-                depend on the same upstream dispatcher, but they do not receive the same epistemic
-                object: one branch is prism-filtered, the other is denatured. Structurally adjacent
-                is not the same thing as epistemically equivalent.
+                In the diamond above, both intermediate modules read from the same upstream
+                dispatcher, yet they observe different values: one branch passes through a prism
+                optic, and the other through a denaturation filter. Sharing an upstream neighbor
+                does not make two modules epistemically equivalent.
             </p>
 
-            <h2>3. Four Topology Classes, Four Predictable Behaviors</h2>
+            <h2>3. Topology Classes and Structural Predictions</h2>
 
             <table>
                 <tr>
@@ -401,7 +397,7 @@ flowchart TD
                 <tr>
                     <td><strong>Hybrid</strong></td>
                     <td>Mixed fan-out, fan-in, and partial parallelism.</td>
-                    <td>Most realistic systems live here; tradeoffs depend on local structure.</td>
+                    <td>Most real systems fall here; tradeoffs depend on local structure.</td>
                 </tr>
             </table>
 
@@ -458,28 +454,28 @@ print(report.density.planning_cost_ratio)
                 exported via <code>operon_ai.__init__</code> as <code>epistemic_analyze</code>
             </div>
 
-            <h2>5. New Example and Two New Spaces</h2>
+            <h2>5. Example and Interactive Spaces</h2>
 
             <p>
-                The release also adds a dedicated example,
-                <code>examples/67_epistemic_topology.py</code>. I wanted one place where the new
-                ideas were visible without reading the whole paper. It constructs four canonical
-                diagrams&mdash;independent, sequential, centralized fan-in, and a hybrid diamond&mdash;then
-                prints their observation profiles, partitions, topology classes, theorem outputs,
-                and topology recommendations.
+                The release also includes a standalone example,
+                <code>examples/67_epistemic_topology.py</code>, so you can see the analysis in
+                action without reading the whole paper. It constructs four canonical diagrams
+                (independent, sequential, centralized fan-in, and a hybrid diamond) and prints
+                their observation profiles, partitions, topology classes, theorem outputs, and
+                recommendations.
             </p>
 
             <p>
-                Two new Hugging Face Spaces package the same ideas as interactive tools:
+                Two Hugging Face Spaces package the same ideas as interactive tools:
             </p>
 
             <ul>
                 <li>
-                    <strong>Epistemic Topology Explorer</strong>&mdash;preset diagrams, observation profiles,
-                    theorem dashboard, topology advisor.
+                    <strong>Epistemic Topology Explorer</strong>: preset diagrams, observation
+                    profiles, a theorem dashboard, and a topology advisor.
                 </li>
                 <li>
-                    <strong>Diagram Builder</strong>&mdash;define your own modules and wires in a small text
+                    <strong>Diagram Builder</strong>: define modules and wires in a small text
                     format and compare two candidate topologies side by side.
                 </li>
             </ul>
@@ -493,20 +489,20 @@ print(report.density.planning_cost_ratio)
             <h2>6. Kim et al. as an External Check</h2>
 
             <p>
-                The important paper-side task after adding the epistemic section was not to produce
-                stronger rhetoric, but to test whether the new explanation lines up with an external
-                empirical study. The reference point here is Kim et al.,
+                After drafting the epistemic section of the paper, I wanted to test whether its
+                predictions line up with an external empirical study. The reference point is
+                Kim et al.,
                 <a href="https://arxiv.org/abs/2512.08296"><em>Towards a Science of Scaling Agent Systems</em></a>.
             </p>
 
             <div class="insight">
-                <p class="insight-title">A Deliberate Restraint</p>
+                <p class="insight-title">Scope of the Comparison</p>
                 <p>
-                    The Kim comparison is qualitative, not a direct parameter fit. Their reported
-                    metrics are architecture-level aggregates across benchmarks. The operon theorems
-                    are simplified mechanistic models. The right question is whether the predicted
-                    ordering and regime changes match, not whether benchmark percentages are literal
-                    theorem variables.
+                    This comparison is qualitative rather than a parameter fit. Kim et al. report
+                    architecture-level aggregates across benchmarks, while operon's theorems are
+                    simplified mechanistic models. The relevant check is whether the predicted
+                    orderings and regime transitions match the empirical trends, without treating
+                    benchmark percentages as literal theorem variables.
                 </p>
             </div>
 
@@ -539,9 +535,9 @@ print(report.density.planning_cost_ratio)
             </table>
 
             <p>
-                For me, the payoff of that comparison was mostly epistemic honesty. The white paper
-                now says something narrower and better: the new formal layer provides a mechanistic
-                interpretation of external scaling regularities, not an overfitted benchmark story.
+                Comparing against Kim et al. kept the paper's claim appropriately narrow: the
+                epistemic layer gives a mechanistic explanation of observed scaling regularities,
+                while stopping short of claiming a quantitative parameter fit.
             </p>
 
             <h2>7. Validation</h2>
@@ -580,11 +576,10 @@ print(report.density.planning_cost_ratio)
             </p>
 
             <p>
-                So the next step after v0.17 is probably not another theoretical layer. It is a
-                thinner, pattern-first API that hides most of the substrate while preserving the
-                structure that makes the analysis possible. In a way, that feels like the right
-                sequel to this release: first make the architecture language explicit, then make it
-                easier to use.
+                The next step after v0.17 is a thinner, pattern-first API on top of this
+                substrate, hiding the formal machinery by default while keeping the underlying
+                wiring structure intact for analysis. Having made the architecture language
+                explicit here, the obvious follow-up is making it easier to use.
             </p>
 
             <blockquote>

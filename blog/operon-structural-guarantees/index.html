@@ -149,38 +149,38 @@
         <article>
             <header>
                 <h1>What Biological Agent Design Actually Buys You</h1>
-                <div class="subtitle">After benchmarking three operon subsystems against naive alternatives, the honest answer is: structural guarantees, not algorithmic sophistication</div>
+                <div class="subtitle">Benchmarking three Operon subsystems against simple baselines points to structural guarantees over algorithmic sophistication</div>
                 <div class="author"><a href="/">Bogdan Banu</a> &middot; April 4, 2026</div>
                 <div class="version-note">operon-ai v0.27.1 &middot; <a href="https://arxiv.org/abs/2605.15225" style="color:#6a6;border:none;">arXiv:2605.15225</a></div>
             </header>
 
-            <p><em><strong>Update (May 2026):</strong> the three benchmarks below are now written up formally &mdash; <a href="https://arxiv.org/abs/2605.15225"><em>Do Biological Structural Guarantees Earn Their Complexity?</em></a> (arXiv:2605.15225), with a Gemma&nbsp;4 27B end-to-end follow-up confirming the split this post describes: state-integrity guarantees are deterministic, behavioral and output-layer guarantees show honest limitations with capable models. This post is the narrative companion; the paper carries the full methodology and the conditional-guarantee analysis.</em></p>
+            <p><em><strong>Update (May 2026):</strong> the three benchmarks below are now written up formally in <a href="https://arxiv.org/abs/2605.15225"><em>Do Biological Structural Guarantees Earn Their Complexity?</em></a> (arXiv:2605.15225), alongside a Gemma&nbsp;4 27B end-to-end follow-up that confirms the split described here: state-integrity guarantees hold deterministically, while behavioral and output-layer guarantees hit real limits with capable models. The paper covers the full methodology and conditional-guarantee analysis.</em></p>
 
             <h2>The biological stack</h2>
 
             <p>Operon implements about 22 biological motifs. They span DNA-level configuration (Genome, Histone epigenetics) through organelles (Nucleus for LLM calls, Ribosome for prompt synthesis, Mitochondria for deterministic computation, Lysosome for cleanup) to tissue-level coordination (Morphogen gradients, DiffusionField, Quorum Sensing). It is, as far as I know, the most complete cellular biology metaphor stack applied to AI agent reliability.</p>
 
-            <p>Not all of these motifs are equally valuable. Some provide genuine engineering benefits. Some are elegant organizational principles that happen not to outperform simpler alternatives. After the C8 convergence phase showed that biological abstractions generalize as <em>code structure</em> rather than <em>optimization algorithms</em>, I wanted to know which features actually earn their complexity.</p>
+            <p>Not all of these motifs are equally useful. Some give real engineering benefits, while others are tidy ways to organize code that perform no better than simpler designs. After the C8 convergence phase showed that biological abstractions generalize as <em>code structure</em> rather than as <em>optimization algorithms</em>, I wanted to test which mechanisms actually justify their complexity.</p>
 
-            <p>I tested three representative features, each compared against a simple, reasonable non-biological alternative. Not a strawman. The kind of thing a competent engineer would reach for without reading any biology papers. 1,000 trials per scenario, 10 seeds, 10M+ total data points. No LLM calls during benchmarking&mdash;pure computation.</p>
+            <p>I benchmarked three representative subsystems against straightforward, non-biological baselines: the kind of implementation a competent engineer would write without ever opening a biology paper. Each scenario ran for 1,000 trials across 10 seeds (more than 10M data points in total), using pure local computation with no LLM calls.</p>
 
-            <h2>What earned its weight: metabolism priority gating</h2>
+            <h2>Metabolism priority gating</h2>
 
             <p>The <code>ATP_Store</code> manages three energy currencies (ATP, GTP, NADH) with regeneration, debt tracking, and a five-state metabolic state machine: FEASTING, NORMAL, CONSERVING, STARVING, DORMANT. The <code>MTORScaler</code>, inspired by KEGG pathway hsa04152 (AMPK signaling), senses the AMP:ATP ratio and its <em>rate of change</em> to make adaptive scaling decisions.</p>
 
-            <p>The naive alternative: a flat integer counter. Start at N, decrement by cost, return false when empty.</p>
+            <p>The baseline was a flat integer counter: start at N, decrement by cost, and return false when empty.</p>
 
-            <p>Under bursty load, the biological system served <strong>100% of critical operations</strong> (priority 5+) during resource pressure. The flat counter served <strong>39.8%</strong>. That is a delta of +0.602, statistically significant at p &lt; 0.001, across 24,139 pressure events.</p>
+            <p>Under bursty load, the biological system served <strong>100% of critical operations</strong> (priority 5+) during resource pressure, compared to <strong>39.8%</strong> for the flat counter (a delta of +0.602, p &lt; 0.001 across 24,139 pressure events).</p>
 
-            <p>The tradeoff: the biological system completed 71.9% of total operations versus the naive counter&rsquo;s 68.5% under bursty load. The <code>MTORScaler</code> adds adaptive worker scaling&mdash;8 workers during GROWTH, scaling down to 1 in AUTOPHAGY. In a worker-scaling benchmark, the biological variant completed 300 operations in 57 steps versus 75 for a fixed-worker alternative&mdash;32% faster by front-loading work when resources are abundant. The value is latency (finish sooner), not per-slot efficiency.</p>
+            <p>Overall completion under bursty load was 71.9% for the biological system versus 68.5% for the flat counter. Adding <code>MTORScaler</code> introduces adaptive worker scaling, running 8 workers during GROWTH and scaling down to 1 in AUTOPHAGY. In a worker-scaling benchmark, this variant finished 300 operations in 57 steps versus 75 for a fixed-worker pool (32% faster) by front-loading work while resources are abundant. The gain is lower latency (finishing sooner) rather than higher per-slot efficiency.</p>
 
-            <p>This is mechanism design, not optimization. The priority gate is a simple structural rule. The adaptive scaler is a simple state machine. But together they provide hard guarantees: critical operations <em>will</em> be served, and work <em>will</em> be front-loaded when resources allow. A flat counter cannot provide either guarantee.</p>
+            <p>Neither component is algorithmically complex: the priority gate is a threshold rule and the adaptive scaler is a small state machine. What matters is the mechanism design. Together they enforce two hard guarantees that a flat counter cannot offer: critical operations <em>will</em> be served under contention, and work <em>will</em> be front-loaded when capacity is available.</p>
 
-            <h2>What earned its weight with a tradeoff: quorum sensing</h2>
+            <h2>Quorum sensing</h2>
 
-            <p><code>QuorumSensingBio</code> models autoinducer signal accumulation inspired by KEGG pathway map02024 (the <em>V. fischeri</em> LuxI/LuxR system). Each agent emits a continuous signal proportional to its suspicion level into a shared environment. Signals decay exponentially with a half-life of 5.0 time units. The activation threshold scales as log(N).</p>
+            <p><code>QuorumSensingBio</code> models autoinducer signal accumulation after KEGG pathway map02024 (the <em>V. fischeri</em> LuxI/LuxR system). Each agent emits a continuous signal proportional to its suspicion level into a shared field; signals decay exponentially with a half-life of 5.0 time units, and the activation threshold scales as log(N).</p>
 
-            <p>Three coordination strategies were tested across 300,000 decisions per configuration:</p>
+            <p>I tested three coordination strategies across 300,000 decisions per configuration:</p>
 
             <table>
                 <tr><th>Strategy</th><th>FPR</th><th>TPR at 40% compromise</th></tr>
@@ -189,17 +189,17 @@
                 <tr><td>Majority vote (naive)</td><td><strong>0.000%</strong></td><td>0&ndash;5%</td></tr>
             </table>
 
-            <p>The biological model occupies a unique precision-recall operating point. Majority vote never fires because clean agents always outvote. Independent actors catch everything but cry wolf on 1 in 6&ndash;20 clean time steps. The biological model&rsquo;s zero false-positive rate with meaningful true-positive rate is the useful tradeoff.</p>
+            <p>The biological model sits at a distinct precision-recall operating point. Majority vote almost never triggers because clean agents outvote compromised ones, while independent actors catch every compromise at the cost of crying wolf on 1 in 6&ndash;20 clean time steps. Quorum sensing gives a zero false-positive rate while still catching 71&ndash;87% of events at 40% compromise.</p>
 
-            <p>Two structural properties drive this: continuous signals average out noise (unlike binary votes), and temporal decay ensures stale evidence ages out (unlike a vote that persists forever). Biology solved the problem of coordinating without a leader by making evidence time-sensitive.</p>
+            <p>Two structural properties account for this behavior: continuous signals average out isolated noise where binary votes discard magnitude, and exponential decay ages out stale evidence instead of letting old alerts accumulate indefinitely. Leaderless coordination works here because evidence has a shelf life.</p>
 
-            <h2>What earned its weight once the signal was real: epiplexity</h2>
+            <h2>Epiplexity monitoring</h2>
 
-            <p>The <code>EpiplexityMonitor</code> uses a Bayesian two-signal approach: embedding novelty plus perplexity, inspired by the free energy principle. The theory: an agent repeating itself (low novelty) while remaining uncertain (high perplexity) is in a pathological loop. A converging agent has both low novelty <em>and</em> low perplexity. Two signals should distinguish these cases; one signal cannot.</p>
+            <p><code>EpiplexityMonitor</code> combines two signals in a Bayesian update: embedding novelty and perplexity, modeled on the free energy principle. An agent repeating itself (low novelty) while remaining uncertain (high perplexity) is stuck in a pathological loop, whereas a converging agent shows both low novelty <em>and</em> low perplexity. Separating the two cases requires both signals.</p>
 
-            <p>The naive alternative: cosine similarity across a sliding window plus a timeout.</p>
+            <p>The baseline was cosine similarity over a sliding window paired with a timeout.</p>
 
-            <p>With mock embeddings (SHA-256 hashes), the naive detector won: 94% accuracy on loops versus biological&rsquo;s 47%. I initially reported this as an honest negative. Then I swapped in real sentence embeddings (all-MiniLM-L6-v2, local, no API calls) and the result flipped.</p>
+            <p>With mock embeddings (SHA-256 hashes), the baseline won, reaching 94% accuracy on loops versus 47% for the biological monitor. I initially wrote that up as a negative result. Once I swapped in real sentence embeddings (all-MiniLM-L6-v2, running locally with no API calls), the outcome flipped.</p>
 
             <table>
                 <tr><th>Scenario</th><th>Bio (real emb)</th><th>Naive (real emb)</th><th>Naive FP rate</th></tr>
@@ -209,37 +209,37 @@
                 <tr><td>Loop (easy case)</td><td>57.1%</td><td><strong>94.0%</strong></td><td>75.0%</td></tr>
             </table>
 
-            <p>The biological monitor achieves <strong>96% accuracy</strong> on convergence and false-stagnation scenarios&mdash;the exact cases it was designed for. The naive detector sees similar outputs and screams &ldquo;stagnant!&rdquo; at 98% false-positive rate on false stagnation. It cannot distinguish an agent converging confidently from an agent stuck in a loop.</p>
+            <p>The biological monitor reaches <strong>96% accuracy</strong> on convergence and false-stagnation scenarios, the two regimes it was built for. Seeing similar outputs, the baseline calls stagnation with a 98% false-positive rate on false-stagnation runs because it has no way to separate a confident, converging agent from one stuck in a loop.</p>
 
-            <p>The loop scenario still favors naive (94% vs 57%) because exact repetition is trivially detectable by cosine similarity. That is the easy case. The hard case&mdash;semantically similar outputs where the agent&rsquo;s confidence level matters&mdash;is where the two-signal design earns its complexity. The structural guarantee is conditional: it works when the embedding signal carries semantic meaning, just as a biological receptor works when its ligand is present.</p>
+            <p>The baseline still wins on pure repetition loops (94% vs 57%), where exact repeats are easy for cosine similarity to catch. Where the two-signal design matters is the harder case: semantically similar outputs in which the agent&rsquo;s confidence separates progress from stagnation. The guarantee is conditional on signal quality: it holds when the embeddings carry semantic meaning, much like a biological receptor that only fires when its ligand is present.</p>
 
-            <h2>C8 confirmed the same pattern at the meta-level</h2>
+            <h2>The same pattern in C8 meta-evolution</h2>
 
-            <p>The C8 convergence phase tested whether Operon&rsquo;s biological abstractions improve meta-level configuration search. Finding: tournament mutation matches or beats LLM-guided evolution. Biological abstractions generalize as code structure (lossless Genome round-trip, scale-invariant EpiplexityMonitor) but not as optimization algorithms. The mechanism benchmarks confirm this: structural features work, algorithmic claims do not automatically hold.</p>
+            <p>The C8 convergence phase tested whether Operon&rsquo;s biological abstractions help with meta-level configuration search, and found that simple tournament mutation matches or beats LLM-guided evolution. The biological abstractions generalized cleanly as code structure (a lossless Genome round-trip and a scale-invariant EpiplexityMonitor), while failing to outperform simple search as optimization algorithms. These three subsystem benchmarks point in the same direction: the structural properties hold up, whereas algorithmic advantages cannot be assumed.</p>
 
-            <h2>Epistemic topology is a diagnostic, not a runtime mechanism</h2>
+            <h2>Epistemic topology as a static diagnostic</h2>
 
-            <p>Operon&rsquo;s epistemic layer derives four theorems from wiring diagram structure: error amplification bound, sequential communication overhead, parallel speedup, tool density scaling. Complete implementation. Useful as a structural linter&mdash;it correctly identifies architectures likely to amplify errors or incur coordination overhead.</p>
+            <p>Operon&rsquo;s epistemic layer derives four theorems directly from wiring diagram structure: error amplification bounds, sequential communication overhead, parallel speedup, and tool density scaling. The implementation is complete and works well as a static structural linter, flagging architectures prone to error amplification or heavy coordination overhead.</p>
 
-            <p>But: no runtime feedback loop. The topology does not auto-reconfigure based on observed behavior. No empirical validation of predicted bounds against measured benchmark performance. The biological motifs (metabolism, quorum sensing) now have stronger empirical backing than the formal topology theorems. Worth keeping as an analysis tool. Claims about predictive precision need tempering until empirical validation is completed.</p>
+            <p>At this stage, though, it has no runtime feedback loop (the topology never reconfigures itself from observed behavior) and no empirical validation tying the predicted bounds to measured benchmark performance. As a result, the runtime motifs like metabolism and quorum sensing currently have stronger empirical backing than the topology theorems. The epistemic layer is worth keeping as an analysis tool, provided claims about its predictive precision wait for live validation.</p>
 
             <h2>Which frameworks benefit most</h2>
 
-            <p>Operon has convergence adapters for six frameworks. Grounded in benchmark results:</p>
+            <p>Operon ships convergence adapters for six external frameworks. Based on these benchmarks, the fit varies:</p>
 
-            <p><strong>A-Evolve</strong> benefits most from structural safety. Its Solve-Observe-Evolve-Gate-Reload loop is exactly where metabolic budgets prevent unbounded exploration, developmental staging structures search phases, and the fitness gate (a critical operation) is always evaluated under metabolic budgeting&mdash;the benchmark proves this.</p>
+            <p><strong>A-Evolve</strong> gets the most out of structural safety. In its Solve-Observe-Evolve-Gate-Reload loop, metabolic budgets bound exploration, developmental staging separates search phases, and priority gating guarantees the fitness gate (a critical operation) still runs under resource pressure.</p>
 
-            <p><strong>Swarms</strong> benefits most from coordination features. Its graph-based multi-agent topology is where quorum sensing provides leaderless consensus with zero false positives. When false consensus triggers coordinated action across a swarm, the 0% FPR guarantee is operationally critical.</p>
+            <p><strong>Swarms</strong> maps naturally to the coordination layer. Its graph-based multi-agent topology can use quorum sensing for leaderless consensus without false alarms, which matters operationally whenever spurious consensus would trigger coordinated action across the swarm.</p>
 
-            <p><strong>DeerFlow</strong> benefits from metabolic budgets preventing recursive sub-agent calls from exhausting resources. AnimaWorks, Ralph, and Scion have lighter fits: genome immutability for config audit, backpressure enforcement, and cross-container consensus respectively.</p>
+            <p><strong>DeerFlow</strong> primarily needs metabolic budgets to stop recursive sub-agent calls from exhausting resources. The remaining three adapters have narrower roles: genome immutability for config auditing in AnimaWorks, backpressure enforcement in Ralph, and cross-container consensus in Scion.</p>
 
-            <h2>The pattern</h2>
+            <h2>What the benchmarks show</h2>
 
-            <p>Across all three benchmarks and the C8 meta-evolution findings, the same pattern holds: Operon&rsquo;s value is <em>structural guarantees</em>&mdash;hard properties enforced by design that simpler approaches cannot match without reimplementing the same structural choices.</p>
+            <p>Across all three benchmarks and the C8 meta-evolution runs, the same conclusion emerges: Operon&rsquo;s value comes from <em>structural guarantees</em>, meaning hard properties enforced by the architecture that simpler designs can only match by reimplementing the same structure.</p>
 
-            <p>Priority gating guarantees critical service under pressure. Signal accumulation with decay guarantees zero false alarms with meaningful detection. Two-signal Bayesian discrimination guarantees convergence/stagnation distinction&mdash;when the embedding signal is real. A metabolic state machine is simple. Exponential decay is a one-liner. A two-signal combiner is undergraduate statistics. But each provides a structural guarantee that a flat counter, a majority vote, or a cosine threshold structurally cannot.</p>
+            <p>The underlying math is elementary: a small metabolic state machine, a one-line exponential decay, and a two-signal Bayesian combiner straight out of undergraduate statistics. Yet each enforces an invariant that a flat counter, a majority vote, or a cosine threshold cannot provide on its own: critical operations stay served under load, leaderless consensus stays free of false alarms while still detecting compromises, and convergence stays distinct from stagnation once the embedding signal is real.</p>
 
-            <p>The epiplexity result adds a nuance: some structural guarantees are <em>conditional</em> on signal quality. The two-signal design works when embeddings carry semantic meaning; it fails when they do not. This is analogous to a biological receptor that provides a structural binding guarantee but only functions in the presence of its ligand. The structure is always there; whether it activates depends on the environment.</p>
+            <p>The epiplexity benchmark adds an important qualification: some structural guarantees are <em>conditional</em> on input signal quality. The two-signal structure is always in place, but it only separates convergence from stagnation when the underlying embeddings carry semantic meaning.</p>
 
             <h2>What comes next</h2>
 
@@ -251,7 +251,7 @@
             </ul>
 
             <ul>
-                <li><a href="https://arxiv.org/abs/2605.15225">Paper &mdash; <em>Do Biological Structural Guarantees Earn Their Complexity?</em></a> (arXiv:2605.15225) &mdash; the formal write-up of this post&rsquo;s benchmarks.</li>
+                <li><a href="https://arxiv.org/abs/2605.15225">Paper: <em>Do Biological Structural Guarantees Earn Their Complexity?</em></a> (arXiv:2605.15225), the formal write-up of this post&rsquo;s benchmarks.</li>
                 <li><a href="https://github.com/coredipper/operon">GitHub</a></li>
                 <li><a href="https://pypi.org/project/operon-ai/">PyPI</a></li>
                 <li><a href="https://banu.be/operon">Docs</a></li>

@@ -343,28 +343,28 @@
             <div class="abstract">
                 <p class="abstract-title">Summary</p>
                 <p>
-                    Operon v0.12 introduces a <strong>reproducible eval harness</strong> with two benchmark suites derived
-                    from established academic benchmarks: <strong>BFCL</strong> (Berkeley Function Calling Leaderboard) for
-                    structural validation and <strong>AgentDojo</strong> for prompt injection immunity. This release also
-                    corrects several mathematical inconsistencies between the paper and the implementation&mdash;most
-                    significantly, replacing the logistic sigmoid with the paper's exponential saturation in the Epiplexity
-                    formula, and fixing the stagnation detection direction. All claims are now backed by 100-seed
-                    reproducible results.
+                    Operon v0.12 adds a <strong>reproducible eval harness</strong> with two benchmark suites adapted
+                    from published academic benchmarks: <strong>BFCL</strong> (Berkeley Function Calling Leaderboard) for
+                    structural validation and <strong>AgentDojo</strong> for prompt injection detection. This release also
+                    fixes several mathematical discrepancies between the paper and the implementation, most notably
+                    replacing the logistic sigmoid with the paper's exponential saturation in the Epiplexity
+                    formula and inverting the stagnation detection direction. All reported numbers come from 100-seed
+                    reproducible runs.
                 </p>
             </div>
 
-            <h2>1. The Problem: Verifying Biological Claims</h2>
+            <h2>1. Verifying the Biological Claims</h2>
 
             <p>
-                The previous releases introduced mechanisms inspired by Systems Biology: Chaperone Proteins for structural
-                healing, T-cell receptors for anomaly detection, Epiplexity for epistemic stagnation monitoring. These
-                biological analogies are compelling&mdash;but analogies are not evidence.
+                Earlier releases introduced mechanisms borrowed from Systems Biology: Chaperone Proteins for structural
+                healing, T-cell receptors for anomaly detection, and Epiplexity for epistemic stagnation monitoring.
+                Those analogies explain the architecture, but they do not show whether the implementations actually work.
             </p>
 
             <p>
-                A framework that claims "Chaperone-mediated folding repairs malformed JSON" needs to demonstrate
-                this under controlled conditions. A system claiming "Immune surveillance detects prompt injection"
-                needs adversarial evaluation, not just unit tests. v0.12 addresses this gap.
+                Claiming that chaperone-mediated folding repairs malformed JSON calls for controlled corruption
+                benchmarks; claiming that immune surveillance catches prompt injection calls for adversarial evaluation
+                beyond unit tests. Release v0.12 adds an empirical eval harness for both.
             </p>
 
             <div class="insight">
@@ -381,7 +381,7 @@
             <p>
                 The <a href="https://gorilla.cs.berkeley.edu/leaderboard.html">Berkeley Function Calling Leaderboard</a>
                 (BFCL) evaluates how well models generate structured function calls. We adapt it to test the
-                Chaperone protein motif&mdash;the retry-and-repair loop that folds malformed LLM outputs into
+                Chaperone protein motif, the retry-and-repair loop that folds malformed LLM outputs into
                 valid schemas.
             </p>
 
@@ -497,7 +497,7 @@
                 can refold structure, but cannot repair sequence mutations.
             </p>
 
-            <h3>2.3 Healing: Error Context Matters</h3>
+            <h3>2.3 Healing with Error Context</h3>
 
             <p>
                 The Chaperone Loop (Section 5.5.1 of the paper) specifies that error traces should be fed back to the
@@ -530,10 +530,10 @@
             </table>
 
             <p>
-                Blind retry recovers only 37.5% of failures. Injecting the error trace ("TypeError: 'one hundred'
-                is not float") into the generator's context achieves 99.5% healing. The biological analogy holds:
-                the GroEL cage doesn't just retry folding&mdash;it provides a <em>protected environment</em>
-                where the error signal itself guides correction.
+                Blind retry recovers only 37.5% of failures, whereas injecting the error trace ("TypeError: 'one hundred'
+                is not float") into the generator's context reaches 99.5% healing. Like the GroEL cage providing a
+                <em>protected environment</em> for refolding, the healing loop works because the error signal itself
+                guides the next attempt.
             </p>
 
             <div class="reference-impl">
@@ -546,14 +546,14 @@
             <p>
                 <a href="https://agentdojo.spylab.ai/">AgentDojo</a> (Debenedetti et al., NeurIPS 2024) provides
                 a dynamic environment for evaluating prompt injection attacks and defenses. We adapt its attack
-                templates to test the Adaptive Immunity motif&mdash;the T-cell surveillance system that detects
-                compromised agents through behavioral anomaly.
+                templates to test the Adaptive Immunity motif, the T-cell surveillance system that detects
+                compromised agents via behavioral anomalies.
             </p>
 
             <h3>3.1 Experimental Setup</h3>
 
             <p>
-                We create a population of 40 simulated agents. Eight are "compromised"&mdash;their behavioral
+                We create a population of 40 simulated agents, eight of which are "compromised": their behavioral
                 profiles are shifted by injection patterns derived from four AgentDojo attack categories:
             </p>
 
@@ -609,19 +609,19 @@
             </table>
 
             <p>
-                The wide confidence intervals reflect the small sample size (8 compromised agents)&mdash;a
-                deliberate choice to model realistic deployments where compromised agents are rare. The
-                sensitivity of 100% with 0% false positives on AgentDojo-derived attacks is encouraging,
-                but the confidence bounds remind us that larger-scale evaluation is needed.
+                The wide confidence intervals reflect the small sample size (8 compromised agents), chosen to
+                model deployments where compromised agents are rare. Reaching 100% sensitivity with 0% false
+                positives on the AgentDojo-derived patterns is encouraging, though the confidence bounds show
+                that larger-scale evaluation is still needed.
             </p>
 
             <div class="insight">
-                <p class="insight-title">Honest Assessment</p>
+                <p class="insight-title">Scope and Limitations</p>
                 <p>
-                    These are simulated behavioral shifts, not real LLM-mediated attacks. The eval tests
-                    the <em>statistical detection machinery</em> (baseline profiling, anomaly scoring, canary
-                    signals), not the full attack-defense loop. Real-world injection resistance requires
-                    end-to-end evaluation with actual LLMs&mdash;a direction for future work.
+                    This suite uses simulated behavioral shifts rather than live LLM-mediated attacks. It exercises
+                    the <em>statistical detection machinery</em> (baseline profiling, anomaly scoring, and canary
+                    signals) in isolation; measuring real injection resistance requires end-to-end evaluation with
+                    live LLMs, which remains future work.
                 </p>
             </div>
 
@@ -633,11 +633,11 @@
             <h2>4. Mathematical Corrections</h2>
 
             <p>
-                During the development of the eval harness, a comprehensive audit revealed several inconsistencies
-                between the paper and the implementation. These are now corrected in both directions.
+                While building the eval harness, an audit of the codebase against the paper turned up several
+                inconsistencies. Both the code and the paper have been updated so they agree.
             </p>
 
-            <h3>4.1 Exponential Saturation, Not Sigmoid</h3>
+            <h3>4.1 Exponential Saturation</h3>
 
             <p>
                 The paper defines perplexity normalization as an exponential saturation function:
@@ -648,10 +648,10 @@
             </div>
 
             <p>
-                This maps $[0, \infty) \to [0, 1)$ with a natural interpretation: $H_0$ is the baseline perplexity
-                where the function reaches $\approx63\%$ saturation. The implementation was using a logistic sigmoid
-                $\frac{1}{1+e^{-x}}$ instead&mdash;a function with different domain ($\mathbb{R} \to (0,1)$),
-                different inflection point, and different asymptotic behavior.
+                This maps $[0, \infty) \to [0, 1)$ with a direct interpretation: $H_0$ is the baseline perplexity
+                where the function reaches $\approx63\%$ saturation. The implementation had been using a logistic sigmoid
+                $\frac{1}{1+e^{-x}}$, which has a different domain ($\mathbb{R} \to (0,1)$), inflection point, and
+                asymptotic behavior.
             </p>
 
             <div class="correction">
@@ -674,7 +674,7 @@
             </div>
 
             <p>
-                Low Epiplexity means low Bayesian surprise&mdash;the agent's outputs carry no new information.
+                Low Epiplexity means low Bayesian surprise: the agent's outputs carry no new information.
                 The implementation was checking the <em>opposite</em> direction ($\mathcal{E}_w > \delta$),
                 which would flag high-surprise (exploring) agents as stagnant.
             </p>
@@ -731,7 +731,7 @@
                     <tr>
                         <td>43: Code Review Pipeline</td>
                         <td>CFFL, Quorum</td>
-                        <td>Multi-agent review with conjunctive gating&mdash;code ships only if both Generator and Reviewer approve</td>
+                        <td>Multi-agent review with conjunctive gating: code ships only if both Generator and Reviewer approve</td>
                     </tr>
                     <tr>
                         <td>44: Codebase Q&amp;A (RAG)</td>
@@ -788,10 +788,9 @@
             <h2>7. Interactive Demos</h2>
 
             <p>
-                Every biological motif in the framework now has a corresponding interactive demo on
-                HuggingFace Spaces. These run entirely in-browser&mdash;no API keys, no setup. Each demo
-                includes curated presets that demonstrate the motif's core behavior: failure modes, recovery
-                dynamics, and parameter sensitivity.
+                Every biological motif in the framework now has an interactive demo on HuggingFace Spaces
+                that runs in the browser with no API keys or local setup. Each demo ships with presets
+                covering failure modes, recovery dynamics, and parameter sensitivity.
             </p>
 
             <table>
@@ -861,7 +860,7 @@
                     <tr>
                         <td>Mitochondria (MIPS)</td>
                         <td><a href="https://huggingface.co/spaces/coredipper/operon-mitochondria">operon-mitochondria</a></td>
-                        <td>Safe calculator with AST-based parsing&mdash;no injection risk</td>
+                        <td>Safe calculator using AST-based parsing to avoid injection</td>
                     </tr>
                     <tr>
                         <td>ATP Budget</td>
@@ -901,7 +900,7 @@
                     <tr>
                         <td>Repair Memory</td>
                         <td><a href="https://huggingface.co/spaces/coredipper/operon-repair-memory">operon-repair-memory</a></td>
-                        <td>Epigenetic repair memory&mdash;stores healing strategies as histone markers for reuse</td>
+                        <td>Epigenetic repair memory that stores healing strategies as histone markers for reuse</td>
                     </tr>
                     <tr>
                         <td>Scheduled Maintenance</td>
@@ -918,31 +917,28 @@
 
             <p>
                 The demos are built with <a href="https://gradio.app">Gradio</a> and deployed from the
-                <code>huggingface/space-*/</code> directories in the repository. Each includes tunable parameters so
-                that edge cases&mdash;entropy collapse, budget exhaustion, stagnation recovery&mdash;can
-                be explored directly.
+                <code>huggingface/space-*/</code> directories in the repository. Each includes tunable parameters
+                for exploring edge cases such as entropy collapse, budget exhaustion, and stagnation recovery.
             </p>
 
             <h2>8. Conclusion</h2>
 
             <p>
-                Operon v0.12 shifts the project from "biologically inspired architecture" to "empirically
-                validated architecture." The eval harness provides reproducible, statistically grounded
-                evidence for the framework's claims. The mathematical corrections ensure that the paper
-                and the code agree exactly&mdash;not approximately, not directionally, but precisely.
+                With v0.12, the framework's claims are backed by reproducible benchmarks rather than analogies
+                alone, and the mathematical fixes bring the paper and implementation into exact agreement.
             </p>
 
             <p>
-                The results are honest. The Chaperone repairs structural damage (65.5% cascade accuracy)
-                but cannot recover semantic information lost to type mutations (6.5% strict). The Immune
-                System detects all simulated compromises but operates on behavioral distributions, not
-                actual LLM outputs. These are the bounds of what the current implementation can claim.
+                The numbers also make the current limits clear. The Chaperone repairs structural damage reliably
+                (65.5% cascade accuracy), yet it rarely recovers exact original values after type mutations or
+                field deletions (6.5% strict). The Immune System catches all simulated compromises in the
+                AgentDojo-derived suite, though those tests operate on synthetic behavioral distributions rather
+                than live LLM transcripts.
             </p>
 
             <p>
-                The next frontier is end-to-end evaluation: real LLMs, real attacks, real function calls.
-                The eval harness provides the scaffolding; the benchmarks provide the methodology. What
-                remains is connecting the simulated biology to the living system.
+                The next step is end-to-end evaluation with live LLMs, real function calls, and actual prompt
+                injection attempts, building on the harness and suites introduced here.
             </p>
 
             <p>

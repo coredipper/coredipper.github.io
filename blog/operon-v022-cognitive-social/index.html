@@ -205,7 +205,7 @@
         <article>
             <header>
                 <h1>Operon v0.22: The Cognitive Architecture</h1>
-                <p class="subtitle">Cognitive Modes, Sleep Consolidation, Social Learning, Curiosity, and What Happens When Agents Start Dreaming</p>
+                <p class="subtitle">Cognitive Modes, Sleep Consolidation, Social Learning, and Curiosity Signals</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -216,32 +216,32 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    v0.21 gave Operon adaptive structure: pattern libraries, watchers,
-                    and the feedback loop that connects them. v0.22 goes further into
-                    the cognitive architecture that Dupoux, LeCun, and Malik describe
-                    as the precondition for autonomous learning. Stages now declare
-                    whether they are System&nbsp;A (observational) or System&nbsp;B
-                    (action-oriented). A sleep consolidation cycle replays successful
-                    patterns, compresses them into templates, runs counterfactual
-                    analysis over corrected facts, and promotes histone marks from
-                    temporary to permanent. Organisms can share templates across
-                    libraries with trust-weighted adoption. And the watcher gains
-                    curiosity signals that trigger escalation when the agent encounters
-                    genuinely novel territory. This is the release where Operon starts
-                    dreaming, socializing, and getting curious.
+                    v0.21 added adaptive structure to Operon: pattern libraries,
+                    watchers, and the feedback loop connecting them. v0.22 builds
+                    out the cognitive layer motivated by Dupoux, LeCun, and
+                    Malik&rsquo;s framing of autonomous learning. Stages can now
+                    declare whether they are System&nbsp;A (observational) or
+                    System&nbsp;B (action-oriented). A sleep consolidation cycle
+                    replays successful runs, compresses recurring patterns into
+                    templates, runs counterfactual checks over corrected facts,
+                    and promotes histone marks from temporary to permanent.
+                    Organisms can also exchange templates across libraries using
+                    trust-weighted adoption, while the watcher adds curiosity
+                    signals that escalate unfamiliar inputs from fast to deep
+                    models.
                 </p>
             </div>
 
             <h2>1. Cognitive Modes: System A/B as Stage Annotations</h2>
 
             <p>
-                Operon&rsquo;s fast/deep nucleus distinction started as cost
-                optimization: route cheap work to a small model, expensive work to
-                a large one. v0.22 reframes this as a cognitive architecture principle.
-                The <code>CognitiveMode</code> enum classifies stages as
-                <code>OBSERVATIONAL</code> (System&nbsp;A &mdash; passive sensing,
+                Operon&rsquo;s fast/deep nucleus split started as cost routing:
+                send routine work to a small model and harder work to a large
+                one. v0.22 adds an explicit cognitive annotation on top of it.
+                The <code>CognitiveMode</code> enum marks each stage as either
+                <code>OBSERVATIONAL</code> (System&nbsp;A: passive sensing and
                 information gathering) or <code>ACTION_ORIENTED</code>
-                (System&nbsp;B &mdash; active decision-making, goal pursuit).
+                (System&nbsp;B: active decision-making and goal pursuit).
             </p>
 
 <pre><code>from operon_ai import CognitiveMode, SkillStage
@@ -260,14 +260,14 @@ SkillStage(name="planner", role="Strategist", mode="deep",
                 reports the System&nbsp;A/B distribution across a run.
             </p>
 
-            <h2>2. Sleep Consolidation: When the Organism Dreams</h2>
+            <h2>2. Sleep Consolidation</h2>
 
             <p>
-                The <code>SleepConsolidation</code> class composes five existing
-                components &mdash; <code>AutophagyDaemon</code>,
+                <code>SleepConsolidation</code> composes five existing
+                components (<code>AutophagyDaemon</code>,
                 <code>PatternLibrary</code>, <code>EpisodicMemory</code>,
-                <code>HistoneStore</code>, and <code>BiTemporalMemory</code>
-                &mdash; into a five-step post-batch consolidation cycle:
+                <code>HistoneStore</code>, and <code>BiTemporalMemory</code>)
+                into a five-step post-batch cycle:
             </p>
 
             <ol>
@@ -276,23 +276,23 @@ SkillStage(name="planner", role="Strategist", mode="deep",
                     memory with tier promotion (WORKING &rarr; EPISODIC)</li>
                 <li><strong>Compress</strong> recurring high-success patterns into
                     consolidated <code>PatternTemplate</code> instances</li>
-                <li><strong>Counterfactual replay</strong> &mdash; diff bi-temporal
-                    corrections since each run and ask: &ldquo;would the outcome
-                    have changed with updated facts?&rdquo;</li>
-                <li><strong>Promote</strong> frequently-accessed ACETYLATION histone
-                    marks to permanent METHYLATION</li>
+                <li><strong>Run counterfactual replay</strong> by diffing
+                    bi-temporal corrections since each run and asking whether
+                    updated facts would have changed the outcome</li>
+                <li><strong>Promote</strong> frequently accessed ACETYLATION
+                    histone marks to permanent METHYLATION</li>
             </ol>
 
             <div class="insight">
-                <p class="insight-title">Why Consolidation Matters</p>
+                <p class="insight-title">What Consolidation Prevents</p>
                 <p>
-                    Without consolidation, the organism accumulates raw experience
-                    without distilling it. Pattern libraries grow but don&rsquo;t
-                    sharpen. Episodic memories decay without promotion. Histone marks
-                    expire before they can become permanent lessons. The sleep cycle
-                    is the mechanism that converts operational history into structural
-                    knowledge &mdash; exactly what Dupoux et al. describe as
-                    imagination-based learning during rest.
+                    Without an offline consolidation pass, raw experience piles
+                    up without changing future behavior: pattern libraries grow
+                    without pruning or compression, episodic memories decay
+                    before promotion, and useful histone marks expire instead of
+                    becoming permanent. The sleep cycle turns operational
+                    history into durable structure, mirroring what Dupoux et al.
+                    describe as offline, imagination-based learning during rest.
                 </p>
             </div>
 
@@ -319,41 +319,41 @@ result = sl_b.import_from_peer(exchange)
             <h3>Epistemic Vigilance</h3>
 
             <p>
-                The <code>TrustRegistry</code> implements epistemic vigilance:
-                per-peer trust scores are updated via exponential moving average
-                over adoption outcomes. When an imported template succeeds, trust
-                in the source peer increases. When it fails, trust decreases.
-                Trust below a configurable threshold blocks adoption entirely.
+                <code>TrustRegistry</code> implements epistemic vigilance by
+                maintaining per-peer trust scores via an exponential moving
+                average over adoption outcomes. Trust in a source peer rises
+                when its imported templates succeed, falls when they fail, and
+                blocks adoption altogether once it drops below a configurable
+                threshold.
             </p>
 
             <p>
-                This is not blind imitation. It is calibrated trust &mdash; the
-                organism learns which peers provide useful templates and which
-                provide noise, and adjusts its adoption behavior accordingly.
-                Provenance tracking traces every adopted template back to its
-                source peer, closing the feedback loop.
+                Provenance tracking records which peer supplied each adopted
+                template so subsequent execution outcomes feed directly back
+                into that peer&rsquo;s trust score. Over time, the organism
+                filters out noisy peers and keeps adopting from reliable ones.
             </p>
 
             <h2>4. Curiosity Signals: Intrinsic Motivation</h2>
 
             <p>
-                The watcher gains a new signal source: curiosity. When the
-                <code>EpiplexityMonitor</code> detects EXPLORING status (high
-                embedding novelty &mdash; the agent is encountering genuinely
-                unfamiliar territory), the watcher emits a curiosity signal.
-                If the signal value exceeds <code>curiosity_escalation_threshold</code>
-                and the stage uses a fast model, the watcher recommends ESCALATE
-                to engage the deep model for more thorough investigation.
+                The watcher adds curiosity as a new signal source. When
+                <code>EpiplexityMonitor</code> detects EXPLORING status
+                (indicating high embedding novelty on unfamiliar inputs), the
+                watcher emits a curiosity signal. If that value exceeds
+                <code>curiosity_escalation_threshold</code> on a stage using a
+                fast model, the watcher recommends ESCALATE to engage the deep
+                model for closer analysis.
             </p>
 
             <p>
-                This operationalizes intrinsic motivation: the organism actively
-                seeks deeper understanding of novel inputs rather than processing
-                them with cheap statistical pattern matching. The curiosity signal
-                is an epistemic signal (same category as epiplexity) with
-                <code>source=&quot;curiosity&quot;</code>, keeping the three-category
-                taxonomy intact while adding a new dimension within the epistemic
-                category.
+                This gives the organism a concrete form of intrinsic motivation:
+                instead of answering unfamiliar inputs with a fast model&rsquo;s
+                cheap pass, it spends deeper compute when novelty spikes.
+                Curiosity is filed as an epistemic signal (same category as
+                epiplexity) with <code>source=&quot;curiosity&quot;</code>,
+                extending the epistemic category without changing the
+                watcher&rsquo;s three-category taxonomy.
             </p>
 
             <h2>5. Validation</h2>
@@ -399,26 +399,26 @@ result = sl_b.import_from_peer(exchange)
             <h2>6. What Comes Next</h2>
 
             <p>
-                v0.22 delivers the cognitive architecture layer. Two phases remain
-                on the roadmap: Phase&nbsp;7 (developmental staging &mdash; critical
-                periods, capability gating, telomere-based maturation) and
-                Phase&nbsp;8 (release integration &mdash; cross-subsystem tests,
-                large-scope bi-temporal adapters, paper polish, publication-grade
-                eval runs).
+                With the cognitive layer in place, two phases remain on the
+                roadmap: Phase&nbsp;7 covers developmental staging (critical
+                periods, capability gating, and telomere-based maturation), and
+                Phase&nbsp;8 covers release integration (cross-subsystem tests,
+                bi-temporal memory adapters, paper revisions, and evaluation
+                runs).
             </p>
 
             <p>
-                The progression is now six layers deep:
+                Across the full roadmap, the stack runs six layers deep:
                 <strong>structure</strong> (v0.17&ndash;0.18) &rarr;
                 <strong>memory</strong> (v0.19&ndash;0.20) &rarr;
                 <strong>adaptation</strong> (v0.21) &rarr;
                 <strong>cognition</strong> (v0.22) &rarr;
                 <strong>development</strong> (v0.23) &rarr;
                 <strong>publication</strong> (v0.23.x).
-                Each layer assumes the previous one is stable. The cognitive
-                extensions &mdash; dreaming, socializing, getting curious &mdash;
-                are only possible because the adaptive loop, the pattern library,
-                and the watcher were already in place.
+                Each layer builds on the stability of the ones below it; sleep
+                consolidation, social learning, and curiosity signals all rely
+                directly on the adaptive loop, pattern library, and watcher
+                introduced in v0.21.
             </p>
 
             <blockquote>

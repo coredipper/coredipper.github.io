@@ -47,7 +47,7 @@
         <article>
             <header>
                 <h1>Operon: Roadmap Complete</h1>
-                <p class="subtitle">Eight Phases, Six Layers, 1130 Tests, and What It Means to Build Agents That Grow Up</p>
+                <p class="subtitle">Eight Phases, Six Layers, 1130 Tests, and Integration with Operational Runtimes</p>
                 <p class="author">
                     Bogdan Banu &middot; March 2026 &middot;
                     <a href="https://github.com/coredipper/operon">github.com/coredipper/operon</a>
@@ -58,15 +58,15 @@
             <div class="abstract">
                 <div class="abstract-title">Abstract</div>
                 <p>
-                    The eight-phase roadmap that began with bi-temporal memory in
-                    v0.19 is now complete. Operon has grown from a library of typed
-                    wiring patterns into a cognitive architecture where agents have
-                    auditable memory, adaptive structure selection, sleep consolidation,
-                    social learning, curiosity, and developmental staging with critical
-                    periods. This post describes what the capstone integration actually
-                    proves, how the enriched capabilities compose into something greater
-                    than the sum, and what that means for convergence with operational
-                    runtimes.
+                    The eight-phase roadmap that started with bi-temporal memory in
+                    v0.19 is complete. Operon has expanded from typed wiring patterns
+                    into a stack covering auditable memory, adaptive template selection,
+                    sleep consolidation, social learning, curiosity signals, and
+                    developmental staging with critical periods. This post covers what
+                    the Phase 8 integration tests verify, how the subsystems operate
+                    together across an organism&rsquo;s lifecycle, and what it takes to
+                    connect this structural layer to operational runtimes like Swarms
+                    and AnimaWorks.
                 </p>
             </div>
 
@@ -89,291 +89,298 @@
             </table>
 
             <p>
-                The progression &mdash; <strong>structure &rarr; memory &rarr;
+                The progression (<strong>structure &rarr; memory &rarr;
                 adaptation &rarr; cognition &rarr; development &rarr;
-                integration</strong> &mdash; mirrors the biological sequence from
-                genome (fixed structure) through epigenetics (learned bias) to
-                neural development (plastic then crystallizing). Each layer assumes
-                the previous one is stable. The capstone proves they compose.
+                integration</strong>) follows a biological sequence: fixed
+                structure first (genome), then learned bias (epigenetics), then
+                plastic and eventually crystallizing development. Each layer
+                depends on the stability of the one beneath it, and Phase 8
+                tests whether they compose without interfering with one another.
             </p>
 
-            <h2>2. The Capstone: What Integration Actually Proves</h2>
+            <h2>2. Cross-Subsystem Integration</h2>
 
             <p>
-                Building subsystems in isolation is the easy part. The hard part is
-                proving they compose &mdash; that a watcher can observe a
-                substrate-equipped organism, that consolidation can distill adaptive
-                runs, that scaffolding respects developmental gates. Phase 8 exists
-                to answer that question with five end-to-end integration tests that
-                exercise the full stack.
+                Subsystems that pass unit tests in isolation can still clash
+                when wired together. Phase 8 adds five end-to-end integration
+                tests to verify that a watcher can monitor a substrate-equipped
+                organism, that sleep consolidation distills adaptive runs
+                cleanly, and that teacher-learner scaffolding enforces
+                developmental gates.
             </p>
 
             <h3>Substrate + Watcher</h3>
 
             <p>
-                An organism runs with a bi-temporal memory substrate and a watcher
-                simultaneously attached. Stages emit facts into the substrate via
-                <code>emit_output_fact</code>; the watcher collects signals and
-                monitors convergence. After the run, the bi-temporal store contains
-                the auditable fact trail and the watcher&rsquo;s signal history
-                records what it observed at each stage. The two systems do not
-                interfere &mdash; they share <code>shared_state</code> but operate
-                on orthogonal keys.
+                An organism runs with both a bi-temporal memory substrate and a
+                watcher attached. Stages emit facts into the substrate via
+                <code>emit_output_fact</code> while the watcher collects signals
+                and checks convergence. Afterward, the bi-temporal store holds
+                the auditable fact trail and the watcher records its per-stage
+                signal history. Both read and write <code>shared_state</code>
+                without interfering because they use disjoint keys.
             </p>
 
             <h3>Adaptive Assembly + Consolidation</h3>
 
             <p>
-                An <code>AdaptiveSkillOrganism</code> fingerprints a task, retrieves
-                the best template from the <code>PatternLibrary</code>, assembles it,
-                runs it, and records the outcome. Then <code>SleepConsolidation</code>
-                takes over: it replays the successful run record into
-                <code>EpisodicMemory</code>, promotes it from WORKING to EPISODIC
-                tier, and compresses recurring patterns into consolidated templates.
-                The experience pool accumulates intervention outcomes across both
-                phases. The loop closes: run &rarr; record &rarr; consolidate &rarr;
-                better template selection next time.
+                An <code>AdaptiveSkillOrganism</code> fingerprints a task,
+                retrieves the top-scoring template from
+                <code>PatternLibrary</code>, assembles and runs it, and records
+                the outcome. <code>SleepConsolidation</code> then replays the
+                successful run record into <code>EpisodicMemory</code>, promotes
+                it from WORKING to EPISODIC tier, and compresses recurring
+                patterns into consolidated templates. Across both stages, the
+                experience pool accumulates intervention outcomes, closing the
+                loop from execution and recording through consolidation back to
+                future template selection.
             </p>
 
             <h3>Social Learning + Development</h3>
 
             <p>
-                A mature organism (MATURE stage, 80% telomere consumed) exports its
-                successful templates. A young organism (EMBRYONIC, with an open
-                &ldquo;rapid adoption&rdquo; critical period) imports them via
-                <code>scaffold_learner()</code>. Templates with
-                <code>min_stage=&quot;adolescent&quot;</code> are filtered out &mdash;
-                the learner isn&rsquo;t ready yet. After ticking the learner forward
-                to ADOLESCENT, the same scaffolding call succeeds for the advanced
-                templates. The critical period closes permanently. Trust scores
-                update based on whether adopted templates actually work for the
-                learner.
+                A MATURE organism (80% telomere consumed) exports its successful
+                templates, and an EMBRYONIC learner with an open &ldquo;rapid
+                adoption&rdquo; critical period imports them through
+                <code>scaffold_learner()</code>. Templates marked
+                <code>min_stage=&quot;adolescent&quot;</code> are filtered out
+                until the learner is ticked forward to ADOLESCENT, at which
+                point the same scaffolding call admits them and the critical
+                period closes permanently. Trust scores then update based on
+                whether the adopted templates work for the learner.
             </p>
 
             <h3>Memory Adapters</h3>
 
             <p>
-                <code>histone_to_bitemporal()</code> bridges HistoneStore markers
-                into bi-temporal facts; <code>episodic_to_bitemporal()</code> does
-                the same for EpisodicMemory entries. These one-way, non-destructive
-                adapters mean that the three memory systems &mdash; epigenetic bias,
-                episodic recall, and auditable facts &mdash; can flow into a single
-                temporal store for unified querying. A consolidation cycle that
-                promotes histone marks can now also create bi-temporal facts,
-                making the promotion auditable.
+                <code>histone_to_bitemporal()</code> converts HistoneStore
+                markers into bi-temporal facts, and
+                <code>episodic_to_bitemporal()</code> does the same for
+                EpisodicMemory entries. Both adapters are one-way and
+                non-destructive, letting epigenetic bias, episodic recall, and
+                auditable facts feed into a single temporal store for unified
+                querying. When a consolidation cycle promotes histone marks, it
+                can now emit bi-temporal facts alongside them so the promotion
+                itself is auditable.
             </p>
 
             <div class="insight">
-                <p class="insight-title">Why This Matters</p>
+                <p class="insight-title">Shared Interfaces Across Phases</p>
                 <p>
-                    Each phase was tested in isolation. The integration tests prove
-                    something different: that the subsystems were designed to compose
-                    from the start. The three-layer context model (topology, ephemeral,
-                    bi-temporal) carries through from Phase 2 to Phase 8 without
-                    modification. The <code>SkillRuntimeComponent</code> protocol from
-                    Phase 3 is the same protocol the developmental signals use in
-                    Phase 7. The <code>PatternLibrary</code> scoring function from
-                    Phase 3 is the same one that consolidation compresses into and
-                    social learning shares across organisms. Coherence was not bolted
-                    on at the end &mdash; it was the constraint from the beginning.
+                    The integration tests confirm that the core abstractions
+                    held across all eight phases without redesign. Phase 2&rsquo;s
+                    three-layer context model (topology, ephemeral, bi-temporal)
+                    still sits underneath Phase 8 unchanged. Developmental
+                    signals in Phase 7 attach through the same
+                    <code>SkillRuntimeComponent</code> protocol introduced in
+                    Phase 3, and both sleep consolidation and social learning
+                    operate directly on Phase 3&rsquo;s
+                    <code>PatternLibrary</code> scoring function. Keeping those
+                    interfaces fixed from the start is what makes cross-subsystem
+                    composition straightforward.
                 </p>
             </div>
 
-            <h2>3. The Enriched Capabilities</h2>
+            <h2>3. End-to-End Organism Lifecycle</h2>
 
             <p>
-                What does an Operon organism actually <em>do</em> now, with all
-                eight phases composed?
+                With all eight phases wired together, an organism moves through
+                a full lifecycle from initialization to maturation.
             </p>
 
             <p>
-                It starts as an embryonic organism with maximum learning plasticity
-                and minimal capabilities. During a critical period, it rapidly adopts
-                templates from mature peers via trust-weighted social learning. As it
-                ticks through its telomere lifecycle, it transitions through JUVENILE
-                and ADOLESCENT stages, unlocking progressively more complex tools
-                (gated by <code>Plasmid.min_stage</code>). Its watcher monitors
-                three signal categories &mdash; epistemic (epiplexity, curiosity),
-                somatic (ATP budget, developmental maturity), and species-specific
-                (immune threats) &mdash; and intervenes with retry, escalate, or halt
-                when signals cross thresholds. When curiosity is high on a fast
-                model, it escalates to the deep model for more thorough investigation.
+                It starts at the EMBRYONIC stage with maximum learning plasticity
+                and minimal tool access. While its initial critical period is
+                open, it adopts templates from mature peers via trust-weighted
+                social learning. As its telomere ticks down through JUVENILE and
+                ADOLESCENT stages, progressively more complex tools gated by
+                <code>Plasmid.min_stage</code> become available. Throughout
+                execution, the watcher tracks epistemic signals (epiplexity,
+                curiosity), somatic signals (ATP budget, developmental maturity),
+                and species-specific signals (immune threats), intervening with
+                retry, escalate, or halt when thresholds trip. If curiosity
+                spikes while a stage runs on a fast model, the watcher escalates
+                to the deep model for closer analysis.
             </p>
 
             <p>
-                After a batch of runs, it sleeps. The <code>SleepConsolidation</code>
-                cycle prunes stale context, replays successful patterns into episodic
-                memory with tier promotion, compresses recurring high-success patterns
+                Between batches of runs, <code>SleepConsolidation</code> prunes
+                stale context, replays successful patterns into episodic memory
+                with tier promotion, compresses recurring high-success patterns
                 into consolidated templates, runs counterfactual replay over
                 bi-temporal corrections (&ldquo;what if we had known this fact
-                earlier?&rdquo;), and promotes frequently-accessed histone marks from
-                temporary ACETYLATION to permanent METHYLATION. The experience pool
-                accumulates intervention outcomes across runs, so the watcher&rsquo;s
-                decisions improve with operational history.
+                earlier?&rdquo;), and promotes frequently accessed histone marks
+                from temporary ACETYLATION to permanent METHYLATION. Meanwhile,
+                the experience pool accumulates intervention outcomes across
+                runs so the watcher calibrates its decisions against operational
+                history.
             </p>
 
             <p>
-                At MATURE stage, it becomes a teacher. It exports proven templates to
-                younger organisms, filtered by the learner&rsquo;s developmental
-                readiness. The trust registry tracks whether its exports actually help
-                the learner, creating a calibrated reputation. Critical periods close:
-                the rapid-adoption window shuts, and the organism settles into its
-                mature pattern repertoire. The bi-temporal memory preserves the full
-                history &mdash; every fact, every correction, every belief state at
-                every point in time &mdash; so that any past decision can be
-                reconstructed and explained.
+                Once it reaches the MATURE stage, the organism can act as a
+                teacher, exporting proven templates to younger peers filtered by
+                each learner&rsquo;s developmental readiness. The trust registry
+                tracks whether those exports help the recipient, building a
+                calibrated peer reputation. With its own critical periods closed,
+                the mature organism stops rapid template adoption and relies on
+                its established repertoire, while bi-temporal memory preserves
+                every fact, correction, and historical belief state so past
+                decisions can be reconstructed.
             </p>
 
-            <h2>4. What This Means for Convergence</h2>
+            <h2>4. Connecting to Operational Runtimes</h2>
 
             <p>
-                Operon is a library. It does not run agents. It describes how they
-                should be wired, what they should remember, how they should adapt,
-                and when they should grow. The next question is: what happens when
-                this structural layer meets an operational runtime?
-            </p>
-
-            <p>
-                Two projects have independently converged on complementary ideas.
-                <a href="https://github.com/xuiltul/animaworks">AnimaWorks</a>
-                builds persistent agent organizations that run 24/7 with identity,
-                memory consolidation, and heartbeat-driven autonomy. It has the
-                cognitive runtime that Operon lacks &mdash; but no structural
-                guarantees, no bi-temporal auditability, no convergence detection.
-                <a href="https://github.com/kyegomez/swarms">Swarms</a> provides
-                enterprise-grade multi-agent orchestration with 10+ pattern types
-                and production scaling. It has the deployment infrastructure that
-                Operon lacks &mdash; but no formal topology analysis, no experience
-                pool, no developmental gating.
+                Operon is a structural library rather than an agent runtime: it
+                specifies how agents are wired, what they record, how they adapt,
+                and how their capabilities mature, leaving execution and hosting
+                to other systems. The natural next step is connecting this
+                structural layer to operational runtimes.
             </p>
 
             <p>
-                The completed roadmap makes a three-layer architecture possible:
+                Two existing projects cover the complementary halves of the
+                stack. <a href="https://github.com/xuiltul/animaworks">AnimaWorks</a>
+                builds persistent agent organizations running 24/7 with identity,
+                memory consolidation, and heartbeat-driven autonomy. That covers
+                the long-lived cognitive runtime Operon omits, though it lacks
+                structural guarantees, bi-temporal auditability, and convergence
+                detection. <a href="https://github.com/kyegomez/swarms">Swarms</a>
+                handles enterprise multi-agent orchestration with 10+ pattern
+                types and production scaling, providing production deployment
+                infrastructure while leaving out formal topology analysis, an
+                experience pool, and developmental gating.
+            </p>
+
+            <p>
+                Together, they partition cleanly into three layers:
             </p>
 
             <ul>
-                <li><strong>Operon</strong> (structural layer) &mdash; topology
-                    advice, epistemic analysis, pattern scoring, watcher signals,
-                    bi-temporal auditability, developmental gating</li>
-                <li><strong>Swarms</strong> (orchestration layer) &mdash; enterprise
-                    deployment, scaling, monitoring, multi-provider routing</li>
-                <li><strong>AnimaWorks</strong> (cognitive layer) &mdash; persistent
+                <li><strong>Operon (structural layer):</strong> topology advice,
+                    epistemic analysis, pattern scoring, watcher signals,
+                    bi-temporal auditability, and developmental gating.</li>
+                <li><strong>Swarms (orchestration layer):</strong> enterprise
+                    deployment, scaling, monitoring, and multi-provider routing.</li>
+                <li><strong>AnimaWorks (cognitive layer):</strong> persistent
                     identity, 6-channel priming, heartbeat autonomy, memory
-                    consolidation, forgetting lifecycle</li>
+                    consolidation, and a forgetting lifecycle.</li>
             </ul>
 
             <p>
-                Operon designs and validates the structure. Swarms executes it at
-                scale. AnimaWorks gives it persistent cognition. Each layer is
-                independently useful; the combination is greater than the sum.
+                Each layer works independently, with Operon validating the
+                structure, Swarms executing it at scale, and AnimaWorks
+                supplying persistent state and autonomy.
             </p>
 
             <p>
-                Concretely, the enriched capabilities enable specific integration
-                points that didn&rsquo;t exist before the roadmap:
+                Completing the roadmap opens four concrete integration points:
             </p>
 
             <ul>
-                <li><strong>Template exchange</strong> &mdash; Operon&rsquo;s
+                <li><strong>Template exchange:</strong> Operon&rsquo;s
                     <code>SocialLearning</code> can import templates from Swarms&rsquo;
                     <code>AutoSwarmBuilder</code> output, score them in the
                     <code>PatternLibrary</code>, and share successful ones with
                     AnimaWorks organizations via trust-weighted adoption.</li>
-                <li><strong>Convergence detection</strong> &mdash; Operon&rsquo;s
+                <li><strong>Convergence detection:</strong> Operon&rsquo;s
                     watcher can monitor AnimaWorks&rsquo; heartbeat cycle and
-                    Swarms&rsquo; workflow execution, applying the BIGMAS intervention-rate
-                    signal to detect non-convergence in external runtimes.</li>
-                <li><strong>Consolidation bridging</strong> &mdash; AnimaWorks&rsquo;
+                    Swarms&rsquo; workflow execution, applying the BIGMAS
+                    intervention-rate signal to detect non-convergence in
+                    external runtimes.</li>
+                <li><strong>Consolidation bridging:</strong> AnimaWorks&rsquo;
                     nightly memory consolidation can feed into Operon&rsquo;s
                     <code>SleepConsolidation</code> via the memory adapters,
                     creating auditable bi-temporal records from AnimaWorks&rsquo;
                     episodic and semantic memories.</li>
-                <li><strong>Developmental scaffolding</strong> &mdash; A mature
-                    Operon organism can scaffold a newly deployed AnimaWorks agent,
+                <li><strong>Developmental scaffolding:</strong> a mature Operon
+                    organism can scaffold a newly deployed AnimaWorks agent,
                     gating which templates and tools are available based on the
-                    new agent&rsquo;s developmental stage and critical period windows.</li>
+                    new agent&rsquo;s developmental stage and critical period
+                    windows.</li>
             </ul>
 
             <div class="insight">
-                <p class="insight-title">The Deeper Point</p>
+                <p class="insight-title">Scope of the Library</p>
                 <p>
-                    The roadmap was never about building everything in one library.
-                    It was about building the structural guarantees that make
-                    convergence with operational runtimes safe and auditable. An
-                    AnimaWorks agent that consolidates memories without bi-temporal
-                    auditability cannot explain its past decisions. A Swarms workflow
-                    that selects patterns without scored templates cannot learn from
-                    failure. A newly deployed agent without developmental gating gets
-                    full capabilities before it has proven it can handle them. Operon
-                    provides the missing layers. The roadmap proves they compose.
+                    Keeping Operon focused on structural guarantees lets
+                    operational runtimes adopt only the parts they lack. Without
+                    bi-temporal logging, an AnimaWorks agent consolidating
+                    memories cannot reconstruct why it made earlier decisions;
+                    without scored templates, a Swarms workflow repeats failed
+                    patterns; without developmental gating, a newly deployed
+                    agent receives full tool access before demonstrating
+                    competence. Operon supplies those constraints as composable
+                    components rather than trying to replace the runtime itself.
                 </p>
             </div>
 
-            <h2>5. Proving It with TLA+</h2>
+            <h2>5. Formal Specification with TLA+</h2>
 
             <p>
-                The convergence of three independently developed systems creates
-                coordination problems that benefit from formal specification.
-                Murat Demirbas&rsquo;s
+                Connecting three independently developed systems introduces
+                concurrency and coordination bugs that unit tests miss. Murat
+                Demirbas&rsquo;s
                 <a href="https://muratbuffalo.blogspot.com/2026/03/tla-mental-models.html">&ldquo;TLA+ Mental Models&rdquo;</a>
-                (March 2026) describes seven mental models for effective
-                formal specification. They map directly onto the convergence
-                architecture.
+                (March 2026) lays out seven mental models for formal
+                specification that map directly onto this integration boundary.
             </p>
 
             <h3>The Illegal Knowledge Problem</h3>
 
             <p>
-                Demirbas identifies a critical pitfall: guards that read global
-                state atomically represent &ldquo;illegal knowledge&rdquo; no
-                real process could possess. Operon&rsquo;s
+                One recurring pitfall Demirbas highlights is writing guards that
+                read global state atomically, assuming &ldquo;illegal
+                knowledge&rdquo; no real process can have. Operon&rsquo;s
                 <code>WatcherComponent</code> currently reads
-                <code>shared_state</code> atomically &mdash; fine in a single
-                process, but in a distributed deployment via Swarms, no single
-                watcher can atomically observe all stages across nodes.
+                <code>shared_state</code> atomically. In a single process that
+                is safe, but in a distributed Swarms deployment no single
+                watcher can take an atomic snapshot of stages running across
+                separate nodes.
             </p>
 
             <p>
-                TLA+ refinement identifies which guards are
-                <strong>locally stable</strong> &mdash; they can only be changed
-                by the local organism&rsquo;s own actions:
-            </p>
-
-            <ul>
-                <li>&ldquo;My own developmental stage&rdquo; &mdash; only my
-                    own <code>tick()</code> can advance it</li>
-                <li>&ldquo;My own intervention count&rdquo; &mdash; only my
-                    watcher increments it</li>
-                <li>&ldquo;A fact&rsquo;s append-only history&rdquo; &mdash;
-                    no action can delete a bi-temporal fact</li>
-            </ul>
-
-            <p>
-                Versus guards that require coordination:
+                TLA+ refinement separates guards that are
+                <strong>locally stable</strong> (modifiable only by the local
+                organism&rsquo;s own actions):
             </p>
 
             <ul>
-                <li>&ldquo;Peer&rsquo;s trust score&rdquo; &mdash; another
-                    organism&rsquo;s <code>record_outcome()</code> can change it</li>
-                <li>&ldquo;Library&rsquo;s template rankings&rdquo; &mdash; other
-                    organisms&rsquo; <code>record_run()</code> shifts scores</li>
-                <li>&ldquo;Peer&rsquo;s developmental stage&rdquo; &mdash; needed
-                    for <code>scaffold_learner()</code> but potentially stale</li>
+                <li><strong>Own developmental stage:</strong> only the
+                    organism&rsquo;s own <code>tick()</code> can advance it.</li>
+                <li><strong>Own intervention count:</strong> only the local
+                    watcher increments it.</li>
+                <li><strong>Append-only fact history:</strong> no action can
+                    delete a bi-temporal fact.</li>
             </ul>
 
             <p>
-                Demirbas&rsquo;s insight: &ldquo;If you can make your guards
-                locally stable, the protocol requires less coordination and
-                tolerates communication delays gracefully.&rdquo; The locally
-                stable guards are the operations that can be implemented
-                without distributed locking. The convergence adapters should
-                be designed around this distinction.
+                Other guards depend on remote state and require coordination:
+            </p>
+
+            <ul>
+                <li><strong>Peer trust score:</strong> another organism&rsquo;s
+                    <code>record_outcome()</code> can change it.</li>
+                <li><strong>Library template rankings:</strong> other
+                    organisms&rsquo; <code>record_run()</code> calls shift
+                    scores.</li>
+                <li><strong>Peer developmental stage:</strong> read during
+                    <code>scaffold_learner()</code>, where the cached value may
+                    be stale.</li>
+            </ul>
+
+            <p>
+                As Demirbas notes, &ldquo;If you can make your guards locally
+                stable, the protocol requires less coordination and tolerates
+                communication delays gracefully.&rdquo; Locally stable checks
+                can run without distributed locking, so the inter-layer adapters
+                should be designed around this split.
             </p>
 
             <h3>Safety Invariants</h3>
 
             <p>
-                Six safety invariants that the convergence must preserve:
+                Any inter-layer adapter has to preserve six safety invariants:
             </p>
 
             <ol>
@@ -393,13 +400,12 @@
             </ol>
 
             <p>
-                These are not just test assertions. They are the contracts that
-                inter-layer adapters must preserve. A Swarms adapter that imports
-                an Operon template must preserve template adoption safety. An
-                AnimaWorks consolidation bridge must preserve bi-temporal
-                append-only semantics. TLA+ model checking can verify these
-                contracts hold across all interleavings &mdash; something unit
-                tests cannot do.
+                These invariants define the contracts for inter-layer adapters:
+                a Swarms adapter importing an Operon template must preserve
+                template adoption safety, and an AnimaWorks consolidation bridge
+                must preserve bi-temporal append-only semantics. Model checking
+                them in TLA+ verifies that they hold across all concurrent
+                interleavings, which unit tests cannot exhaustively cover.
             </p>
 
             <h3>Atomicity That Needs Refinement</h3>
@@ -423,52 +429,47 @@
             </table>
 
             <p>
-                The TLA+ methodology: start with coarse-grained atomicity
-                (current implementation), systematically split into finer steps,
-                reverify safety at each step. The payoff is that fine-grained
-                actions give Swarms maximum scheduling freedom and AnimaWorks
-                maximum heartbeat concurrency &mdash; while the model checker
-                proves the invariants still hold.
+                Standard TLA+ refinement starts from the coarse-grained atomic
+                actions of the single-process implementation, splits them into
+                finer steps, and reverifies safety at each step. Finer-grained
+                actions give Swarms wider scheduling freedom and AnimaWorks
+                higher heartbeat concurrency while the model checker confirms
+                the safety invariants still hold.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Three Candidate Specs</p>
-                <p>
-                    <strong>TemplateExchangeProtocol.tla</strong> &mdash; models
-                    peer exchange with trust scoring; proves adoption preserves
-                    safety invariants. <strong>DevelopmentalGating.tla</strong>
-                    &mdash; models lifecycle with critical periods; proves
-                    capability gating is never violated under concurrent
-                    adoption. <strong>ConvergenceDetection.tla</strong> &mdash;
-                    models the intervention-rate signal across distributed
-                    organisms; proves non-convergence is always detected within
-                    bounded steps.
-                </p>
+                <ul>
+                    <li><strong>TemplateExchangeProtocol.tla:</strong> models
+                        peer exchange with trust scoring to verify that adoption
+                        preserves the safety invariants.</li>
+                    <li><strong>DevelopmentalGating.tla:</strong> models the
+                        lifecycle and critical periods to verify that capability
+                        gating holds under concurrent adoption.</li>
+                    <li><strong>ConvergenceDetection.tla:</strong> models the
+                        intervention-rate signal across distributed organisms to
+                        verify that non-convergence is detected within bounded
+                        steps.</li>
+                </ul>
             </div>
 
             <h2>6. What Comes Next</h2>
 
             <p>
-                The roadmap is complete. The code is stable. The paper is
-                publication-ready. What remains is the convergence work:
-                building the adapters that connect Operon&rsquo;s structural
-                layer to AnimaWorks&rsquo; cognitive runtime and Swarms&rsquo;
-                enterprise orchestration, with TLA+ specifications proving the
-                inter-layer contracts hold under distributed interleavings.
+                With the eight-phase roadmap complete, the codebase stable, and
+                the paper ready for publication, the remaining work is
+                integration: building the adapters connecting Operon&rsquo;s
+                structural layer to AnimaWorks&rsquo; cognitive runtime and
+                Swarms&rsquo; orchestration layer, backed by TLA+ specifications
+                for the distributed boundaries.
             </p>
 
             <p>
-                Agents that cannot explain their past decisions are agents you
-                cannot trust with consequential ones. Agents that cannot learn
-                from their operational history are agents that require constant
-                human supervision. Agents that get full capabilities before
-                they have matured are agents that fail in preventable ways.
-                The roadmap addressed all three. The convergence investigation
-                &mdash; with formal verification via TLA+ &mdash; is about
-                making those guarantees available to agents that actually run
-                in production, with mathematical proof that the guarantees
-                survive the transition from single-process library to
-                distributed deployment.
+                Auditable memory, learning from operational history, and staged
+                capability rollout are now in place inside the single-process
+                library. The convergence work and TLA+ verification will test
+                whether those guarantees survive the move from a standalone
+                library into distributed production runtimes.
             </p>
 
             <blockquote>

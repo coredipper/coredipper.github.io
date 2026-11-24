@@ -169,20 +169,18 @@
                 <div class="version-note">operon-ai v0.28.0&ndash;v0.28.1</div>
             </header>
 
-            <h2>The problem with structural guarantees</h2>
+            <h2>Three open questions about structural guarantees</h2>
 
-            <p>The <a href="/blog/operon-structural-guarantees/">previous post</a> showed that Operon&rsquo;s biological design earns its complexity through structural guarantees: priority gating serves critical operations under pressure, quorum sensing provides zero false alarms, and epiplexity monitoring distinguishes convergence from stagnation when embedding quality is present.</p>
+            <p>The <a href="/blog/operon-structural-guarantees/">previous post</a> benchmarked three of Operon&rsquo;s biological mechanisms and found that their value comes from structural guarantees: priority gating serves critical operations under load, quorum sensing keeps false alarms at zero, and epiplexity monitoring separates convergence from stagnation when given real semantic embeddings.</p>
 
-            <p>But three questions remained open. First: do the epistemic topology theorems&mdash;the formal bounds on error amplification, sequential overhead, and tool density&mdash;actually predict what happens when real agents run real tasks? Second: can those guarantees be inspected and verified at runtime, not just documented in comments? Third: when you compile an organism to a different framework (Swarms, DeerFlow, Ralph, Scion), do the guarantees survive?</p>
+            <p>Three questions remained open after those benchmarks. First, do the epistemic topology theorems (formal bounds on error amplification, sequential overhead, and tool density) predict what happens when real agents run real tasks? Second, can those guarantees be checked at runtime instead of living only in comments and docstrings? Third, do they survive compilation to external frameworks (Swarms, DeerFlow, Ralph, and Scion)? Releases v0.28.0 and v0.28.1 address all three.</p>
 
-            <p>v0.28.0 and v0.28.1 answer all three.</p>
-
-            <h2>Running the theorems against reality</h2>
+            <h2>Testing the topology theorems on live runs</h2>
 
             <p>The first thing we built was a validation harness that compares epistemic analysis predictions against measured behavior from real LLM execution. The harness constructs the same <code>ExternalTopology</code> the live evaluator would build, runs full epistemic analysis to capture all theorem predictions, then executes the task through a <code>SkillOrganism</code> pipeline with Gemma 4 27B (a mixture-of-experts model, 4B active parameters) served locally via Ollama.<sup><a href="#correction-model" style="text-decoration: none;">[*]</a></sup></p>
             <p id="correction-model" style="font-size: 0.9em; color: #666; border-left: 3px solid #888; padding-left: 0.8em;"><sup>[*]</sup> Correction (v0.34.5): the actual model is <code>gemma4:latest</code> (8B Q4_K_M, digest <code>c6eb396dbd59</code>), not 27B with 4B-active. Immutable model-identity recording was added in v0.34.4 and clarified the spec.</p>
 
-            <p>20 benchmark tasks spanning easy (2&ndash;3 stages), medium (4&ndash;5 stages), and hard (5&ndash;7 stages) difficulty. Each run in both guided and unguided configurations with 3 repetitions: 120 total runs.</p>
+            <p>We ran 20 benchmark tasks spanning easy (2&ndash;3 stages), medium (4&ndash;5 stages), and hard (5&ndash;7 stages) difficulty, each executed in both guided and unguided configurations across 3 repetitions for 120 total runs.</p>
 
             <table>
                 <tr><th>Theorem</th><th>Predicted</th><th>Measured</th><th>&rho;</th><th>p</th><th>Status</th></tr>
@@ -192,9 +190,9 @@
                 <tr><td>Composite risk</td><td>risk score</td><td>1 &minus; quality</td><td><strong>+0.751</strong></td><td>&lt;0.001</td><td>Validated</td></tr>
             </table>
 
-            <p>The error amplification bound&mdash;the number of agents as independent error sources in a sequential pipeline&mdash;strongly predicts execution failure (&rho; = +0.751, p &lt; 0.001). That is a meaningful correlation with statistical significance.</p>
+            <p>The error amplification bound, which counts the number of agents acting as independent error sources in a sequential pipeline, correlates strongly with execution failure (&rho; = +0.751, p &lt; 0.001).</p>
 
-            <p>But the <em>way</em> it predicts failure is unexpected. The dominant failure mode is not quality degradation but <strong>timeout</strong>: longer pipelines are increasingly likely to exceed the provider&rsquo;s request budget before completing all stages. Among the 42 runs that completed, quality was uniformly high (mean 0.981), including all 12 completed medium-difficulty tasks (quality 1.0).</p>
+            <p>The failure mechanism itself was unexpected. Instead of gradual quality degradation, the dominant failure mode was <strong>timeout</strong>: longer pipelines routinely exhausted the provider&rsquo;s request time budget before finishing all stages. Among the 42 runs that did finish, quality stayed uniformly high (mean 0.981), including all 12 completed medium-difficulty runs (quality 1.0).</p>
 
             <table>
                 <tr><th>Difficulty</th><th>Runs</th><th>Timed out</th><th>Quality (overall)</th><th>Quality (completed)</th></tr>
@@ -203,11 +201,11 @@
                 <tr><td>Hard (5&ndash;7 stages)</td><td>42</td><td>42</td><td>0.00</td><td>&mdash;</td></tr>
             </table>
 
-            <p>The bound correctly identifies <em>which architectures are fragile</em> without modeling <em>how</em> they fail. This is an honest finding: the epistemic layer is a structural diagnostic, not a quality predictor. It tells you &ldquo;this pipeline has more things that can go wrong,&rdquo; which is exactly what happened&mdash;longer pipelines exhausted their time budget.</p>
+            <p>The bound flags <em>which architectures are fragile</em> without predicting <em>how</em> they will fail. Treated as a structural diagnostic, that is still useful: it warns that a pipeline has more points of failure, and on these runs the extra stages pushed tasks past their time limit before quality ever degraded.</p>
 
-            <h2>Making guarantees inspectable: the certificate framework</h2>
+            <h2>The certificate framework</h2>
 
-            <p>Operon&rsquo;s structural guarantees were previously informal&mdash;documented in comments and docstrings. v0.28.0 makes them formal with a <code>Certificate</code> dataclass that captures a guarantee as a self-verifiable record.</p>
+            <p>Previously, Operon&rsquo;s structural guarantees lived only in comments and docstrings. Release v0.28.0 turns them into runtime objects via a <code>Certificate</code> dataclass that records each guarantee in a self-verifiable form.</p>
 
             <p>A certificate stores the theorem being claimed, the parameters that make it hold, and a verification function that re-derives the conclusion from the parameters (derivation replay). Three mechanisms now produce certificates:</p>
 
@@ -218,7 +216,7 @@
                 <tr><td><code>ATP_Store</code></td><td>Priority gating structurally configured</td><td>Budget &gt; 0, thresholds ordered</td></tr>
             </table>
 
-            <p>Verification is derivation replay: the <code>verify()</code> method re-derives the math from the stored parameters and confirms the conclusion still holds. If someone changes the population size without re-calibrating, the certificate fails. If someone overlaps the mTOR threshold bands, the certificate fails.</p>
+            <p>Calling <code>verify()</code> replays the derivation from the stored parameters and checks that the inequality or ordering condition still holds. Changing the population size without recalibrating, or overlapping the mTOR threshold bands, causes verification to fail.</p>
 
 <pre><code>qs = QuorumSensingBio(population_size=10)
 qs.calibrate()
@@ -227,13 +225,13 @@ result = cert.verify()
 assert result.holds
 # evidence: {"c_ss": 11.59, "threshold": 23.18, "ratio": 0.5}</code></pre>
 
-            <p>The quorum sensing certificate is the strongest instance. It implements the categorical certificate from <a href="https://arxiv.org/abs/2603.28906">de los Riscos et al. (Prop 5.1)</a>: the no-false-activation guarantee preserves under population changes because the threshold is defined in terms of architecture parameters (N, s, h), not a fixed constant. When a convergence compiler changes the agent count, re-calling <code>calibrate()</code> restores the guarantee.</p>
+            <p>The quorum sensing certificate is the strongest of the three. It implements the categorical certificate from <a href="https://arxiv.org/abs/2603.28906">de los Riscos et al. (Prop 5.1)</a>: the no-false-activation guarantee holds across population changes because the threshold is computed from the architecture parameters (N, s, h) rather than hardcoded as a constant. When a convergence compiler changes the agent count, calling <code>calibrate()</code> restores the bound.</p>
 
             <h2>Certificates survive compilation</h2>
 
-            <p>This is the v0.28.1 addition and the most practically useful feature. Operon compiles organisms to four frameworks: Swarms, DeerFlow, Ralph, and Scion. Each compiler maps <code>SkillStage</code>s to framework-specific agent configurations. But until now, the structural guarantees were silently dropped during compilation.</p>
+            <p>Added in v0.28.1, this is the most practically useful part of the release. Operon compiles organisms to four target frameworks (Swarms, DeerFlow, Ralph, and Scion), mapping each <code>SkillStage</code> to framework-specific agent configurations. Until now, those compilers silently dropped the organism&rsquo;s structural guarantees.</p>
 
-            <p>Now, all four compilers emit a <code>"certificates"</code> key in their output dict containing serialized certificates. A new <code>verify_compiled()</code> function deserializes and re-verifies them:</p>
+            <p>All four compilers now emit a <code>"certificates"</code> key in their output dict containing serialized certificates, and <code>verify_compiled()</code> deserializes and re-verifies them:</p>
 
 <pre><code>from operon_ai.convergence.swarms_compiler import organism_to_swarms
 from operon_ai.core.certificate import verify_compiled
@@ -243,23 +241,21 @@ results = verify_compiled(compiled)
 assert all(r.holds for r in results)
 # All structural guarantees survived compilation</code></pre>
 
-            <p>The certificates are JSON-serializable, so they can be persisted, transmitted, and verified in any environment. The verification function uses lazy theorem resolution&mdash;it imports the relevant module and looks up the verification function by name, so it works even in a fresh process that only has the compiled artifact.</p>
+            <p>Certificates are JSON-serializable, so they can be persisted, shipped alongside the compiled config, and checked in another environment. Verification uses lazy theorem resolution: it imports the relevant module and looks up the check by name, so it works in a fresh process that only has the compiled artifact.</p>
 
-            <p>This is the concrete implementation of Proposition 5.1: structural guarantees are functorially stable under compilation. The organism&rsquo;s certificate says &ldquo;priority gating is configured correctly.&rdquo; After compilation to Swarms, the same certificate is present in the output, verifiable with the same derivation replay, and holds with the same evidence.</p>
+            <p>This puts Proposition 5.1 into practice: structural guarantees remain functorially stable under compilation. If an organism carries a certificate stating that priority gating is configured correctly, compiling it to Swarms preserves that certificate in the output, where derivation replay succeeds with the same evidence.</p>
 
-            <h2>What the filtering artifact taught us</h2>
+            <h2>A filtering bug in the initial analysis</h2>
 
-            <p>An instructive mistake from the validation work: our initial analysis showed <em>no correlation</em> between error bounds and quality (&rho; = &minus;0.187, p = 0.23). Wrong direction, not significant. The &ldquo;negative result&rdquo; was about to become the headline.</p>
+            <p>Our first pass over the validation data showed <em>no correlation</em> between the error bound and task quality (&rho; = &minus;0.187, p = 0.23), pointing in the wrong direction and well short of significance. That looked like a clean negative result until we checked the preprocessing script.</p>
 
-            <p>Then we realized: the code was filtering out timed-out runs as &ldquo;infrastructure failures&rdquo;&mdash;leaving only the easy tasks that all scored high. When we included timeouts as failures (which they are&mdash;the organism failed to produce output), the correlation jumped to &rho; = +0.751 with p &lt; 0.001.</p>
-
-            <p>The lesson: be careful what you filter. The data points you remove are often the ones the predictor was trying to explain.</p>
+            <p>The script was dropping timed-out runs as &ldquo;infrastructure failures,&rdquo; which left almost exclusively the easy tasks that all scored near 1.0. Once we counted timeouts as failures (since the organism failed to produce output within budget), the correlation jumped to &rho; = +0.751 (p &lt; 0.001). Filtering out the failing runs had simply removed the exact outcomes the bound was predicting.</p>
 
             <h2>Guided equals unguided (again)</h2>
 
-            <p>Across 120 runs: unguided 49% success, guided 48% success. No measurable difference. This confirms every prior session (Nemotron cross-judging, live eval, C8 evolution). For single-model local providers where guided and unguided use the same model, topology guidance has no effect on outcome quality.</p>
+            <p>Across all 120 runs, unguided configurations succeeded 49% of the time and guided ones 48%, with no measurable difference between them. That matches our earlier evaluations (Nemotron cross-judging, live eval, and C8 evolution): on a single-model local provider where both configurations run the same underlying model, topology guidance does not improve outcome quality.</p>
 
-            <p>This is consistent with <a href="https://arxiv.org/abs/2603.26993">Ao et al. (2026)</a>: without new exogenous signals, each stage in a delegated pipeline cannot outperform a single-model baseline. Guidance changes the <em>mode assignment</em> (fast vs deep nucleus) but not the <em>model capability</em>.</p>
+            <p>This is consistent with <a href="https://arxiv.org/abs/2603.26993">Ao et al. (2026)</a>: without new exogenous signals, each stage in a delegated pipeline cannot outperform a single-model baseline. Guidance changes the <em>mode assignment</em> (fast vs deep nucleus) without changing the <em>model capability</em>.</p>
 
             <h2>What comes next</h2>
 

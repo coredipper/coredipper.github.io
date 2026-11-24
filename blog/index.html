@@ -103,7 +103,7 @@
         <div class="articles">
             <a href="/blog/harness-engineering-categorical-architecture/" class="article-card">
                 <h2>Harness Engineering as Categorical Architecture</h2>
-                <p class="subtitle">Paper 5 is on arXiv. The triple (G, Know, &Phi;) is the formalism behind every gate, certificate, and adapter Operon has shipped &mdash; here is what it claims, what it does not, and what it unlocks for the rest of the work.</p>
+                <p class="subtitle">Paper 5 is on arXiv. The Architecture triple (G, Know, &Phi;) formalizes Operon&rsquo;s gates, certificates, and framework adapters under a single preservation theorem.</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Paper 5</span>
@@ -114,7 +114,7 @@
 
             <a href="/blog/pinecones-and-the-portable-certificate/" class="article-card">
                 <h2>Pinecones and the Portable Certificate</h2>
-                <p class="subtitle">A materials-engineering preprint from MIT just made the substrate-independence move explicit. The Operon papers have been making the same move silently for five iterations &mdash; here is what we can borrow from how they did it.</p>
+                <p class="subtitle">An MIT materials-engineering preprint formalises substrate-independent verification for 4D-printed composites using the same categorical structure Operon uses for agent harnesses, with five ideas worth adopting.</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Certificates</span>
@@ -125,7 +125,7 @@
 
             <a href="/blog/factor-graphs-for-langgraph-gates/" class="article-card">
                 <h2>SLAM Already Solved Stagnation</h2>
-                <p class="subtitle">operon-langgraph-gates v0.1 is a discrete-state port of factor-graph fixed-lag smoothing (Kaess 2012). The port is trivial &mdash; the scope discipline that falls out is the upgrade. Written in reply to Dellaert&rsquo;s April 21 GTSAM post on factor graphs as world models.</p>
+                <p class="subtitle">operon-langgraph-gates v0.1 is a discrete-state port of factor-graph fixed-lag smoothing (Kaess 2012). Writing the mapping down is straightforward; what matters is the scope discipline it enforces.</p>
                 <p class="meta">
                     <span class="tag">operon-langgraph-gates</span>
                     <span class="tag">Factor Graphs</span>
@@ -136,7 +136,7 @@
 
             <a href="/blog/openhands-gates-swebench-lite-null/" class="article-card">
                 <h2>Score-Rejection Isn&rsquo;t Cert-Firing (and n=10 Isn&rsquo;t Enough)</h2>
-                <p class="subtitle">I ran the same structural-critic experiment twice on the same 10 SWE-bench-lite instances: +0 pp pass@1 one run, +10 pp the next. Zero certificate fires on either. An honest update from an earlier post that conflated score-based retry with sustained-stagnation attestation.</p>
+                <p class="subtitle">Running the same structural-critic experiment twice on 10 SWE-bench-lite instances produced two different pass@1 deltas and zero certificate fires, correcting an earlier post that conflated two distinct signals.</p>
                 <p class="meta">
                     <span class="tag">operon-openhands-gates</span>
                     <span class="tag">SWE-bench</span>
@@ -147,7 +147,7 @@
 
             <a href="/blog/operon-v035-phase-c-retry-and-cross-model/" class="article-card">
                 <h2>Phase C: The 8B Ceiling Holds Cross-Model, and Retry Is the Wrong Lever</h2>
-                <p class="subtitle">22 hours of Ollama on a second 8B model with format-correction retry active. 0/30 evaluated, 0 retry-recovered patches. The v0.34.5 &ldquo;single survivor&rdquo; was gemma4-specific. Retry helps competence-with-lapses, not capability-ceiling models &mdash; a sharper negative than v0.34.5 predicted.</p>
+                <p class="subtitle">22 hours on Ollama, 30 submissions on a second 8B model with format-correction retry enabled, and zero recoveries.</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">SWE-bench</span>
@@ -158,7 +158,7 @@
 
             <a href="/blog/operon-v0345-format-discipline-ceiling/" class="article-card">
                 <h2>When Your Diagnostic Beats Your Result</h2>
-                <p class="subtitle">A patch sanitizer + repo grounding pipeline disambiguated SWE-bench Phase 2&rsquo;s &ldquo;model or harness?&rdquo; failure mode. The score didn&rsquo;t move &mdash; but the failure became attributable, and the bottleneck localized to 8B diff-format discipline rather than file selection.</p>
+                <p class="subtitle">We built a patch-apply pipeline to separate model errors from harness failures in Phase 2. The score stayed at zero, but the bottleneck became attributable.</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">SWE-bench</span>
@@ -169,7 +169,7 @@
 
             <a href="/blog/operon-v030-e2e-evaluation/" class="article-card">
                 <h2>Where Structural Guarantees Actually Help (and Where They Don&rsquo;t)</h2>
-                <p class="subtitle">End-to-end evaluation with real LLM agents reveals that Operon&rsquo;s value depends on which layer you&rsquo;re protecting. Updated for v0.33.1: interactive HF Spaces, per-stage LangGraph, Paper 5 citations</p>
+                <p class="subtitle">End-to-end evaluation with real LLM agents shows that Operon&rsquo;s guarantees hold unconditionally at the state layer, conditionally on behavior, and not at all on output quality.</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">E2E Evaluation</span>
@@ -191,7 +191,7 @@
 
             <a href="/blog/operon-structural-guarantees/" class="article-card">
                 <h2>What Biological Agent Design Actually Buys You</h2>
-                <p class="subtitle">After benchmarking three operon subsystems against naive alternatives, the honest answer is: structural guarantees, not algorithmic sophistication</p>
+                <p class="subtitle">Benchmarking three Operon subsystems against simple baselines points to structural guarantees over algorithmic sophistication</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Benchmarks</span>
@@ -202,7 +202,7 @@
 
             <a href="/blog/operon-v026-meta-evolution/" class="article-card">
                 <h2>Operon v0.26: What Happens When You Try to Evolve Your Agent Architectures</h2>
-                <p class="subtitle">We built biological evolution for AI organisms. Here&rsquo;s why random mutation won.</p>
+                <p class="subtitle">Applying Operon&rsquo;s biological abstractions to architecture search, where random mutation outperformed an LLM proposer</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Meta-Evolution</span>
@@ -212,7 +212,7 @@
 
             <a href="/blog/operon-v025-evaluation/" class="article-card">
                 <h2>Operon v0.25: The Compile&ndash;Decompile Loop</h2>
-                <p class="subtitle">Why comparing agent frameworks requires a round-trip through structure, and what Scion taught us about isolation</p>
+                <p class="subtitle">Comparing agent frameworks via a compile&ndash;decompile round-trip, and how Scion handles container isolation</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Evaluation</span>
@@ -225,7 +225,7 @@
 
             <a href="/blog/operon-v024-convergence/" class="article-card">
                 <h2>Operon v0.24: Why Your Agent Framework Needs a Structural Linter</h2>
-                <p class="subtitle">Five-layer convergence architecture, TLA+ verification, and what it means for Swarms, DeerFlow, and the rest</p>
+                <p class="subtitle">A source-agnostic IR for five agent frameworks, four TLA+ protocol specs, and co-design convergence</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Convergence</span>
@@ -238,7 +238,7 @@
 
             <a href="/blog/operon-v023-roadmap-complete/" class="article-card">
                 <h2>Operon: Roadmap Complete</h2>
-                <p class="subtitle">Eight Phases, Six Layers, 1130 Tests, and What It Means to Build Agents That Grow Up</p>
+                <p class="subtitle">Eight Phases, Six Layers, 1130 Tests, and Integration with Operational Runtimes</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Roadmap</span>
@@ -249,7 +249,7 @@
 
             <a href="/blog/operon-v023-developmental-staging/" class="article-card">
                 <h2>Operon v0.23: Developmental Staging</h2>
-                <p class="subtitle">Critical Periods, Capability Gating, and What Happens When Agents Grow Up</p>
+                <p class="subtitle">Critical Periods, Capability Gating, and Teacher-Learner Scaffolding</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Development</span>
@@ -261,7 +261,7 @@
 
             <a href="/blog/operon-v022-cognitive-social/" class="article-card">
                 <h2>Operon v0.22: The Cognitive Architecture</h2>
-                <p class="subtitle">Cognitive Modes, Sleep Consolidation, Social Learning, Curiosity, and What Happens When Agents Start Dreaming</p>
+                <p class="subtitle">Cognitive Modes, Sleep Consolidation, Social Learning, and Curiosity Signals</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Cognition</span>
@@ -273,7 +273,7 @@
 
             <a href="/blog/operon-v021-adaptive-foundations/" class="article-card">
                 <h2>Operon v0.21: Adaptive Foundations</h2>
-                <p class="subtitle">Pattern Repository, Watcher Component, and the Static Scaffolding for Dynamic Assembly</p>
+                <p class="subtitle">Pattern Repository, Watcher Component, Adaptive Assembly, and an Intervention Experience Pool</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Adaptation</span>
@@ -285,7 +285,7 @@
 
             <a href="/blog/operon-v020-substrate-integration/" class="article-card">
                 <h2>Operon v0.20: Substrate Integration</h2>
-                <p class="subtitle">Three-Layer Context, Auditable Workflows, and the Question Every Multi-Stage System Should Answer</p>
+                <p class="subtitle">Three-Layer Context, Per-Stage Read/Write Hooks, and Auditable Workflows</p>
                 <p class="meta">
                     <span class="tag">Operon</span>
                     <span class="tag">Substrate</span>

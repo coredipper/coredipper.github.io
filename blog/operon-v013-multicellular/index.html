@@ -365,7 +365,7 @@
                     Operon v0.13 implements five paper concepts across three feature areas:
                     <strong>Plasmid Registry</strong> for dynamic tool acquisition via horizontal gene transfer (Paper &sect;6.2),
                     <strong>Denaturation Layers</strong> for wire-level anti-injection filtering (Paper &sect;5.3),
-                    and <strong>Multicellular Organization</strong>&mdash;metabolic-epigenetic coupling, cell type specialization,
+                    and <strong>Multicellular Organization</strong> covering metabolic-epigenetic coupling, cell type specialization,
                     and tissue architecture (Paper &sect;6.5). The release adds 64 new tests (760 total, zero regressions),
                     5 examples, and 2 interactive Gradio demos.
                 </p>
@@ -374,15 +374,15 @@
             <h2>1. From Cells to Organisms</h2>
 
             <p>
-                Previous releases built the individual cell: membrane, mitochondria, chaperone, ribosome, lysosome, nucleus.
-                Each organelle does one thing well. But a cell in isolation is a bacterium. The interesting biology starts
-                when cells specialize, group into tissues, and coordinate as organisms.
+                Previous releases focused on the individual cell: membrane, mitochondria, chaperone, ribosome, lysosome,
+                and nucleus. Those organelles handle single-agent concerns, whereas larger workflows require cells that
+                specialize, share tools, and organize into tissues.
             </p>
 
             <p>
-                v0.13 crosses that threshold. An agent can now dynamically acquire tools from a shared pool (horizontal
-                gene transfer), protect its wiring from injection cascades (denaturation), and participate in hierarchical
-                multi-agent architectures where topology enforces security (tissues).
+                v0.13 adds that multicellular layer. Agents can now acquire tools dynamically from a shared pool
+                (horizontal gene transfer), sanitize inter-agent channels against injection cascades (denaturation),
+                and compose into tissues whose topology enforces capability boundaries.
             </p>
 
             <div class="diagram">
@@ -413,7 +413,7 @@
                 In molecular biology, plasmids are small circular DNA molecules that bacteria exchange via
                 conjugation, transformation, or transduction. A bacterium that acquires a plasmid carrying
                 an antibiotic resistance gene gains that capability without vertical inheritance. This is
-                <em>horizontal gene transfer</em> (HGT)&mdash;the mechanism by which bacteria share tools.
+                <em>horizontal gene transfer</em> (HGT), a way for bacteria to exchange capabilities directly.
             </p>
 
             <p>
@@ -457,11 +457,10 @@ mito.release("reverse")                  # Plasmid curing
             <h3>2.1 Capability Gating</h3>
 
             <p>
-                The critical constraint is capability gating. A plasmid&rsquo;s
-                <code>required_capabilities</code> must be a subset of the agent&rsquo;s
-                <code>allowed_capabilities</code>. This prevents privilege escalation&mdash;an agent
-                restricted to filesystem reads cannot absorb a plasmid that requires network access,
-                regardless of what&rsquo;s available in the registry.
+                Uptake is gated by capabilities: a plasmid&rsquo;s <code>required_capabilities</code>
+                must be a subset of the agent&rsquo;s <code>allowed_capabilities</code>. This prevents
+                privilege escalation, since an agent restricted to filesystem reads cannot absorb a
+                plasmid that requires network access regardless of what is in the registry.
             </p>
 
             <div class="insight">
@@ -499,10 +498,10 @@ mito.release("reverse")                  # Plasmid curing
             </p>
 
             <p>
-                The paper (&sect;5.3) prescribes <em>denaturation</em>&mdash;wire-level transformation that
-                destroys the syntactic structure injections rely on, without destroying semantic content.
-                Like heat denaturing a protein unfolds its tertiary structure, these filters unfold the
-                markup structure that carries the attack.
+                The paper (&sect;5.3) uses <em>denaturation</em>, a wire-level transformation that
+                strips the syntactic structure injections depend on while leaving semantic content intact.
+                Just as heat unfolds a protein&rsquo;s tertiary structure, these filters remove the markup
+                that carries the attack.
             </p>
 
             <h3>3.1 Four Filter Strategies</h3>
@@ -534,9 +533,9 @@ mito.release("reverse")                  # Plasmid curing
             <h3>3.2 Wire-Level Integration</h3>
 
             <p>
-                Filters attach to wires, not to modules. The <code>Wire</code> dataclass gains an optional
-                <code>denature</code> field, and <code>DiagramExecutor</code> applies the filter automatically
-                as data flows through the wire:
+                Filters attach directly to wires via an optional <code>denature</code> field on
+                <code>Wire</code>, and <code>DiagramExecutor</code> runs them automatically as data
+                crosses the edge:
             </p>
 
 <pre>
@@ -560,22 +559,21 @@ diagram.connect(
 </pre>
 
             <div class="insight">
-                <p class="insight-title">Why Wire-Level?</p>
+                <p class="insight-title">Wire-Level Enforcement</p>
                 <p>
-                    Filtering at the wire level rather than the module level is the key design decision.
-                    Module-level filtering depends on each agent implementing it correctly&mdash;a behavioral
-                    property. Wire-level filtering is a topological property: it&rsquo;s enforced by the wiring
-                    diagram itself, regardless of what the modules do. Safety from structure, not from strings.
+                    Attaching filters to wires shifts enforcement from module behavior to graph topology.
+                    Module-level filtering relies on every agent implementing sanitization properly,
+                    whereas wire-level filtering is enforced by the diagram executor whenever data
+                    crosses an edge, independent of what the upstream or downstream modules do.
                 </p>
             </div>
 
             <h3>3.3 Backward Compatibility</h3>
 
             <p>
-                The <code>denature</code> field defaults to <code>None</code>. Existing wires, diagrams, and
-                executor calls work unchanged. The filter is only applied when explicitly attached. This makes
-                denaturation opt-in and composable: you can denature inter-tissue wires while leaving intra-tissue
-                wires raw.
+                Because <code>denature</code> defaults to <code>None</code>, existing wires, diagrams,
+                and executor calls behave unchanged. Filters run only where explicitly attached, so you
+                can sanitize inter-tissue boundaries while leaving internal wires untouched.
             </p>
 
             <div class="reference-impl">
@@ -614,15 +612,15 @@ diagram.connect(
             <h3>4.2 Cell Type Specialization</h3>
 
             <p>
-                Every cell in your body shares the same DNA but expresses different gene programs. A neuron
-                silences muscle genes; a liver cell silences neuron genes. The same genome, different phenotypes.
+                Cells in a multicellular organism share the same DNA while expressing different gene
+                programs: a neuron silences muscle genes, and a liver cell silences neuronal genes,
+                producing distinct phenotypes from one genome.
             </p>
 
             <p>
-                <code>CellType</code> + <code>ExpressionProfile</code> implement this pattern. A
-                <code>CellType</code> defines which genes to overexpress, silence, or leave at baseline.
-                Calling <code>differentiate(genome)</code> produces a <code>DifferentiatedCell</code> with
-                the appropriate configuration:
+                <code>CellType</code> and <code>ExpressionProfile</code> model this mechanism. A
+                <code>CellType</code> specifies which genes to overexpress, silence, or leave at baseline,
+                and <code>differentiate(genome)</code> produces a configured <code>DifferentiatedCell</code>:
             </p>
 
 <pre>
@@ -640,13 +638,13 @@ cell = classifier.differentiate(genome)
             <h3>4.3 Tissue Architecture</h3>
 
             <p>
-                Cells form tissues&mdash;groups sharing a morphogen gradient and a security boundary
-                (<code>TissueBoundary</code>). The boundary defines:
+                Cells group into tissues that share a morphogen gradient and a security boundary
+                (<code>TissueBoundary</code>). The boundary specifies:
             </p>
 
             <ul>
-                <li><strong>Input/output ports</strong>&mdash;typed channels for inter-tissue communication</li>
-                <li><strong>Allowed capabilities</strong>&mdash;the maximum capability set for any cell in the tissue</li>
+                <li><strong>Input/output ports:</strong> typed channels for inter-tissue communication</li>
+                <li><strong>Allowed capabilities:</strong> the maximum capability set for any cell in the tissue</li>
             </ul>
 
             <p>
@@ -675,9 +673,9 @@ organism.connect("ResearchTissue", "findings",
             <div class="insight">
                 <p class="insight-title">Compositionality</p>
                 <p>
-                    The same <code>WiringDiagram</code> that wires modules within a cell also wires
-                    tissues within an organism. This is the category-theoretic compositionality the paper
-                    prescribes: the same mathematical object at every level of the hierarchy.
+                    The same <code>WiringDiagram</code> abstraction connects modules inside a cell and
+                    tissues inside an organism, keeping one formal representation across every level of
+                    the hierarchy.
                 </p>
             </div>
 
@@ -744,18 +742,18 @@ organism.connect("ResearchTissue", "findings",
             <h3>6.2 Interactive Gradio Demos</h3>
 
             <p>
-                Two new Hugging Face Spaces provide interactive exploration:
+                Two Hugging Face Spaces are available for interactive testing:
             </p>
 
             <ul>
                 <li>
-                    <strong>space-plasmid</strong>&mdash;Create agents with specific capabilities, browse the
-                    registry, acquire/release tools, and execute them. Includes a guided scenario walkthrough.
+                    <strong>space-plasmid:</strong> Create agents with specific capabilities, browse the
+                    registry, acquire or release tools, and execute them, with a guided scenario walkthrough.
                 </li>
                 <li>
-                    <strong>space-denature</strong>&mdash;Paste injection payloads and see how each filter
-                    transforms them. Includes a wire comparison tab showing raw vs. denatured data flow
-                    through a live <code>DiagramExecutor</code>.
+                    <strong>space-denature:</strong> Paste injection payloads to inspect each filter&rsquo;s
+                    output, including a wire comparison tab showing raw vs. denatured data flow through a
+                    live <code>DiagramExecutor</code>.
                 </li>
             </ul>
 
@@ -767,17 +765,17 @@ organism.connect("ResearchTissue", "findings",
 
             <ul>
                 <li>
-                    <strong>Coalgebraic State Machines</strong> (Paper &sect;4.2)&mdash;Formalize agent behavior
-                    as coalgebras with bisimulation equivalence, enabling provable behavioral guarantees.
+                    <strong>Coalgebraic State Machines (Paper &sect;4.2):</strong> Formalize agent behavior
+                    as coalgebras with bisimulation equivalence for behavioral comparison.
                 </li>
                 <li>
-                    <strong>Morphogen Diffusion</strong> (Paper &sect;6.4)&mdash;Move from global shared gradients
-                    to locally diffused morphogen fields with spatial decay, enabling true position-dependent
-                    agent behavior.
+                    <strong>Morphogen Diffusion (Paper &sect;6.4):</strong> Replace global shared gradients
+                    with locally diffused morphogen fields that decay across graph distance, giving agents
+                    position-dependent state.
                 </li>
                 <li>
-                    <strong>Optic-Based Wiring</strong> (Paper &sect;3.3)&mdash;Replace the current lens-based
-                    port model with full optics (prisms, traversals), enabling more expressive wiring patterns.
+                    <strong>Optic-Based Wiring (Paper &sect;3.3):</strong> Extend the current lens-based
+                    port model with prisms and traversals for conditional routing and collection transforms.
                 </li>
             </ul>
 

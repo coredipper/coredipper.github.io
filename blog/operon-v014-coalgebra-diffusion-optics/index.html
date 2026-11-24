@@ -362,11 +362,11 @@
             <div class="abstract">
                 <p class="abstract-title">Summary</p>
                 <p>
-                    Operon v0.14 implements three paper gaps:
+                    Operon v0.14 implements three remaining pieces from the paper:
                     <strong>Coalgebraic State Machines</strong> (Paper &sect;4.2) for composable
                     observation and evolution with bisimulation equivalence,
                     <strong>Morphogen Diffusion</strong> (Paper &sect;6.4) for graph-based spatially varying
-                    concentrations that replace the global gradient model, and
+                    concentrations replacing the global gradient model, and
                     <strong>Optic-Based Wiring</strong> (Paper &sect;3.3) for conditional routing (prism)
                     and collection processing (traversal) on wires.
                     The release adds 67 new tests (827 total, zero regressions), 3 examples,
@@ -377,19 +377,19 @@
             <h2>1. The Algebra&ndash;Coalgebra Duality</h2>
 
             <p>
-                v0.13 built the multicellular hierarchy: cells specialize, form tissues, exchange tools.
-                But the individual cell&rsquo;s behavior was still described informally. HistoneStore has
-                a <code>retrieve()</code> method and a <code>store()</code> method. ATP_Store has
-                <code>report()</code> and <code>consume()</code>. CellCycleController has
-                <code>get_phase()</code> and <code>advance()</code>. The pattern is the same each time:
-                <em>observe state</em> and <em>evolve state</em>. But without a shared interface, these
-                machines cannot be composed or compared.
+                v0.13 built the multicellular hierarchy: cells specialize, group into tissues, and
+                exchange tools. Individual cell behavior, however, remained informal. HistoneStore
+                exposes <code>retrieve()</code> and <code>store()</code>; ATP_Store exposes
+                <code>report()</code> and <code>consume()</code>; CellCycleController exposes
+                <code>get_phase()</code> and <code>advance()</code>. Each component follows the same
+                pattern of <em>observing state</em> and <em>evolving state</em>, yet without a shared
+                interface they cannot be composed or compared.
             </p>
 
             <p>
-                The paper (&sect;4.2) identifies this as a <em>coalgebra</em>&mdash;the categorical dual
-                of an algebra. Where an algebra builds structure up through constructors, a coalgebra
-                <em>observes</em> structure through destructors. The fundamental signature is:
+                The paper (&sect;4.2) models this as a <em>coalgebra</em>, the categorical dual
+                of an algebra. Where an algebra builds structure through constructors, a coalgebra
+                <em>observes</em> structure through destructors, with the signature:
             </p>
 
             <div class="equation">
@@ -398,7 +398,8 @@
 
             <p>
                 This is a Mealy machine: a state space $S$, an input alphabet $I$, and an output
-                alphabet $O$. The coalgebraic framing gives us composition for free.
+                alphabet $O$. Framing components as coalgebras gives standard parallel and sequential
+                composition operators.
             </p>
 
             <div class="diagram">
@@ -434,8 +435,8 @@ class Coalgebra(Protocol[S, I, O]):
 </pre>
 
             <p>
-                The simplest concrete implementation is <code>FunctionalCoalgebra</code>&mdash;two
-                plain functions wrapped into the protocol:
+                The simplest concrete implementation is <code>FunctionalCoalgebra</code>, which
+                wraps two plain functions into the protocol:
             </p>
 
 <pre>
@@ -473,26 +474,26 @@ outputs = sm.run([1, 2, 3, 4, 5])
             <h3>1.3 Composition</h3>
 
             <p>
-                Two composition operators mirror the biological reality:
+                Two composition operators cover parallel and chained signaling:
             </p>
 
             <ul>
                 <li>
-                    <strong>ParallelCoalgebra</strong>&mdash;Two pathways activated by the same signal.
-                    State is $(S_1, S_2)$, output is $(O_1, O_2)$. Both receive the same input.
-                    Analogy: MAPK and PI3K both triggered by EGF binding.
+                    <strong>ParallelCoalgebra:</strong> Runs two pathways on the same input signal,
+                    with product state $(S_1, S_2)$ and paired output $(O_1, O_2)$, analogous to
+                    MAPK and PI3K both activating on EGF binding.
                 </li>
                 <li>
-                    <strong>SequentialCoalgebra</strong>&mdash;Signal transduction cascade. Input goes
-                    to the first coalgebra; its readout becomes the input to the second. Analogy:
-                    receptor activation produces a second messenger that activates an effector.
+                    <strong>SequentialCoalgebra:</strong> Chains two coalgebras into a cascade where
+                    the first coalgebra&rsquo;s readout feeds the second as input, analogous to a
+                    receptor producing a second messenger that triggers an effector.
                 </li>
             </ul>
 
             <h3>1.4 Bisimulation</h3>
 
             <p>
-                Two state machines are <em>bisimilar</em> if no observer can distinguish them&mdash;for
+                Two state machines are <em>bisimilar</em> if no observer can distinguish them: for
                 every input sequence, they produce the same output sequence. <code>check_bisimulation</code>
                 tests this over a bounded input sequence:
             </p>
@@ -514,10 +515,10 @@ result = check_bisimulation(c, d, [1, 2, 3])
             <div class="insight">
                 <p class="insight-title">Biological Parallel</p>
                 <p>
-                    Two cells are bisimilar if they respond identically to all stimuli&mdash;the
-                    definition of &ldquo;same cell type&rdquo; in functional terms. You never compare
-                    internal state directly; you compare observable behavior. This is precisely the
-                    coalgebraic perspective: identity through observation, not through structure.
+                    Two cells are bisimilar when they respond identically to every stimulus, which is
+                    the functional definition of belonging to the same cell type. Under a coalgebraic
+                    view, equivalence is defined strictly by observable input-output behavior, leaving
+                    internal state representations free to differ.
                 </p>
             </div>
 
@@ -529,8 +530,9 @@ result = check_bisimulation(c, d, [1, 2, 3])
 
             <p>
                 v0.13&rsquo;s <code>MorphogenGradient</code> is global: every agent reads the same
-                concentrations. This is like broadcasting a hormone through the bloodstream&mdash;useful,
-                but it misses the key mechanism that patterns embryonic development: <em>spatial diffusion</em>.
+                concentrations. That works like broadcasting a hormone through the bloodstream for
+                system-wide signals, yet it lacks <em>spatial diffusion</em>, the mechanism that
+                patterns embryonic development.
             </p>
 
             <p>
@@ -543,7 +545,7 @@ result = check_bisimulation(c, d, [1, 2, 3])
             <h3>2.1 Graph-Based Spatial Model</h3>
 
             <p>
-                Operon agents don&rsquo;t have physical positions (Paper &sect;6.5, line 135). Instead, we
+                Operon agents don&rsquo;t have physical positions (Paper &sect;6.5). Instead, we
                 use <em>graph adjacency</em> from the wiring topology as the spatial model. Each node is
                 an agent or cell; each edge is a connection through which morphogens can diffuse.
             </p>
@@ -584,20 +586,20 @@ for n in ["Source", "Near", "Mid", "Far"]:
 
             <ol>
                 <li>
-                    <strong>Emit</strong>&mdash;Each <code>MorphogenSource</code> adds its
+                    <strong>Emit:</strong> Each <code>MorphogenSource</code> adds its
                     <code>emission_rate</code> to its node, capped at <code>max_concentration</code>.
                 </li>
                 <li>
-                    <strong>Diffuse</strong>&mdash;For each node, a <code>diffusion_rate</code>
+                    <strong>Diffuse:</strong> For each node, a <code>diffusion_rate</code>
                     fraction of concentration flows outward, split evenly among neighbors.
                     This is a discrete approximation of Fick&rsquo;s law on the graph Laplacian.
                 </li>
                 <li>
-                    <strong>Decay</strong>&mdash;All concentrations are multiplied by
+                    <strong>Decay:</strong> All concentrations are multiplied by
                     $(1 - \text{decay\_rate})$, modeling morphogen degradation.
                 </li>
                 <li>
-                    <strong>Clamp</strong>&mdash;Values above 1.0 are capped; values below
+                    <strong>Clamp:</strong> Values above 1.0 are capped; values below
                     <code>min_concentration</code> snap to zero, preventing floating-point dust.
                 </li>
             </ol>
@@ -620,33 +622,33 @@ for n in ["Source", "Near", "Mid", "Far"]:
             <p>
                 <code>Tissue</code> gains an optional <code>diffusion_field</code> parameter. When
                 present, <code>add_cell()</code> registers nodes and <code>connect_cells()</code>
-                registers edges automatically. Two new methods bridge to the existing gradient API:
+                registers edges automatically. Two new methods connect it to the existing gradient API:
             </p>
 
             <ul>
                 <li>
-                    <code>tissue.diffuse(steps=1)</code>&mdash;Advance the diffusion field.
+                    <code>tissue.diffuse(steps=1)</code>: Advances the diffusion field.
                 </li>
                 <li>
-                    <code>tissue.get_cell_gradient(name)</code>&mdash;Returns a
-                    <code>MorphogenGradient</code> reflecting local concentrations at that cell.
-                    Falls back to the shared tissue gradient when no diffusion field is configured.
+                    <code>tissue.get_cell_gradient(name)</code>: Returns a
+                    <code>MorphogenGradient</code> reflecting local concentrations at that cell,
+                    falling back to the shared tissue gradient when no diffusion field is configured.
                 </li>
             </ul>
 
             <p>
-                When <code>diffusion_field</code> is <code>None</code> (the default), all behavior
-                is identical to v0.13. The integration is fully backward compatible.
+                When <code>diffusion_field</code> is <code>None</code> (the default), behavior
+                matches v0.13 with full backward compatibility.
             </p>
 
             <div class="insight">
                 <p class="insight-title">Why Graph Adjacency?</p>
                 <p>
-                    Physical coordinates would require inventing a spatial embedding for every
-                    agent topology. Graph adjacency is intrinsic&mdash;it comes directly from the
-                    wiring diagram that already exists. An agent&rsquo;s &ldquo;position&rdquo; is
-                    defined by its connectivity, not by arbitrary coordinates. Two agents that are
-                    three hops apart in the wiring graph are &ldquo;far&rdquo; in the diffusion model.
+                    Physical coordinates would force an arbitrary spatial embedding onto every
+                    agent topology. Graph adjacency comes directly from the existing wiring
+                    diagram, so an agent&rsquo;s &ldquo;position&rdquo; is determined by its
+                    connectivity: two agents three hops apart in the wiring graph are
+                    &ldquo;far&rdquo; in the diffusion model.
                 </p>
             </div>
 
@@ -659,26 +661,26 @@ for n in ["Source", "Near", "Mid", "Far"]:
             <h2>3. Optic-Based Wiring</h2>
 
             <p>
-                v0.13&rsquo;s wiring system uses <code>PortType</code> matching&mdash;a lens-like
-                pattern where data flows through if the types align. This handles the common case
-                but lacks two capabilities the paper describes:
+                v0.13&rsquo;s wiring system uses <code>PortType</code> matching, a lens-like
+                pattern where data flows through if the types align. That handles the common case
+                but leaves out two capabilities described in the paper:
             </p>
 
             <ul>
                 <li>
-                    <strong>Conditional routing</strong>&mdash;Send data to different destinations
-                    based on its DataType. Currently requires the application to build routing logic
-                    inside module handlers.
+                    <strong>Conditional routing:</strong> Directing data to different destinations
+                    based on its DataType, which previously required routing logic inside module
+                    handlers.
                 </li>
                 <li>
-                    <strong>Collection processing</strong>&mdash;Apply a transformation to each
-                    element of a list as it flows through a wire. Currently requires the receiving
-                    module to handle iteration.
+                    <strong>Collection processing:</strong> Mapping a transformation over each
+                    element of a list in transit, which previously fell to the receiving module.
                 </li>
             </ul>
 
             <p>
-                Optics (Paper &sect;3.3) solve both by adding three optic types to the wiring layer:
+                Optics (Paper &sect;3.3) address both by adding three base optics and a composition
+                combinator to the wiring layer:
             </p>
 
             <table>
@@ -686,17 +688,17 @@ for n in ["Source", "Near", "Mid", "Far"]:
                 <tr>
                     <td><code>LensOptic</code></td>
                     <td>Pass-through (always transmits)</td>
-                    <td>Constitutive expression&mdash;always active</td>
+                    <td>Constitutive expression (always active)</td>
                 </tr>
                 <tr>
                     <td><code>PrismOptic</code></td>
                     <td>Conditional routing by DataType</td>
-                    <td>Receptor specificity&mdash;only responds to matching ligand</td>
+                    <td>Receptor specificity (responds only to matching ligand)</td>
                 </tr>
                 <tr>
                     <td><code>TraversalOptic</code></td>
                     <td>Map transform over list elements</td>
-                    <td>Polymerase processivity&mdash;walks a sequence</td>
+                    <td>Polymerase processivity (walks a sequence)</td>
                 </tr>
                 <tr>
                     <td><code>ComposedOptic</code></td>
@@ -708,10 +710,9 @@ for n in ["Source", "Near", "Mid", "Far"]:
             <h3>3.1 Prism Routing</h3>
 
             <p>
-                The prism is the most interesting optic. It accepts a set of <code>DataType</code>
-                values and rejects everything else. When used with fan-out wiring&mdash;one output port
-                connected to multiple prism-filtered wires&mdash;data is routed to the correct
-                destination based on its runtime type:
+                <code>PrismOptic</code> accepts a set of <code>DataType</code> values and rejects
+                everything else. Paired with fan-out wiring (one output port feeding multiple
+                prism-filtered wires), it routes data to destinations based on runtime type:
             </p>
 
             <div class="diagram">
@@ -744,19 +745,19 @@ diagram.connect("Router", "out", "ErrorHandler", "in",
 
             <ol>
                 <li>
-                    <strong>Static type bypass</strong>&mdash;When a wire carries an optic,
-                    <code>require_flow_to</code> is skipped. The optic takes responsibility for
+                    <strong>Static type bypass:</strong> When a wire carries an optic,
+                    <code>require_flow_to</code> is skipped and the optic takes responsibility for
                     type correctness at runtime.
                 </li>
                 <li>
-                    <strong>Output coercion relaxation</strong>&mdash;When all outgoing wires from
+                    <strong>Output coercion relaxation:</strong> When all outgoing wires from
                     a port carry optics, the executor accepts <code>TypedValue</code> as-is without
                     enforcing DataType matching against the port spec.
                 </li>
                 <li>
-                    <strong>Prism-rejection skip</strong>&mdash;When a module&rsquo;s unfilled inputs
+                    <strong>Prism-rejection skip:</strong> When a module&rsquo;s unfilled inputs
                     all come from optic wires whose sources have already executed, the module is skipped
-                    with an empty <code>ModuleExecution</code> rather than causing a deadlock.
+                    with an empty <code>ModuleExecution</code> rather than deadlocking.
                 </li>
             </ol>
 
@@ -780,8 +781,8 @@ doubler.transmit(5, DataType.JSON, IntegrityLabel.VALIDATED)
 
             <p>
                 <code>ComposedOptic</code> chains optics sequentially: all must accept, and transforms
-                are applied left-to-right. Optics also coexist with <code>DenatureFilter</code>s
-                on the same wire&mdash;denaturation applies first, then the optic:
+                apply left-to-right. Optics also coexist with <code>DenatureFilter</code>s
+                on the same wire, with denaturation running before the optic:
             </p>
 
 <pre>
@@ -793,13 +794,12 @@ diagram.connect("A", "out", "B", "in",
 </pre>
 
             <div class="insight">
-                <p class="insight-title">Why Skip, Not Fallback?</p>
+                <p class="insight-title">Skipping on Prism Rejection</p>
                 <p>
-                    When a prism rejects data, the destination module is skipped entirely rather than
-                    receiving a default value. This mirrors biology: a receptor that doesn&rsquo;t bind
-                    its ligand doesn&rsquo;t activate the downstream pathway with a &ldquo;nothing bound&rdquo;
-                    signal. It simply doesn&rsquo;t activate. Skipping also avoids forcing every handler
-                    behind a prism to include <code>if input is None</code> boilerplate.
+                    When a prism rejects data, the destination module is skipped rather than given
+                    a default value. A receptor that fails to bind its ligand stays inactive without
+                    firing a &ldquo;nothing bound&rdquo; signal downstream, and skipping keeps
+                    handlers behind a prism free of <code>if input is None</code> boilerplate.
                 </p>
             </div>
 
@@ -852,23 +852,23 @@ diagram.connect("A", "out", "B", "in",
             <h2>6. What&rsquo;s Next</h2>
 
             <p>
-                With coalgebra, diffusion, and optics in place, the remaining paper gaps center on
-                higher-order composition and formal verification:
+                The remaining sections of the paper focus on higher-order composition and formal
+                verification:
             </p>
 
             <ul>
                 <li>
-                    <strong>Bisimulation-Based Testing</strong>&mdash;Use coalgebraic equivalence as
+                    <strong>Bisimulation-Based Testing:</strong> Use coalgebraic equivalence as
                     a regression test: if a refactored agent is bisimilar to the original over a
                     representative input suite, the refactor preserves behavior.
                 </li>
                 <li>
-                    <strong>Diffusion-Guided Orchestration</strong>&mdash;Replace the global
-                    <code>GradientOrchestrator</code> with diffusion-field-aware orchestration
-                    where each agent reads its local gradient, not the shared one.
+                    <strong>Diffusion-Guided Orchestration:</strong> Update
+                    <code>GradientOrchestrator</code> so each agent reads its local concentration
+                    from the diffusion field instead of a single shared gradient.
                 </li>
                 <li>
-                    <strong>Optic Composition in Tissue</strong>&mdash;Allow tissues to declare
+                    <strong>Optic Composition in Tissue:</strong> Allow tissues to declare
                     optic policies on their boundary ports, so inter-tissue wires automatically
                     carry the tissue&rsquo;s routing and transform constraints.
                 </li>

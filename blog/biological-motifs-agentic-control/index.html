@@ -311,20 +311,20 @@
             <div class="abstract">
                 <p class="abstract-title">Abstract</p>
                 <p>
-                    The transition of Large Language Models (LLMs) from passive generators to autonomous agents
-                    has introduced significant challenges in reliability, security, and state management. Current agentic
-                    architectures are often constructed ad-hoc, prone to "hallucination cascades," infinite loops, and
-                    prompt injection attacks. This paper proposes that these failure modes are not unique to software
-                    but are instances of universal control problems solved by biological systems over billions of years.
+                    Moving Large Language Models (LLMs) from passive text generation to autonomous execution
+                    introduces significant challenges in reliability, security, and state management. Current agentic
+                    architectures are often constructed ad hoc and remain prone to "hallucination cascades," infinite loops,
+                    and prompt injection attacks. This paper proposes that these failure modes are instances of general
+                    distributed control problems that biological systems have addressed structurally over billions of years.
                 </p>
                 <p>
                     We present a formal isomorphism, <em>at the level of their polynomial-interface models</em>, between Gene
                     Regulatory Networks (GRNs) and Agentic Software Systems using Applied Category Theory. We model
                     agents as Polynomial Functors within the category $\mathbf{Poly}$, and their interactions via the Operad
-                    of Wiring Diagrams. We derive a rigorous syntax for agent composition by mapping biological
-                    mechanisms&mdash;including Quorum Sensing for consensus, Chaperone Proteins for structural validation,
-                    and Endosymbiosis for neuro-symbolic integration&mdash;to software design patterns. This framework provides
-                    a mathematical basis for "Epigenetic" state management (RAG) and the topological defense against
+                    of Wiring Diagrams. From this construction, we derive a formal syntax for agent composition that maps
+                    biological mechanisms (Quorum Sensing for consensus, Chaperone Proteins for structural validation,
+                    and Endosymbiosis for neuro-symbolic integration) to software design patterns. This framework provides
+                    a mathematical basis for "Epigenetic" state management (RAG) and topological defenses against
                     adversarial "Prion" attacks.
                 </p>
             </div>
@@ -332,27 +332,27 @@
             <h2>1. Introduction</h2>
 
             <p>
-                The field of Artificial Intelligence is undergoing a paradigm shift from Generative AI (systems that
-                produce text based on static prompts) to Agentic AI (systems that execute multi-step workflows to
-                achieve autonomous goals). While the capabilities of individual Large Language Models (LLMs) have
-                scaled predictably, the engineering of systems of agents remains a fragile art. Developers struggle with
-                non-deterministic outputs, infinite loops, adversarial attacks, and the difficulty of maintaining global
-                coherence in distributed, stochastic systems.
+                Artificial Intelligence systems are increasingly moving from single-turn Generative AI (producing text
+                from static prompts) to Agentic AI (executing multi-step workflows to achieve autonomous goals). While
+                the capabilities of individual Large Language Models (LLMs) have scaled predictably, engineering reliable
+                systems of agents remains difficult and largely ad hoc. Developers contend with non-deterministic outputs,
+                infinite loops, adversarial inputs, and the problem of maintaining global coherence in distributed,
+                stochastic systems.
             </p>
 
             <p>
-                We argue that these challenges are not novel engineering problems, but fundamental constraints of
-                distributed information processing systems. The closest existing analogue to a multi-agent software
-                architecture is not a traditional computer program, but a Gene Regulatory Network (GRN). In a biological
-                cell, thousands of genes act as autonomous agents, reading local chemical signals (context) and expressing
-                proteins (actions/tools) that, in turn, regulate other genes.
+                We argue that these difficulties stem from fundamental constraints of distributed information processing
+                systems. A multi-agent software architecture has more in common with a Gene Regulatory Network (GRN) than
+                with a conventional deterministic program: inside a biological cell, thousands of genes act as autonomous
+                agents, reading local chemical signals (context) and expressing proteins (actions/tools) that, in turn,
+                regulate other genes.
             </p>
 
             <h3>1.1 The Biological Heuristic</h3>
 
             <p>
-                Biology has evolved specific topological structures, known as Network Motifs, to handle noise, security,
-                and state. We identify four critical biological heuristics that map directly to agentic engineering:
+                Biology relies on recurring topological structures, known as Network Motifs, to handle noise, security,
+                and state. Four biological motifs map directly to agentic software engineering:
             </p>
 
             <ul>
@@ -365,9 +365,9 @@
             <h3>1.2 The Categorical Bridge</h3>
 
             <p>
-                To move this observation from metaphor to discipline, we utilize Applied Category Theory. We define the
-                category of agents using the language of $\mathbf{Poly}$ (Polynomial Functors). An agent is not defined by its weights, but by its interface&mdash;a dynamical system consuming observations
-                and producing actions:
+                To turn this observation from metaphor into a formal framework, we use Applied Category Theory and define
+                the category of agents in $\mathbf{Poly}$ (Polynomial Functors). Rather than modeling internal weights,
+                we characterize an agent by its typed interface, a dynamical system consuming observations and producing actions:
             </p>
 
             <div class="equation">
@@ -386,8 +386,8 @@
             </ol>
 
             <p>
-                By viewing agentic engineering through the lens of theoretical biology and category theory, we aim to provide a
-                foundation for building robust software systems whose stability properties derive from their network topology.
+                By combining theoretical biology with category theory, we provide a mathematical foundation for building
+                reliable software systems whose stability properties derive from their network topology.
             </p>
 
             <h2>2. Related Work</h2>
@@ -401,11 +401,11 @@
             <h3>2.1 Network Motifs in Systems Biology</h3>
 
             <p>
-                The concept of "Network Motifs"&mdash;statistically over-represented sub-graphs in complex networks&mdash;was introduced
-                by Milo et al. Their work demonstrated that biological networks are not random but are composed of specific
-                building blocks selected for functional data processing. Alon further characterized the dynamical properties
-                of these motifs, identifying the Coherent Feed-Forward Loop (CFFL) as a persistence detector. We extend this by
-                mapping these motifs to the stochastic nature of Generative AI.
+                Milo et al. introduced "Network Motifs," statistically over-represented sub-graphs in complex networks,
+                showing that biological networks deviate sharply from random graphs and consist of recurring building blocks
+                selected for functional information processing. Alon further characterized the dynamical properties
+                of these motifs, identifying the Coherent Feed-Forward Loop (CFFL) as a persistence detector. We apply
+                these motifs to the stochastic setting of Generative AI.
             </p>
 
             <h3>2.2 Applied Category Theory (ACT)</h3>
@@ -420,18 +420,17 @@
             <h3>2.3 Reliability in Agentic AI</h3>
 
             <p>
-                Techniques such as "Chain of Thought" utilize iterative looping to improve output quality. However, these
-                methods operate primarily at the level of the prompt (the input signal) rather than the topology (the wiring).
-                By importing the concept of Autopoiesis, we propose a methodology where reliability is a property of the
-                network architecture itself.
+                Techniques such as "Chain of Thought" use iterative reasoning to improve output quality, operating primarily
+                at the level of the prompt (the input signal) rather than the topology (the wiring). Drawing on Autopoiesis,
+                we propose a methodology in which reliability is a structural property of the network architecture itself.
             </p>
 
             <h2>3. The Mapping: Biology &harr; Software</h2>
 
             <p>
                 To treat Agentic Systems and Gene Regulatory Networks (GRNs) as isomorphic <strong>at the level of their typed
-                interfaces</strong>, we must map them to a common mathematical object. We utilize the category $\mathbf{Poly}$, where
-                objects are polynomial functors representing interfaces, and morphisms represent interaction protocols.
+                interfaces</strong>, we must map them to a common mathematical object. We use the category $\mathbf{Poly}$, where
+                objects are polynomial functors representing interfaces and morphisms represent interaction protocols.
             </p>
 
             <h3>3.1 Preliminaries: The Category Poly</h3>
@@ -456,8 +455,8 @@
             </ul>
 
             <p>
-                This formalism captures the essence of a "stateful interface": the system outputs a value $o$ and then waits
-                for a specific type of input $i\in I_o$ before it can proceed.
+                This formalism directly models a "stateful interface": the system outputs a value $o$ and then accepts
+                only inputs $i\in I_o$ compatible with that position before transitioning.
             </p>
 
             <figure class="diagram">
@@ -468,7 +467,7 @@ flowchart TB
     O --> I2["i₂ ∈ Iₒ"]
     O --> I3["···"]
                 </pre>
-                <figcaption>The Interface P(y) — A Polynomial Functor visualized as a "Mushroom" or "Corolla". The system offers an Output (the cap) and exposes specific Input ports (the stalks) dependent on that output.</figcaption>
+                <figcaption>The Interface P(y): a Polynomial Functor visualized as a "Mushroom" or "Corolla". The system offers an Output (the cap) and exposes specific Input ports (the stalks) dependent on that output.</figcaption>
             </figure>
 
             <h3>3.2 The Isomorphism: Genes and Agents</h3>
@@ -501,9 +500,8 @@ flowchart TB
             <h3>3.3 The Interface: Promoters as Lenses</h3>
 
             <p>
-                In biology, a gene is not universally accessible. It is guarded by a Promoter Region&mdash;a specific DNA sequence
-                that only binds to compatible Transcription Factors. In software, an agent is guarded by an API Schema or
-                Context Window definition.
+                In biology, a gene is guarded by a Promoter Region, a specific DNA sequence that binds only compatible
+                Transcription Factors. In software, an agent is guarded by an API Schema or Context Window definition.
             </p>
 
             <p>
@@ -530,7 +528,7 @@ flowchart TB
 
             <h3>3.4 Epigenetics and State: The Coalgebra</h3>
 
-            <p>Neither genes nor agents are stateless functions. They possess memory.</p>
+            <p>Neither genes nor agents are stateless functions: both maintain internal memory.</p>
 
             <ul>
                 <li><strong>Biology:</strong> Epigenetic markers (Methylation, Histone modification) alter how a gene responds to signals without changing the DNA code.</li>
@@ -773,7 +771,7 @@ flowchart TB
             <div class="equation">$$Tr(A)$$</div>
             <ul>
                 <li><strong>Biological Analogy:</strong> Autoregulation (Homeostasis) or Positive Feedback.</li>
-                <li><strong>Software Implication:</strong> This is the topological definition of Agency. A "stateless" LLM is a simple morphism. An "Agent" is a morphism wrapped in a Trace operation.</li>
+                <li><strong>Software Implication:</strong> This gives a topological definition of Agency: a "stateless" LLM is a simple morphism, whereas an "Agent" is a morphism wrapped in a Trace operation.</li>
             </ul>
 
             <h3>4.3 Theorem: Topological Error Suppression</h3>
@@ -833,7 +831,7 @@ flowchart LR
             <h4>Network Motif 4 (Biological Oscillator)</h4>
             <p>A topology that generates periodic behavior through delayed negative feedback. A node $A$ activates node $B$, which after a delay inhibits $A$, creating a self-sustaining cycle.</p>
             <ul>
-                <li><strong>Biological Function:</strong> Oscillators underlie fundamental biological rhythms&mdash;the circadian clock, the cell cycle oscillator (Cyclin-CDK), and the heartbeat.</li>
+                <li><strong>Biological Function:</strong> Oscillators underlie fundamental biological rhythms: the circadian clock, the cell cycle oscillator (Cyclin-CDK), and the heartbeat.</li>
                 <li><strong>Agentic Isomorphism:</strong>
                     <ul>
                         <li><strong>Heartbeat Oscillator</strong> &rarr; Health checks that verify system liveness</li>
@@ -849,9 +847,9 @@ flowchart LR
             <h2>5. Failure Modes &amp; Pathology</h2>
 
             <p>
-                A key insight of Systems Biology is that diseases are often not caused by the complete failure of a single
-                component, but by the dysregulation of network dynamics. Similarly, catastrophic failures in agentic systems often arise from
-                functional agents interacting in topologically pathological ways.
+                In Systems Biology, disease frequently stems from dysregulated network dynamics rather than the complete
+                failure of a single component. Similarly, catastrophic failures in agentic systems often arise when
+                individually functional agents interact through topologically pathological wiring.
             </p>
 
             <div class="reference-impl">
@@ -907,12 +905,12 @@ flowchart LR
             <h3>6.1 RAG as Digital Methylation</h3>
 
             <p>
-                In Agentic Systems, the Large Language Model (LLM) weights act as the DNA&mdash;a static, pre-trained substrate of
-                potentiality. To create specialized agents, we do not typically retrain the model (mutation); instead, we use
+                In Agentic Systems, the Large Language Model (LLM) weights act as the DNA, a static, pre-trained substrate.
+                To create specialized agents, we do not typically retrain the model (mutation); instead, we use
                 Retrieval Augmented Generation (RAG) and System Prompts.
             </p>
 
-            <p>We define this formally as Phenotypic Plasticity. The output of an agent is not solely a function of its weights ($W$) and the user query ($Q$), but of its epigenetic state ($E$):</p>
+            <p>We define this formally as Phenotypic Plasticity: the output of an agent depends on its weights ($W$), the user query ($Q$), and its epigenetic state ($E$):</p>
 
             <div class="equation">
                 $$O_{\text{agent}} = f(W, E, Q)$$
@@ -927,8 +925,8 @@ flowchart LR
             <h3>6.2 Horizontal Gene Transfer: Dynamic Tool Loading</h3>
 
             <p>
-                Standard evolution relies on vertical inheritance (Pre-training). However, bacteria utilize Horizontal Gene
-                Transfer (HGT) to acquire new capabilities (Plasmids) from the environment in real-time.
+                Standard evolution relies on vertical inheritance (Pre-training). Bacteria, however, also use Horizontal Gene
+                Transfer (HGT) to acquire new capabilities (Plasmids) from the environment in real time.
             </p>
 
             <p>In Agentic Systems, we map Plasmids to Tool Schemas:</p>
@@ -938,7 +936,7 @@ flowchart LR
             </div>
 
             <p>
-                By dynamically retrieving a tool definition and injecting it into the Context Window, the agent undergoes a topological transformation, acquiring a new input/output modality instantly. This suggests that robust agentic architectures should support a "Plasmid Registry"&mdash;a marketplace of ephemeral tools.
+                By dynamically retrieving a tool definition and injecting it into the Context Window, the agent undergoes a topological transformation and acquires a new input/output modality on the fly. Modular agentic architectures can therefore support a "Plasmid Registry": a directory of ephemeral tools loaded on demand.
             </p>
 
             <h3>6.3 The Cost of State: The Metabolic Bound</h3>
@@ -966,7 +964,7 @@ flowchart LR
 
             <p>
                 In Agentic AI, this maps to the integration of Connectionist (Neural) and Symbolic (Code) subsystems. An LLM acts
-                as the host organism&mdash;capable of planning and semantic reasoning but energetically inefficient at arithmetic and
+                as the host organism, capable of planning and semantic reasoning yet inefficient at exact arithmetic and
                 logic. By "engulfing" a deterministic runtime, the agent delegates high-precision tasks to the symbolic organelle:
             </p>
 
@@ -979,28 +977,28 @@ flowchart LR
             <h2>7. Conclusion</h2>
 
             <p>
-                The transition from "Prompt Engineering" to "Agentic Engineering" requires moving beyond component-level
-                optimization toward principled architectural design. Current methodologies often lack the formal foundations
-                needed to guarantee system-level properties like termination and error suppression.
+                Moving from "Prompt Engineering" to "Agentic Engineering" requires architectural formalisms beyond
+                component-level optimization. Current methodologies often lack the formal foundations needed to guarantee
+                system-level properties such as termination and error suppression.
             </p>
 
             <p>
-                In this paper, we have demonstrated that Gene Regulatory Networks (GRNs) provide a proven architectural blueprint
-                for distributed, stochastic information processing. By formalizing this analogy through Applied Category Theory,
-                we have derived a suite of robust design patterns:
+                In this paper, we have shown that Gene Regulatory Networks (GRNs) offer a well-studied architectural
+                template for distributed, stochastic information processing. Formalizing this correspondence through
+                Applied Category Theory yields four classes of design patterns:
             </p>
 
             <ol>
-                <li><strong>Robustness:</strong> The use of Quorum Sensing and CFFL topologies to filter stochastic noise.</li>
-                <li><strong>Validity:</strong> The use of Chaperone Proteins to enforce structural determinism on probabilistic outputs.</li>
-                <li><strong>Security:</strong> The identification of Prion-like prompt injections and the topological defenses required to stop them.</li>
-                <li><strong>Evolution:</strong> The mapping of Horizontal Gene Transfer to dynamic tool loading and Endosymbiosis to neuro-symbolic integration.</li>
+                <li><strong>Noise Filtering:</strong> Quorum Sensing and CFFL topologies for suppressing stochastic noise.</li>
+                <li><strong>Validity:</strong> Chaperone Proteins for enforcing structural constraints on probabilistic outputs.</li>
+                <li><strong>Security:</strong> Topological defenses and denaturation layers against Prion-like prompt injections.</li>
+                <li><strong>Extensibility:</strong> Horizontal Gene Transfer for dynamic tool loading and Endosymbiosis for neuro-symbolic integration.</li>
             </ol>
 
             <p>
-                We conclude that biomimetic topology offers a promising direction for reliable AI agents. The control structures
-                that emerged in biological systems&mdash;from metabolic constraints to symbiotic integration&mdash;address the same
-                fundamental challenges of distributed, stochastic information processing that agentic architectures face today.
+                Biomimetic topology offers a concrete direction for building more reliable AI agents. Control structures
+                evolved in biology, from metabolic constraints to endosymbiotic integration, address the same fundamental
+                challenges of distributed, stochastic information processing that agentic architectures face today.
             </p>
 
         </article>
