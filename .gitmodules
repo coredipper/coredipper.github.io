@@ -6,3 +6,7 @@
 	path = 60
 	url = https://github.com/coredipper/hexecontahedron.git
 	branch = main
+[submodule "75"]
+	path = 75
+	url = https://github.com/coredipper/polyhedron-compound.git
+	branch = main
